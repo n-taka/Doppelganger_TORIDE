@@ -1,0 +1,11 @@
+{
+    "name": "doppelganger-plugin-core",
+    "version-string": "2021.10",
+    "description": "Set of plugins for Doppelganger",
+    "homepage": "https://github.com/n-taka/Doppelganger_Plugin_Core",
+    "dependencies": [
+        "boost",
+        "nlohmann-json",
+        "eigen3"
+    ]
+}
