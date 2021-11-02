@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 3.15)
 ##############################################
 ### project
 ##############################################
-project(loadPolygonMesh
+project(repairMesh
     VERSION 2.0.0
-    DESCRIPTION "Set of plugins for Doppelganger"
+    DESCRIPTION "Repair single mesh"
     HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_Plugin_Core"
     LANGUAGES CXX
 )
@@ -15,15 +15,13 @@ project(loadPolygonMesh
 ### dependencies
 ##############################################
 # Boost
-if (APPLE)
+if (WIN32)
     find_package(Boost REQUIRED COMPONENTS random)
 elseif (APPLE)
     find_package(Boost REQUIRED COMPONENTS random filesystem)
 endif ()
 # json
 find_package(nlohmann_json CONFIG REQUIRED)
-# eigen3
-find_package(Eigen3 CONFIG REQUIRED)
 
 
 ##############################################
@@ -38,7 +36,7 @@ add_library(${PROJECT_NAME} MODULE)
 target_sources(
     ${PROJECT_NAME} PRIVATE
     ${PROJECT_NAME}.cpp
-    "../submodule/Doppelganger/submodule/libigl/include/igl/tinyply.cpp"
+    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/submodule/libigl/include/igl/tinyply.cpp
 )
 
 
@@ -46,9 +44,8 @@ target_sources(
 ### include directories
 ##############################################
 target_include_directories(${PROJECT_NAME} PUBLIC
-    ${EIGEN3_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../submodule/Doppelganger/submodule/libigl/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../submodule/Doppelganger/Doppelganger_install/include
+    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/submodule/libigl/include
+    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/Doppelganger_install/include
 )
 
 
@@ -62,8 +59,7 @@ if(WIN32)
         ${Boost_LIBRARIES}
         nlohmann_json
         nlohmann_json::nlohmann_json
-        Eigen3::Eigen
-        ${CMAKE_CURRENT_SOURCE_DIR}/../submodule/Doppelganger/Doppelganger_install/lib/Doppelganger.lib
+        ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/Doppelganger_install/lib/Doppelganger.lib
         bcrypt.lib
     )
 elseif (APPLE)
@@ -72,8 +68,7 @@ elseif (APPLE)
         ${Boost_LIBRARIES}
         nlohmann_json
         nlohmann_json::nlohmann_json
-        Eigen3::Eigen
-        # ${CMAKE_CURRENT_SOURCE_DIR}/../submodule/Doppelganger/Doppelganger_install/lib/Doppelganger.lib
+        # ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/Doppelganger_install/lib/Doppelganger.lib
     )
 endif ()
 
@@ -98,25 +93,28 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC _USE_MATH_DEFINES)
 ### resources
 ##############################################
 # directory
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_SOURCE_DIR}/../bin/${PROJECT_NAME}")
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}")
 # dll
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${PROJECT_NAME}>" "${CMAKE_CURRENT_SOURCE_DIR}/../bin/${PROJECT_NAME}/")
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${PROJECT_NAME}>" "${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}/")
 # module.js
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/module.js")
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/module.js" "${CMAKE_CURRENT_SOURCE_DIR}/../bin/${PROJECT_NAME}/")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/module.js" "${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}/")
 endif()
+# MeshFix
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/MeshFix" "${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}/")
+# MeshFix.exe
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/MeshFix.exe" "${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}/")
 
 # create zip archive
 # https://stackoverflow.com/questions/44796465/cmake-zip-folder-but-remove-leading-path
 add_custom_command(
     TARGET ${PROJECT_NAME}
     POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E tar "cfv" "${CMAKE_CURRENT_SOURCE_DIR}/../bin/${PROJECT_NAME}.zip" --format=zip -- .
-    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../bin/${PROJECT_NAME}/")
+    COMMAND ${CMAKE_COMMAND} -E tar "cfv" "${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}.zip" --format=zip -- .
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}/")
 
 # erase temporal directory
 add_custom_command(
     TARGET ${PROJECT_NAME}
     POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E rm "-r" "${CMAKE_CURRENT_SOURCE_DIR}/../bin/${PROJECT_NAME}")
-
+    COMMAND ${CMAKE_COMMAND} -E rm "-r" "${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}")
