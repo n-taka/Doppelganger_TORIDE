@@ -82,6 +82,7 @@ add_subdirectory(plugins/TORIDE/loadCADData)
 add_subdirectory(plugins/TORIDE/splitIntoIslands)
 add_subdirectory(plugins/TORIDE/hollowMesh)
 add_subdirectory(plugins/TORIDE/repairMesh)
+add_subdirectory(plugins/TORIDE/estimateThickness)
 ### summary
 # no entry
 ### bottom menu (left)
