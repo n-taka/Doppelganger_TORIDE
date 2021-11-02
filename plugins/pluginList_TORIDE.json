@@ -1,0 +1,74 @@
+{
+    "loadCADData": {
+        "description": {
+            "en": "Load CAD data (iges, step)",
+            "ja": "CADデータを読み込みます(iges, step)"
+        },
+        "optional": true,
+        "UIPosition": "topLeft",
+        "latest": "2.0.0",
+        "versions": {
+            "2.0.0": "https://n-taka.info/nextcloud/s/ppySJSxotgcpPxx/download/loadCADData.zip"
+        }
+    },
+    "splitIntoIslands": {
+        "description": {
+            "en": "Split a mesh into connected components",
+            "ja": "メッシュをアイランド単位に分離します"
+        },
+        "optional": true,
+        "UIPosition": "mesh",
+        "latest": "2.0.0",
+        "versions": {
+            "2.0.0": "https://n-taka.info/nextcloud/s/X7JJK7iccJccD49/download/splitIntoIslands.zip"
+        }
+    },
+    "hollowMesh": {
+        "description": {
+            "en": "Hollow single mesh",
+            "ja": "メッシュを中空にします"
+        },
+        "optional": true,
+        "UIPosition": "mesh",
+        "latest": "2.0.0",
+        "versions": {
+            "2.0.0": "https://n-taka.info/nextcloud/s/Frp7ZJTBRqPiT6t/download/hollowMesh.zip"
+        }
+    },
+    "repairMesh": {
+        "description": {
+            "en": "Repair single mesh",
+            "ja": "単一のメッシュのエラーを修正します"
+        },
+        "optional": true,
+        "UIPosition": "mesh",
+        "latest": "2.0.0.MeshFix",
+        "versions": {
+            "2.0.0.MeshFix": "https://n-taka.info/nextcloud/s/zgZX9mQX4d94dnK/download/repairMesh.zip"
+        }
+    },
+    "estimateThickness": {
+        "description": {
+            "en": "Estimate thickness",
+            "ja": "厚みをチェックします"
+        },
+        "optional": true,
+        "UIPosition": "mesh",
+        "latest": "2.0.0",
+        "versions": {
+            "2.0.0": "https://n-taka.info/nextcloud/s/ZqyqEFsoiTsYo3g/download/estimateThickness.zip"
+        }
+    },
+    "repairAllMeshes": {
+        "description": {
+            "en": "Repair all meshes",
+            "ja": "すべてのメッシュのエラーを修正します"
+        },
+        "optional": true,
+        "UIPosition": "bottomLeft",
+        "latest": "2.0.0.MeshFix",
+        "versions": {
+            "2.0.0.MeshFix": "https://n-taka.info/nextcloud/s/QminEDQJfZ4KZ4m/download/repairAllMeshes.zip"
+        }
+    }
+}
