@@ -10,7 +10,7 @@ const generateUI = function () {
         noUiSlider.create(UI.sliderDiv, {
             start: [0, 100],
             connect: [false, true, false],
-            step: 1,
+            step: 0.1,
             direction: 'rtl',
             tooltips: false,
             orientation: 'vertical',
@@ -20,10 +20,7 @@ const generateUI = function () {
             }
         });
         UI.sliderDiv.noUiSlider.on('update', function () {
-            const sliderValue = UI.sliderDiv.noUiSlider.get();
-            const clippingNear = (parseFloat(sliderValue[0]) - 50.0) / 50.0;
-            const clippingFar = (parseFloat(sliderValue[1]) - 50.0) / 50.0;
-            Canvas.resetCamera(false, clippingNear, clippingFar);
+            Canvas.resetCamera(false);
         });
         UI.sliderDiv.noUiSlider.on('end', function () {
             document.body.style.cursor = "url(../icon/cursorIcon" + MouseKey.iconIdx + ".png) 16 16 , default"
