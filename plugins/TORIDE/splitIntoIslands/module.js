@@ -16,26 +16,46 @@ const generateUI = async function () {
             // for element, we cannot use getElementById ...
             const pButtons = liRoot.querySelector("#buttons_" + json["UUID"]);
             {
-                const a = document.createElement("a");
-                a.setAttribute("class", "tooltipped");
-                a.setAttribute("data-position", "top");
-                a.setAttribute("data-tooltip", getText(text, "Split into islands"));
-                a.addEventListener('click', function (e) {
-                    const parameters = {};
-                    parameters["meshes"] = [json["UUID"]];
-                    request("splitIntoIslands", parameters);
-                    // don't fire click event on the parent (e.g. outlineOnClick)
-                    e.stopPropagation();
+                const parametersForIslandCount = {};
+                parametersForIslandCount["meshes"] = [json["UUID"]];
+                parametersForIslandCount["dryRun"] = true;
+
+                return request("splitIntoIslands", parametersForIslandCount).then((response) => {
+                    const responseJson = JSON.parse(response);
+                    const islandCount = responseJson["meshes"][json["UUID"]]["islandCount"];
+
+                    const a = document.createElement("a");
+                    a.setAttribute("class", "tooltipped");
+                    a.setAttribute("data-position", "top");
+                    a.setAttribute("data-tooltip", getText(text, "Split into islands"));
+                    if (islandCount > 1) {
+                        a.addEventListener('click', function (e) {
+                            const parameters = {};
+                            parameters["meshes"] = [json["UUID"]];
+                            parameters["dryRun"] = false;
+                            request("splitIntoIslands", parameters);
+                            // don't fire click event on the parent (e.g. outlineOnClick)
+                            e.stopPropagation();
+                        });
+                    } else {
+                        a.setAttribute("style", "pointer-events: none;");
+                    }
+                    const instance = M.Tooltip.init(a, {});
+
+                    {
+                        const i = document.createElement("i");
+                        i.innerText = "widgets";
+                        if (islandCount > 1) {
+                            i.setAttribute("class", "material-icons orange-text text-lighten-2");
+                        } else {
+                            i.setAttribute("class", "material-icons blue-grey-text text-lighten-2");
+                        }
+
+                        a.appendChild(i);
+                    }
+                    pButtons.appendChild(a);
+
                 });
-                const instance = M.Tooltip.init(a, {});
-                
-                {
-                    const i = document.createElement("i");
-                    i.setAttribute("class", "material-icons teal-text text-lighten-2");
-                    i.innerText = "widgets";
-                    a.appendChild(i);
-                }
-                pButtons.appendChild(a);
             }
         }
     );
