@@ -18,6 +18,7 @@ const generateUI = async function () {
                 const responseJson = JSON.parse(response);
                 const withoutError = responseJson["meshes"][json["UUID"]]["closed"] && responseJson["meshes"][json["UUID"]]["edgeManifold"] && responseJson["meshes"][json["UUID"]]["vertexManifold"];
                 iIcon.setAttribute("class", (withoutError ? "material-icons teal-text text-lighten-2 circle" : "material-icons orange-text text-lighten-2 circle"));
+                iIcon.setAttribute("style", "font-size: 36px; background: rgba(255, 255, 255, 1);");
                 iIcon.innerText = (withoutError ? "check_circle" : "warning");
             });
         }
