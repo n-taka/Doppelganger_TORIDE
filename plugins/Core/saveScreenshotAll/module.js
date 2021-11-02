@@ -54,8 +54,8 @@ const generateUI = async function () {
                                         if (Canvas.UUIDToMesh[meshUUID].visible) {
                                             meshUUIDToBeRendered.push(meshUUID);
                                         }
-                                        saveScreenshot(meshUUIDToBeRendered, "jpeg");
                                     }
+                                    saveScreenshot(meshUUIDToBeRendered, "jpeg");
                                 }
                             });
                             jpegDiv.appendChild(jpegBtn);
@@ -72,7 +72,7 @@ const generateUI = async function () {
                                 if (document.getElementById('savePerMesh').checked) {
                                     // save a screenshot per mesh
                                     for (let meshUUID of Object.keys(Canvas.UUIDToMesh)) {
-                                        saveScreenshot([meshUUID], "jpeg");
+                                        saveScreenshot([meshUUID], "png");
                                     }
                                 } else {
                                     // save the current view as-is
@@ -81,8 +81,8 @@ const generateUI = async function () {
                                         if (Canvas.UUIDToMesh[meshUUID].visible) {
                                             meshUUIDToBeRendered.push(meshUUID);
                                         }
-                                        saveScreenshot(meshUUIDToBeRendered, "jpeg");
                                     }
+                                    saveScreenshot(meshUUIDToBeRendered, "png");
                                 }
                             });
                             pngDiv.appendChild(pngBtn);
@@ -233,7 +233,8 @@ const saveScreenshot = function (visibleMeshUUIDArray, format) {
                 }
             }
         };
-        request("saveScreenshot", json).then((response) => {
+        console.log(json);
+        request("saveScreenshotAll", json).then((response) => {
             const responseJson = JSON.parse(response);
             if ("screenshots" in responseJson) {
                 for (let screenshotJson of responseJson["screenshots"]) {
