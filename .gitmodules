@@ -1,0 +1,3 @@
+[submodule "submodule/Doppelganger"]
+	path = submodule/Doppelganger
+	url = https://github.com/n-taka/Doppelganger.git
