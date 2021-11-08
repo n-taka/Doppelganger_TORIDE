@@ -96,12 +96,12 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 			{
 				const fs::path pluginsDir(room->core->config.at("plugin").at("dir").get<std::string>());
 				fs::path pluginDir(pluginsDir);
-				std::string dirName("repairMesh");
+				std::string dirName("repairAllMeshes");
 				dirName += "_";
-				std::string installedVersion(room->core->plugin.at("repairMesh")->installedVersion);
+				std::string installedVersion(room->core->plugin.at("repairAllMeshes")->installedVersion);
 				if (installedVersion == "latest")
 				{
-					installedVersion = room->core->plugin.at("repairMesh")->parameters.at("latest").get<std::string>();
+					installedVersion = room->core->plugin.at("repairAllMeshes")->parameters.at("versions").at(0).at("version").get<std::string>();
 				}
 				dirName += installedVersion;
 				pluginDir.append(dirName);
