@@ -191,7 +191,12 @@ const generateUI = async function () {
                         {
                             const spanCurrent = document.createElement("span");
                             spanCurrent.setAttribute("class", "center-align truncate");
-                            spanCurrent.innerText = plugin["installedVersion"];
+                            if (plugin["installedVersion"] == "latest") {
+                                spanCurrent.innerText = (plugin["installedVersion"] + " (" + plugin["versions"][0]["version"] + ")");
+
+                            } else {
+                                spanCurrent.innerText = plugin["installedVersion"];
+                            }
                             tdCurrent.appendChild(spanCurrent);
                         }
                         tr.appendChild(tdCurrent);
@@ -199,23 +204,42 @@ const generateUI = async function () {
                     {
                         const tdVersion = document.createElement("td");
 
-                        // we add special entry "uninstall" or "Don't install" if we already installed this plugin
-                        if (plugin["optional"]) {
-                            plugin["versions"].push("");
-                        }
                         {
                             const select = document.createElement('select');
                             select.setAttribute("data-plugin-name", plugin["name"]);
 
-                            for (let version of plugin["versions"]) {
+                            // we add special entry "latest"
+                            {
                                 const option = document.createElement('option');
-                                option.setAttribute('value', version);
-                                if ((plugin["installedVersion"].length > 0) ? (version == plugin["installedVersion"]) : (version == "")) {
+                                option.setAttribute('value', "latest");
+                                if (plugin["installedVersion"] == "latest") {
                                     option.setAttribute('selected', "");
                                 }
-                                option.innerText = ((version == "") ? getText(text, ((plugin["installedVersion"].length > 0) ? "Uninstall" : "Don't install")) : version);
+                                option.innerText = "latest" + " (" + plugin["versions"][0]["version"] + ")";
                                 select.appendChild(option);
                             }
+
+                            for (let versionEntry of plugin["versions"]) {
+                                const option = document.createElement('option');
+                                option.setAttribute('value', versionEntry["version"]);
+                                if (versionEntry["version"] == plugin["installedVersion"]) {
+                                    option.setAttribute('selected', "");
+                                }
+                                option.innerText = versionEntry["version"];
+                                select.appendChild(option);
+                            }
+
+                            // we add special entry "uninstall" or "Don't install"
+                            if (plugin["optional"]) {
+                                const option = document.createElement('option');
+                                option.setAttribute('value', "");
+                                if (plugin["installedVersion"] == "") {
+                                    option.setAttribute('selected', "");
+                                }
+                                option.innerText = getText(text, ((plugin["installedVersion"].length > 0) ? "Uninstall" : "Don't install"));
+                                select.appendChild(option);
+                            }
+
                             tdVersion.appendChild(select);
                         }
                         tr.appendChild(tdVersion);

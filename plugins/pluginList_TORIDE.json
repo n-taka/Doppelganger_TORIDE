@@ -6,10 +6,12 @@
         },
         "optional": true,
         "UIPosition": "topLeft",
-        "latest": "2.0.0",
-        "versions": {
-            "2.0.0": "https://n-taka.info/nextcloud/s/ppySJSxotgcpPxx/download/loadCADData.zip"
-        }
+        "versions": [
+            {
+                "version": "2.0.0",
+                "URL": "https://n-taka.info/nextcloud/s/ppySJSxotgcpPxx/download/loadCADData.zip"
+            }
+        ]
     },
     "splitIntoIslands": {
         "description": {
@@ -18,10 +20,12 @@
         },
         "optional": true,
         "UIPosition": "mesh",
-        "latest": "2.0.0",
-        "versions": {
-            "2.0.0": "https://n-taka.info/nextcloud/s/X7JJK7iccJccD49/download/splitIntoIslands.zip"
-        }
+        "versions": [
+            {
+                "version": "2.0.0",
+                "URL": "https://n-taka.info/nextcloud/s/X7JJK7iccJccD49/download/splitIntoIslands.zip"
+            }
+        ]
     },
     "hollowMesh": {
         "description": {
@@ -30,10 +34,12 @@
         },
         "optional": true,
         "UIPosition": "mesh",
-        "latest": "2.0.0",
-        "versions": {
-            "2.0.0": "https://n-taka.info/nextcloud/s/Frp7ZJTBRqPiT6t/download/hollowMesh.zip"
-        }
+        "versions": [
+            {
+                "version": "2.0.0",
+                "URL": "https://n-taka.info/nextcloud/s/Frp7ZJTBRqPiT6t/download/hollowMesh.zip"
+            }
+        ]
     },
     "repairMesh": {
         "description": {
@@ -42,10 +48,12 @@
         },
         "optional": true,
         "UIPosition": "mesh",
-        "latest": "2.0.0.MeshFix",
-        "versions": {
-            "2.0.0.MeshFix": "https://n-taka.info/nextcloud/s/zgZX9mQX4d94dnK/download/repairMesh.zip"
-        }
+        "versions": [
+            {
+                "version": "2.0.0.MeshFix",
+                "URL": "https://n-taka.info/nextcloud/s/zgZX9mQX4d94dnK/download/repairMesh.zip"
+            }
+        ]
     },
     "estimateThickness": {
         "description": {
@@ -54,10 +62,12 @@
         },
         "optional": true,
         "UIPosition": "mesh",
-        "latest": "2.0.0",
-        "versions": {
-            "2.0.0": "https://n-taka.info/nextcloud/s/ZqyqEFsoiTsYo3g/download/estimateThickness.zip"
-        }
+        "versions": [
+            {
+                "version": "2.0.0",
+                "URL": "https://n-taka.info/nextcloud/s/ZqyqEFsoiTsYo3g/download/estimateThickness.zip"
+            }
+        ]
     },
     "repairAllMeshes": {
         "description": {
@@ -66,9 +76,11 @@
         },
         "optional": true,
         "UIPosition": "bottomLeft",
-        "latest": "2.0.0.MeshFix",
-        "versions": {
-            "2.0.0.MeshFix": "https://n-taka.info/nextcloud/s/QminEDQJfZ4KZ4m/download/repairAllMeshes.zip"
-        }
+        "versions": [
+            {
+                "version": "2.0.0.MeshFix",
+                "URL": "https://n-taka.info/nextcloud/s/QminEDQJfZ4KZ4m/download/repairAllMeshes.zip"
+            }
+        ]
     }
 }

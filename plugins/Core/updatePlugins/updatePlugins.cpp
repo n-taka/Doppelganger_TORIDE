@@ -59,22 +59,30 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 			if (version.size() > 0)
 			{
 				const nlohmann::json &pluginParameters = plugin->parameters;
-				std::string versionToBeInstall = version;
-				if (version == "latest")
+				const std::string actualVersion((version == "latest") ? pluginParameters.at("versions").at(0).at("version").get<std::string>() : version);
+
+				bool versionFound = false;
+				for (const auto &versionEntry : pluginParameters.at("versions"))
 				{
-					versionToBeInstall = pluginParameters.at("latest").get<std::string>();
+					const std::string &pluginVersion = versionEntry.at("version").get<std::string>();
+					if (pluginVersion == actualVersion)
+					{
+						installedArray.push_back(entry);
+						versionFound = true;
+						break;
+					}
 				}
-				if (pluginParameters.at("versions").contains(versionToBeInstall))
-				{
-					installedArray.push_back(entry);
-				}
-				else
+				if (!versionFound)
 				{
 					std::stringstream ss;
 					ss << "Plugin \"";
 					ss << name;
 					ss << "\" invalid version \"";
-					ss << version;
+					if (version == "latest")
+					{
+						ss << "latest, ";
+					}
+					ss << actualVersion;
 					ss << "\" is specified.";
 					room->core->logger.log(ss.str(), "ERROR");
 				}
