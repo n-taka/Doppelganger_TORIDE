@@ -101,20 +101,24 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/module.js")
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/module.js" "${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}/")
 endif()
 # MeshFix
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/MeshFix" "${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}/")
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/MeshFix")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/MeshFix" "${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}/")
+endif()
 # MeshFix.exe
-# add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/MeshFix.exe" "${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}/")
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/MeshFix.exe")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/MeshFix.exe" "${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}/")
+endif()
 
 # create zip archive
 # https://stackoverflow.com/questions/44796465/cmake-zip-folder-but-remove-leading-path
 add_custom_command(
     TARGET ${PROJECT_NAME}
     POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E tar "cfv" "${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}.zip" --format=zip -- .
+    COMMAND ${CMAKE_COMMAND} -E tar "cf" "${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}.zip" --format=zip -- .
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}/")
 
 # erase temporal directory
-add_custom_command(
-    TARGET ${PROJECT_NAME}
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E rm "-r" "${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}")
+# add_custom_command(
+#     TARGET ${PROJECT_NAME}
+#     POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E rm "-r" "${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}")
