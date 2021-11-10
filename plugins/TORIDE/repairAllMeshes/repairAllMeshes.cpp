@@ -158,13 +158,17 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 				igl::writePLY(fileNameIn.string(), componentMesh.V.template cast<float>(), componentMesh.F);
 
 				std::stringstream cmd;
+#if defined(_WIN32) || defined(_WIN64)
 				cmd << "\"";
+#endif
 				cmd << meshFix;
 				cmd << " ";
 				cmd << fileNameIn;
 				cmd << " ";
 				cmd << fileNameOut;
+#if defined(_WIN32) || defined(_WIN64)
 				cmd << "\"";
+#endif
 				room->logger.log(cmd.str(), "APICALL");
 				system(cmd.str().c_str());
 
