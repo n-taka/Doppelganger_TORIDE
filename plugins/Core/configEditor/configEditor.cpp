@@ -103,7 +103,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 		std::lock_guard<std::mutex> lock(room->core->systemParams.mutex);
 		fs::path configPath(room->core->systemParams.workingDir);
 		configPath.append("config.json");
-		std::ofstream ofs(configPath);
+		std::ofstream ofs(configPath.string());
 		ofs << response.dump(4);
 		ofs.close();
 	}

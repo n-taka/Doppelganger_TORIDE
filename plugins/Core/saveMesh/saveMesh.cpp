@@ -194,7 +194,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 						{
 							// we explicitly append header if the mesh has valid texture
 							std::vector<unsigned char> byteMesh;
-							std::ifstream ifs(meshFilePath, std::ios::in | std::ios::binary);
+							std::ifstream ifs(meshFilePath.string(), std::ios::in | std::ios::binary);
 							ifs.seekg(0, ifs.end);
 							unsigned int length = static_cast<int>(ifs.tellg());
 							std::stringstream objTexHeader;
@@ -213,7 +213,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 							ifs.read(reinterpret_cast<char *>(&byteMesh[0] + objTexHeader.str().length()), length);
 							ifs.close();
 
-							std::ofstream ofs(meshFilePath, std::ios::out | std::ios::binary);
+							std::ofstream ofs(meshFilePath.string(), std::ios::out | std::ios::binary);
 							ofs.write(reinterpret_cast<char *>(&byteMesh[0]), byteMesh.size());
 							ofs.close();
 						}
@@ -223,7 +223,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 							std::string mtl("newmtl material0\nKa 1.000000 1.000000 1.000000\nKd 1.000000 1.000000 1.000000\nKs 0.000000 0.000000 0.000000\nTr 1.000000\nillum 1\nNs 0.000000\nmap_Kd ");
 							mtl += textureFilePath.filename().string();
 							mtl += "\n";
-							std::ofstream ofsMtl(mtlFilePath, std::ios::out | std::ios::binary);
+							std::ofstream ofsMtl(mtlFilePath.string(), std::ios::out | std::ios::binary);
 							ofsMtl.write(mtl.c_str(), mtl.size());
 							ofsMtl.close();
 						}
@@ -304,7 +304,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 				{
 					if (fs::exists(path))
 					{
-						std::ifstream ifs(path, std::ios::in | std::ios::binary);
+						std::ifstream ifs(path.string(), std::ios::in | std::ios::binary);
 						ifs.seekg(0, ifs.end);
 						const unsigned int length = static_cast<unsigned int>(ifs.tellg());
 						bytes.resize(length);

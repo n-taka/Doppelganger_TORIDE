@@ -15,7 +15,11 @@ project(splitIntoIslands
 ### dependencies
 ##############################################
 # Boost
-find_package(Boost REQUIRED COMPONENTS random)
+if (WIN32)
+    find_package(Boost REQUIRED COMPONENTS random)
+elseif (APPLE)
+    find_package(Boost REQUIRED COMPONENTS random filesystem)
+endif ()
 # json
 find_package(nlohmann_json CONFIG REQUIRED)
 
@@ -63,7 +67,7 @@ elseif (APPLE)
         ${Boost_LIBRARIES}
         nlohmann_json
         nlohmann_json::nlohmann_json
-        # ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/Doppelganger_install/lib/Doppelganger.lib
+        ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/Doppelganger_install/lib/libDoppelganger.a
     )
 endif ()
 

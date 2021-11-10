@@ -68,7 +68,7 @@ elseif (APPLE)
         ${Boost_LIBRARIES}
         nlohmann_json
         nlohmann_json::nlohmann_json
-        # ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/Doppelganger_install/lib/Doppelganger.lib
+        ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/Doppelganger_install/lib/libDoppelganger.a
     )
 endif ()
 
@@ -103,7 +103,7 @@ endif()
 # MeshFix
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/MeshFix" "${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}/")
 # MeshFix.exe
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/MeshFix.exe" "${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}/")
+# add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/MeshFix.exe" "${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}/")
 
 # create zip archive
 # https://stackoverflow.com/questions/44796465/cmake-zip-folder-but-remove-leading-path

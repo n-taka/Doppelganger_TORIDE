@@ -33,7 +33,7 @@ namespace fs = boost::filesystem;
 
 namespace
 {
-	std::unordered_map<std::string, std::pair<std::vector<bool>, std::string>> packetsVec;
+	std::unordered_map<std::string, std::pair<std::vector<bool>, std::string> > packetsVec;
 	std::mutex mutexPackets;
 }
 
@@ -186,7 +186,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 				FreeCADConfig = fs::path(FreeCADScript);
 				FreeCADConfig = FreeCADConfig.parent_path();
 				FreeCADConfig.append("FreeCADConfig.json");
-				std::ofstream ofs(FreeCADConfig);
+				std::ofstream ofs(FreeCADConfig.string());
 				ofs << json.dump() << std::endl;
 				ofs.close();
 			}
@@ -204,7 +204,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 			fs::path dirName(filePath);
 			dirName += ".dump";
 
-			std::vector<std::shared_ptr<Doppelganger::triangleMesh>> meshes;
+			std::vector<std::shared_ptr<Doppelganger::triangleMesh> > meshes;
 			for (const auto &p : fs::directory_iterator(dirName))
 			{
 				if (p.path().extension() == ".ply")

@@ -64,7 +64,7 @@ elseif (APPLE)
         ${Boost_LIBRARIES}
         nlohmann_json
         nlohmann_json::nlohmann_json
-        # ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/Doppelganger_install/lib/Doppelganger.lib
+        ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/Doppelganger_install/lib/libDoppelganger.a
     )
 endif ()
 

@@ -102,7 +102,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 	installedPluginJsonPath.append("installed.json");
 
 	// write to file
-	std::ofstream ofs(installedPluginJsonPath);
+	std::ofstream ofs(installedPluginJsonPath.string());
 	ofs << installedArray.dump(4);
 	ofs.close();
 }

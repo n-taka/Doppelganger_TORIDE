@@ -76,7 +76,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 	// first we push_back installed plugins to the response array
 	fs::path installedPluginJsonPath(room->core->config.at("plugin").at("dir").get<std::string>());
 	installedPluginJsonPath.append("installed.json");
-	std::ifstream ifs(installedPluginJsonPath);
+	std::ifstream ifs(installedPluginJsonPath.string());
 	const nlohmann::json installedPluginJson = nlohmann::json::parse(ifs);
 	ifs.close();
 
@@ -88,7 +88,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 		response.push_back(pluginInfo);
 	}
 
-	const std::unordered_map<std::string, std::shared_ptr<Doppelganger::Plugin>> &plugins = room->core->plugin;
+	const std::unordered_map<std::string, std::shared_ptr<Doppelganger::Plugin> > &plugins = room->core->plugin;
 	for (const auto &name_plugin : plugins)
 	{
 		const std::string &name = name_plugin.first;

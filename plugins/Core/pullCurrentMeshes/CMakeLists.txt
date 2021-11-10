@@ -58,7 +58,7 @@ elseif (APPLE)
         ${PROJECT_NAME} PRIVATE
         nlohmann_json
         nlohmann_json::nlohmann_json
-        # ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/Doppelganger_install/lib/Doppelganger.lib
+        ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/Doppelganger_install/lib/libDoppelganger.a
     )
 endif ()
 
