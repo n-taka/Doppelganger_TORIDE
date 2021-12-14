@@ -9,7 +9,7 @@
         "versions": [
             {
                 "version": "2.0.0",
-                "URL": "https://n-taka.info/nextcloud/s/ppySJSxotgcpPxx/download/loadCADData.zip"
+                "URL": "https://n-taka.info/nextcloud/s/saxW5E9n46MAHmC/download/loadCADData.zip"
             }
         ]
     },
@@ -23,7 +23,7 @@
         "versions": [
             {
                 "version": "2.0.0",
-                "URL": "https://n-taka.info/nextcloud/s/X7JJK7iccJccD49/download/splitIntoIslands.zip"
+                "URL": "https://n-taka.info/nextcloud/s/iLyxHGRP3St6wf8/download/splitIntoIslands.zip"
             }
         ]
     },
@@ -37,7 +37,7 @@
         "versions": [
             {
                 "version": "2.0.0",
-                "URL": "https://n-taka.info/nextcloud/s/Frp7ZJTBRqPiT6t/download/hollowMesh.zip"
+                "URL": "https://n-taka.info/nextcloud/s/QkGzSywAWCHwGB8/download/hollowMesh.zip"
             }
         ]
     },
@@ -51,7 +51,7 @@
         "versions": [
             {
                 "version": "2.0.0.MeshFix",
-                "URL": "https://n-taka.info/nextcloud/s/zgZX9mQX4d94dnK/download/repairMesh.zip"
+                "URL": "https://n-taka.info/nextcloud/s/P2sY2yd52m4GxpY/download/repairMesh.zip"
             }
         ]
     },
@@ -65,7 +65,7 @@
         "versions": [
             {
                 "version": "2.0.0",
-                "URL": "https://n-taka.info/nextcloud/s/ZqyqEFsoiTsYo3g/download/estimateThickness.zip"
+                "URL": "https://n-taka.info/nextcloud/s/2NrGjXFs8beD4YB/download/estimateThickness.zip"
             }
         ]
     },
@@ -79,7 +79,7 @@
         "versions": [
             {
                 "version": "2.0.0.MeshFix",
-                "URL": "https://n-taka.info/nextcloud/s/QminEDQJfZ4KZ4m/download/repairAllMeshes.zip"
+                "URL": "https://n-taka.info/nextcloud/s/7LPzyAZT8TNdGD5/download/repairAllMeshes.zip"
             }
         ]
     }
