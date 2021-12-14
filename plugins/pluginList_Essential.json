@@ -1,0 +1,128 @@
+{
+    "sortMeshes": {
+        "description": {
+            "en": "Sort meshes based on name or #triangles",
+            "ja": "名前もしくはポリゴン数でメッシュをソートします"
+        },
+        "optional": false,
+        "UIPosition": "topRight",
+        "versions": [
+            {
+                "version": "2.0.0",
+                "URL": "https://n-taka.info/nextcloud/s/jZzAeW7eMsmD3Yr/download/sortMeshes.zip"
+            }
+        ]
+    },
+    "configEditor": {
+        "description": {
+            "en": "Edit config file",
+            "ja": "設定ファイルを編集します"
+        },
+        "optional": false,
+        "UIPosition": "bottomRight",
+        "versions": [
+            {
+                "version": "2.0.0",
+                "URL": "https://n-taka.info/nextcloud/s/wrk2dsKdLP7c882/download/configEditor.zip"
+            }
+        ]
+    },
+    "listPlugins": {
+        "description": {
+            "en": "List all available plugins",
+            "ja": "利用できるプラグインをリストアップします"
+        },
+        "optional": false,
+        "UIPosition": "bottomRight",
+        "versions": [
+            {
+                "version": "2.0.0",
+                "URL": "https://n-taka.info/nextcloud/s/dtDEcMJ9DEe5WLW/download/listPlugins.zip"
+            }
+        ]
+    },
+    "shutdown": {
+        "description": {
+            "en": "Graceful shutdown",
+            "ja": "正常終了を行います"
+        },
+        "optional": false,
+        "UIPosition": "bottomRight",
+        "versions": [
+            {
+                "version": "2.0.0",
+                "URL": "https://n-taka.info/nextcloud/s/dnejQJdjnsjCZ73/download/shutdown.zip"
+            }
+        ]
+    },
+    "updatePlugins": {
+        "description": {
+            "en": "Update plugins",
+            "ja": "プラグインの更新を行います"
+        },
+        "optional": false,
+        "UIPosition": "none",
+        "versions": [
+            {
+                "version": "2.0.0",
+                "URL": "https://n-taka.info/nextcloud/s/CnPGtwsBZ8MA3Ne/download/updatePlugins.zip"
+            }
+        ]
+    },
+    "pullCanvasParameters": {
+        "description": {
+            "en": "Get parameters for camera on startup",
+            "ja": "接続時にカメラのパラメタを取得します"
+        },
+        "optional": false,
+        "UIPosition": "none",
+        "versions": [
+            {
+                "version": "2.0.0",
+                "URL": "https://n-taka.info/nextcloud/s/7zGEEECmrx4TYao/download/pushCanvasParameters.zip"
+            }
+        ]
+    },
+    "pushCanvasParameters": {
+        "description": {
+            "en": "Synchronize parameters for camera across clients",
+            "ja": "全クライアント間でカメラのパラメタを共有します"
+        },
+        "optional": false,
+        "UIPosition": "none",
+        "versions": [
+            {
+                "version": "2.0.0",
+                "URL": "https://n-taka.info/nextcloud/s/gSimyKzPH6zZbAy/download/pullCanvasParameters.zip"
+            }
+        ]
+    },
+    "pullCurrentMeshes": {
+        "description": {
+            "en": "Get already loaded meshes on startup",
+            "ja": "接続時にすでに読み込まれているメッシュを取得します"
+        },
+        "optional": false,
+        "UIPosition": "none",
+        "versions": [
+            {
+                "version": "2.0.0",
+                "URL": "https://n-taka.info/nextcloud/s/Xe5CPFnxS5ffg6o/download/pullCurrentMeshes.zip"
+            }
+        ]
+    },
+    "syncCursor": {
+        "description": {
+            "en": "Synchronize cursors across clients",
+            "ja": "全クライアント間でカーソル位置を共有します"
+        },
+        "optional": false,
+        "UIPosition": "none",
+        "versions": [
+            {
+                "version": "2.0.0",
+                "URL": "https://n-taka.info/nextcloud/s/82dNfY3xpYSZdMY/download/syncCursor.zip"
+            }
+        ]
+    }
+}

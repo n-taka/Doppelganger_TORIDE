@@ -28,7 +28,7 @@ set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/submodule/Doppelganger/sub
 project(Doppelganger_Plugin_Core
     VERSION 2.0.0
     DESCRIPTION ""
-    HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_Plugin_Core"
+    HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_Plugin"
     LANGUAGES CXX
 )
 

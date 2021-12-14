@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 3.15)
 ##############################################
 ### project
 ##############################################
-project(repairAllMeshes
+project(listPlugins
     VERSION 2.0.0
-    DESCRIPTION "Repair all meshes"
+    DESCRIPTION "List all available plugins"
     HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_Plugin_Core"
     LANGUAGES CXX
 )
@@ -15,10 +15,8 @@ project(repairAllMeshes
 ### dependencies
 ##############################################
 # Boost
-if (WIN32)
-    find_package(Boost REQUIRED COMPONENTS random)
-elseif (APPLE)
-    find_package(Boost REQUIRED COMPONENTS random filesystem)
+if (APPLE)
+    find_package(Boost REQUIRED COMPONENTS filesystem)
 endif ()
 # json
 find_package(nlohmann_json CONFIG REQUIRED)
@@ -36,7 +34,6 @@ add_library(${PROJECT_NAME} MODULE)
 target_sources(
     ${PROJECT_NAME} PRIVATE
     ${PROJECT_NAME}.cpp
-    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/submodule/libigl/include/igl/tinyply.cpp
 )
 
 
@@ -56,11 +53,9 @@ if(WIN32)
     # we need to explicitly add bcrypt.lib due to some bug.
     target_link_libraries(
         ${PROJECT_NAME} PRIVATE
-        ${Boost_LIBRARIES}
         nlohmann_json
         nlohmann_json::nlohmann_json
         ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/Doppelganger_install/lib/Doppelganger.lib
-        bcrypt.lib
     )
 elseif (APPLE)
     target_link_libraries(
@@ -93,20 +88,12 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC _USE_MATH_DEFINES)
 ### resources
 ##############################################
 # directory
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_SOURCE_DIR}/bin/TORIDE/${PROJECT_NAME}")
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}")
 # dll
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${PROJECT_NAME}>" "${CMAKE_SOURCE_DIR}/bin/TORIDE/${PROJECT_NAME}/")
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${PROJECT_NAME}>" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}/")
 # module.js
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/module.js")
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/module.js" "${CMAKE_SOURCE_DIR}/bin/TORIDE/${PROJECT_NAME}/")
-endif()
-# MeshFix
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/MeshFix")
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/MeshFix" "${CMAKE_SOURCE_DIR}/bin/TORIDE/${PROJECT_NAME}/")
-endif()
-# MeshFix.exe
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/MeshFix.exe")
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/MeshFix.exe" "${CMAKE_SOURCE_DIR}/bin/TORIDE/${PROJECT_NAME}/")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/module.js" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}/")
 endif()
 
 # create zip archive
@@ -114,11 +101,11 @@ endif()
 add_custom_command(
     TARGET ${PROJECT_NAME}
     POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E tar "cf" "${CMAKE_SOURCE_DIR}/bin/TORIDE/${PROJECT_NAME}.zip" --format=zip -- .
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/TORIDE/${PROJECT_NAME}/")
+    COMMAND ${CMAKE_COMMAND} -E tar "cf" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}.zip" --format=zip -- .
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}/")
 
 # erase temporal directory
 # add_custom_command(
 #     TARGET ${PROJECT_NAME}
 #     POST_BUILD
-#     COMMAND ${CMAKE_COMMAND} -E rm "-r" "${CMAKE_SOURCE_DIR}/bin/TORIDE/${PROJECT_NAME}")
+#     COMMAND ${CMAKE_COMMAND} -E rm "-r" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}")

@@ -8,7 +8,7 @@ if [ "$(uname)" == "Darwin" ]; then
     # we use custom triplet (x64-osx-mojave)
     triplet="${triplet}64-osx-mojave"
     # copy custom triplet file (for supporting Mojave)
-    cp "x64-osx-mojave.cmake" "submodule/Doppelganger/submodule/vcpkg/triplets/x64-osx-mojave.cmake"
+    cp "${triplet}.cmake" "submodule/vcpkg/triplets/${triplet}.cmake"
 elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
     triplet="${triplet}64-windows-static"
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then

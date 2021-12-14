@@ -2,9 +2,13 @@
     "name": "doppelganger-plugin-core",
     "version-string": "2021.10",
     "description": "Set of plugins for Doppelganger",
-    "homepage": "https://github.com/n-taka/Doppelganger_Plugin_Core",
+    "homepage": "https://github.com/n-taka/Doppelganger_Plugin",
     "dependencies": [
-        "boost",
+        "boost-any",
+        "boost-beast",
+        "boost-random",
+        "boost-uuid",
+        "boost-filesystem",
         "nlohmann-json",
         "eigen3",
         "embree3"
