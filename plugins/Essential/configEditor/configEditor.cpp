@@ -1,11 +1,25 @@
 #ifndef LISTPLUGINS_CPP
 #define LISTPLUGINS_CPP
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN64)
 #define DLLEXPORT __declspec(dllexport)
-#else
+#elif defined(__APPLE__)
+#define DLLEXPORT __attribute__((visibility("default")))
+#elif defined(__linux__)
 #define DLLEXPORT __attribute__((visibility("default")))
 #endif
+
+#if defined(_WIN64)
+#include <filesystem>
+namespace fs = std::filesystem;
+#elif defined(__APPLE__)
+#include "boost/filesystem.hpp"
+namespace fs = boost::filesystem;
+#elif defined(__linux__)
+#include <filesystem>
+namespace fs = std::filesystem;
+#endif
+
 #include <memory>
 #include <nlohmann/json.hpp>
 
@@ -16,13 +30,6 @@
 #include <vector>
 #include <mutex>
 #include <fstream>
-#if defined(_WIN32) || defined(_WIN64)
-#include <filesystem>
-namespace fs = std::filesystem;
-#else
-#include "boost/filesystem.hpp"
-namespace fs = boost::filesystem;
-#endif
 
 extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room> &room, const nlohmann::json &parameters, nlohmann::json &response, nlohmann::json &broadcast)
 {
@@ -93,10 +100,12 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 		if (target == "plugin")
 		{
 			std::stringstream cmd;
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN64)
 			cmd << "start \"\" \"";
 #elif defined(__APPLE__)
 			cmd << "open \"";
+#elif defined(__linux__)
+			cmd << "xdg-open \"";
 #endif
 			fs::path pluginDir = room->core->systemParams.workingDir;
 			pluginDir.append("plugin");
@@ -107,10 +116,12 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 		else if (target == "output")
 		{
 			std::stringstream cmd;
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN64)
 			cmd << "start \"\" \"";
 #elif defined(__APPLE__)
 			cmd << "open \"";
+#elif defined(__linux__)
+			cmd << "xdg-open \"";
 #endif
 			cmd << room->outputDir.string();
 			cmd << "\"";
@@ -119,10 +130,12 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 		else if (target == "log")
 		{
 			std::stringstream cmd;
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN64)
 			cmd << "start \"\" \"";
 #elif defined(__APPLE__)
 			cmd << "open \"";
+#elif defined(__linux__)
+			cmd << "xdg-open \"";
 #endif
 			cmd << room->logger.logDir.string();
 			cmd << "\"";
@@ -135,13 +148,17 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 		// browser availability
 		response.at("browser")["availableBrowsers"] = nlohmann::json::array();
 
+		if(room->core->config.at("server").at("host") == "127.0.0.1")
+		{
 		// chrome
 		{
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN64)
 			std::vector<fs::path> chromePaths({fs::path("C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"),
-											   fs::path("C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe")});
+													   fs::path("C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe")});
 #elif defined(__APPLE__)
 			std::vector<fs::path> chromePaths({fs::path("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")});
+#elif defined(__linux__)
+			std::vector<fs::path> chromePaths({fs::path("/opt/google/chrome/google-chrome")});
 #endif
 			for (auto &p : chromePaths)
 			{
@@ -156,12 +173,13 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 
 		// firefox
 		{
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN64)
 			std::vector<fs::path> firefoxPaths({fs::path("C:\\Program Files\\Mozilla Firefox\\firefox.exe"),
-												fs::path("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe")});
+														fs::path("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe")});
 #elif defined(__APPLE__)
-			// todo update
 			std::vector<fs::path> firefoxPaths({fs::path("/Applications/Firefox.app/Contents/MacOS/firefox")});
+#elif defined(__linux__)
+			std::vector<fs::path> firefoxPaths({fs::path("/usr/bin/firefox")});
 #endif
 			for (auto &p : firefoxPaths)
 			{
@@ -176,7 +194,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 
 		// edge
 		{
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN64)
 			fs::path edgePath("C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe");
 			edgePath.make_preferred();
 			if (fs::exists(edgePath))
@@ -185,12 +203,14 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 			}
 #elif defined(__APPLE__)
 			// nothing
+#elif defined(__linux__)
+			// nothing
 #endif
 		}
 
 		// safari
 		{
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN64)
 			// nothing
 #elif defined(__APPLE__)
 			// todo update
@@ -200,12 +220,15 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 			{
 				response.at("browser").at("availableBrowsers").push_back("safari");
 			}
+#elif defined(__linux__)
+			// nothing
 #endif
 		}
 
 		// default
 		{
 			response.at("browser").at("availableBrowsers").push_back("default");
+		}
 		}
 	}
 	else

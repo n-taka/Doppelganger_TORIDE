@@ -1,11 +1,14 @@
 #ifndef PULLCANVASPARAMETERS_CPP
 #define PULLCANVASPARAMETERS_CPP
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN64)
 #define DLLEXPORT __declspec(dllexport)
-#else
+#elif defined(__APPLE__)
+#define DLLEXPORT __attribute__((visibility("default")))
+#elif defined(__linux__)
 #define DLLEXPORT __attribute__((visibility("default")))
 #endif
+
 #include <memory>
 #include <nlohmann/json.hpp>
 

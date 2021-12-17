@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.15)
 project(updatePlugins
     VERSION 2.0.0
     DESCRIPTION "Update plugins"
-    HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_Plugin_Core"
+    HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_Plugin"
     LANGUAGES CXX
 )
 
@@ -63,7 +63,13 @@ elseif (APPLE)
         ${Boost_LIBRARIES}
         nlohmann_json
         nlohmann_json::nlohmann_json
-        ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/Doppelganger_install/lib/libDoppelganger.a
+    )
+elseif (UNIX)
+    target_link_libraries(
+        ${PROJECT_NAME} PRIVATE
+        ${Boost_LIBRARIES}
+        nlohmann_json
+        nlohmann_json::nlohmann_json
     )
 endif ()
 
@@ -80,6 +86,9 @@ elseif (APPLE)
     # because we support macOS Mojave, we only require C++14 for macOS
     # we use boost::filesystem for macOS
     target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
+elseif (UNIX)
+    # because we want to use std::filesystem, we require C++17 for linux
+    target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 endif ()
 target_compile_definitions(${PROJECT_NAME} PUBLIC _USE_MATH_DEFINES)
 
@@ -88,12 +97,12 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC _USE_MATH_DEFINES)
 ### resources
 ##############################################
 # directory
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}")
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}/${CMAKE_SYSTEM_NAME}")
 # dll
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${PROJECT_NAME}>" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}/")
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${PROJECT_NAME}>" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}/${CMAKE_SYSTEM_NAME}")
 # module.js
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/module.js")
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/module.js" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}/")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/module.js" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}")
 endif()
 
 # create zip archive
