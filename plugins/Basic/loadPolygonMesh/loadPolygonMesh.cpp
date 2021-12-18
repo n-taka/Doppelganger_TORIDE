@@ -1,11 +1,25 @@
 #ifndef LOADPOLYGONMESH_CPP
 #define LOADPOLYGONMESH_CPP
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN64)
 #define DLLEXPORT __declspec(dllexport)
-#else
+#elif defined(__APPLE__)
+#define DLLEXPORT __attribute__((visibility("default")))
+#elif defined(__linux__)
 #define DLLEXPORT __attribute__((visibility("default")))
 #endif
+
+#if defined(_WIN64)
+#include <filesystem>
+namespace fs = std::filesystem;
+#elif defined(__APPLE__)
+#include "boost/filesystem.hpp"
+namespace fs = boost::filesystem;
+#elif defined(__linux__)
+#include <filesystem>
+namespace fs = std::filesystem;
+#endif
+
 #include <memory>
 #include <nlohmann/json.hpp>
 
@@ -18,13 +32,6 @@
 #include <string>
 #include <sstream>
 #include <mutex>
-#if defined(_WIN32) || defined(_WIN64)
-#include <filesystem>
-namespace fs = std::filesystem;
-#else
-#include "boost/filesystem.hpp"
-namespace fs = boost::filesystem;
-#endif
 
 #include "igl/readOBJ.h"
 #include "igl/readPLY.h"

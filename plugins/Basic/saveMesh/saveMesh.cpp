@@ -1,11 +1,25 @@
 #ifndef SAVEMESH_CPP
 #define SAVEMESH_CPP
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN64)
 #define DLLEXPORT __declspec(dllexport)
-#else
+#elif defined(__APPLE__)
+#define DLLEXPORT __attribute__((visibility("default")))
+#elif defined(__linux__)
 #define DLLEXPORT __attribute__((visibility("default")))
 #endif
+
+#if defined(_WIN64)
+#include <filesystem>
+namespace fs = std::filesystem;
+#elif defined(__APPLE__)
+#include "boost/filesystem.hpp"
+namespace fs = boost::filesystem;
+#elif defined(__linux__)
+#include <filesystem>
+namespace fs = std::filesystem;
+#endif
+
 #include <memory>
 #include <nlohmann/json.hpp>
 
@@ -19,15 +33,6 @@
 #include <string>
 #include <mutex>
 #include <fstream>
-
-#include <string>
-#if defined(_WIN32) || defined(_WIN64)
-#include <filesystem>
-namespace fs = std::filesystem;
-#else
-#include "boost/filesystem.hpp"
-namespace fs = boost::filesystem;
-#endif
 
 #include "igl/writeOBJ.h"
 #include "igl/writePLY.h"
@@ -204,9 +209,11 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 							objTexHeader << "usemtl material0\n";
 
 							byteMesh.resize(length + objTexHeader.str().length());
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN64)
 							sprintf_s(reinterpret_cast<char *>(&byteMesh[0]), byteMesh.size(), "%s", objTexHeader.str().c_str());
-#elif defined(__APPLE__) || defined(__linux__)
+#elif defined(__APPLE__)
+							sprintf(reinterpret_cast<char *>(&byteMesh[0]), "%s", objTexHeader.str().c_str());
+#elif defined(__linux__)
 							sprintf(reinterpret_cast<char *>(&byteMesh[0]), "%s", objTexHeader.str().c_str());
 #endif
 							ifs.seekg(0, ifs.beg);
@@ -286,10 +293,12 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 				// open a directory that containing filePath
 				// open output directory.
 				std::stringstream cmd;
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN64)
 				cmd << "start \"\" \"";
 #elif defined(__APPLE__)
 				cmd << "open \"";
+#elif defined(__linux__)
+				cmd << "xdg-open \"";
 #endif
 				cmd << room->outputDir.string();
 				cmd << "\"";

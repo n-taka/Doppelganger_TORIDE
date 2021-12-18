@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.15)
 project(outlineOnClick
     VERSION 2.0.0
     DESCRIPTION "Visualize outline when a mesh is clicked"
-    HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_Plugin_Core"
+    HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_Plugin"
     LANGUAGES CXX
 )
 
@@ -21,10 +21,10 @@ add_custom_target(${PROJECT_NAME} ALL)
 ### resources
 ##############################################
 # directory
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_SOURCE_DIR}/bin/Basic/${PROJECT_NAME}")
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_SOURCE_DIR}/bin/Basic/${PROJECT_NAME}/${CMAKE_SYSTEM_NAME}")
 # module.js
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/module.js")
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/module.js" "${CMAKE_SOURCE_DIR}/bin/Basic/${PROJECT_NAME}/")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/module.js" "${CMAKE_SOURCE_DIR}/bin/Basic/${PROJECT_NAME}")
 endif()
 
 # create zip archive
