@@ -1,11 +1,25 @@
 #ifndef LOADCADDATA_CPP
 #define LOADCADDATA_CPP
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN64)
 #define DLLEXPORT __declspec(dllexport)
-#else
+#elif defined(__APPLE__)
+#define DLLEXPORT __attribute__((visibility("default")))
+#elif defined(__linux__)
 #define DLLEXPORT __attribute__((visibility("default")))
 #endif
+
+#if defined(_WIN64)
+#include <filesystem>
+namespace fs = std::filesystem;
+#elif defined(__APPLE__)
+#include "boost/filesystem.hpp"
+namespace fs = boost::filesystem;
+#elif defined(__linux__)
+#include <filesystem>
+namespace fs = std::filesystem;
+#endif
+
 #include <memory>
 #include <nlohmann/json.hpp>
 
@@ -20,13 +34,6 @@
 #include <string>
 #include <sstream>
 #include <mutex>
-#if defined(_WIN32) || defined(_WIN64)
-#include <filesystem>
-namespace fs = std::filesystem;
-#else
-#include "boost/filesystem.hpp"
-namespace fs = boost::filesystem;
-#endif
 
 #include "igl/readPLY.h"
 #include "igl/remove_duplicate_vertices.h"
@@ -119,7 +126,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 		// find FreeCADCmd binary
 		fs::path FreeCADCmd;
 		{
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN64)
 			std::vector<fs::path> ProgramFilesPaths(
 				{fs::path("C:\\Program Files"),
 				 fs::path("C:\\Program Files (x86)")});
@@ -147,6 +154,8 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 				}
 			}
 #elif defined(__APPLE__)
+			FreeCADCmd = fs::path("/Applications/FreeCAD.app/Contents/Resources/bin/FreeCADCmd");
+#elif defined(__linux__)
 			// todo
 			FreeCADCmd = fs::path("/Applications/FreeCAD.app/Contents/Resources/bin/FreeCADCmd");
 #endif
@@ -192,9 +201,11 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 			}
 
 			std::stringstream cmd;
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN64)
 			cmd << "\"" << FreeCADCmd << " " << FreeCADScript << "\"";
 #elif defined(__APPLE__)
+			cmd << FreeCADCmd << " " << FreeCADScript;
+#elif defined(__linux__)
 			cmd << FreeCADCmd << " " << FreeCADScript;
 #endif
 

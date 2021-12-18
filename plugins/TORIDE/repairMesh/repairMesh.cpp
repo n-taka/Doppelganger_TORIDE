@@ -1,11 +1,25 @@
 #ifndef REPAIRMESH_CPP
 #define REPAIRMESH_CPP
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN64)
 #define DLLEXPORT __declspec(dllexport)
-#else
+#elif defined(__APPLE__)
+#define DLLEXPORT __attribute__((visibility("default")))
+#elif defined(__linux__)
 #define DLLEXPORT __attribute__((visibility("default")))
 #endif
+
+#if defined(_WIN64)
+#include <filesystem>
+namespace fs = std::filesystem;
+#elif defined(__APPLE__)
+#include "boost/filesystem.hpp"
+namespace fs = boost::filesystem;
+#elif defined(__linux__)
+#include <filesystem>
+namespace fs = std::filesystem;
+#endif
+
 #include <memory>
 #include <nlohmann/json.hpp>
 
@@ -18,15 +32,6 @@
 
 #include <string>
 #include <mutex>
-
-#include <string>
-#if defined(_WIN32) || defined(_WIN64)
-#include <filesystem>
-namespace fs = std::filesystem;
-#else
-#include "boost/filesystem.hpp"
-namespace fs = boost::filesystem;
-#endif
 
 #include "igl/facet_components.h"
 #include "igl/remove_unreferenced.h"
@@ -107,9 +112,14 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 				pluginDir.append(dirName);
 
 				meshFix = fs::path(pluginDir);
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN64)
+				meshFix.append("Windows");
 				meshFix.append("MeshFix.exe");
-#else
+#elif defined(__APPLE__)
+				meshFix.append("Darwin");
+				meshFix.append("MeshFix");
+#elif defined(__linux__)
+				meshFix.append("Linux");
 				meshFix.append("MeshFix");
 #endif
 			}
@@ -158,7 +168,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 				igl::writePLY(fileNameIn.string(), componentMesh.V.template cast<float>(), componentMesh.F);
 
 				std::stringstream cmd;
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN64)
 				cmd << "\"";
 #endif
 				cmd << meshFix;
@@ -166,7 +176,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 				cmd << fileNameIn;
 				cmd << " ";
 				cmd << fileNameOut;
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN64)
 				cmd << "\"";
 #endif
 				room->logger.log(cmd.str(), "APICALL");
