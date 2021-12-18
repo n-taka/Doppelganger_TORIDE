@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # MeshFix
-cmake -B build_MeshFix -S ./submodule/MeshFix-V2.1
+cmake -B build_MeshFix -S ./submodule/MeshFix-V2.1 -DCMAKE_BUILD_TYPE="Release"
 cmake --build build_MeshFix --config "Release"
 if [ "$(uname)" == "Darwin" ]; then
     cp ./submodule/MeshFix-V2.1/bin64/MeshFix ./plugins/TORIDE/repairMesh/MeshFix_macOS
