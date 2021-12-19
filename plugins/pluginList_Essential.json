@@ -55,6 +55,20 @@
             }
         ]
     },
+    "assets": {
+        "description": {
+            "en": "Set of files for HTML client",
+            "ja": "HTMLクライアントのためのファイル群です"
+        },
+        "optional": false,
+        "UIPosition": "none",
+        "versions": [
+            {
+                "version": "2.0.0",
+                "URL": "https://n-taka.info/nextcloud/s/meBibD32xLLakFa/download/assets.zip"
+            }
+        ]
+    },
     "updatePlugins": {
         "description": {
             "en": "Update plugins",

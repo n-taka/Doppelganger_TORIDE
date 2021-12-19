@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.15)
 ##############################################
 project(assets
     VERSION 2.0.0
-    DESCRIPTION "Set of codes for HTML client"
+    DESCRIPTION "Set of files for HTML client"
     HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_Plugin"
     LANGUAGES CXX
 )
