@@ -21,6 +21,7 @@ add_subdirectory(listPlugins)
 add_subdirectory(shutdown)
 
 ### others
+add_subdirectory(assets)
 add_subdirectory(updatePlugins)
 add_subdirectory(pullCanvasParameters)
 add_subdirectory(pushCanvasParameters)
