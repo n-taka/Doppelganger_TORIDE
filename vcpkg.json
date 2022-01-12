@@ -5,12 +5,14 @@
     "homepage": "https://github.com/n-taka/Doppelganger_Plugin",
     "dependencies": [
         "boost-any",
+        "boost-asio",
         "boost-beast",
         "boost-random",
         "boost-uuid",
         "boost-filesystem",
         "nlohmann-json",
         "eigen3",
-        "embree3"
+        "embree3",
+        "openssl"
     ]
 }

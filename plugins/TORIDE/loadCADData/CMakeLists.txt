@@ -24,6 +24,8 @@ elseif (UNIX)
 endif ()
 # json
 find_package(nlohmann_json CONFIG REQUIRED)
+# openSSL
+find_package(OpenSSL REQUIRED)
 
 
 ##############################################
@@ -61,6 +63,8 @@ if(WIN32)
         ${Boost_LIBRARIES}
         nlohmann_json
         nlohmann_json::nlohmann_json
+        OpenSSL::SSL
+        OpenSSL::Crypto
         ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/Doppelganger_install/lib/Doppelganger.lib
         bcrypt.lib
     )
@@ -70,6 +74,8 @@ elseif (APPLE)
         ${Boost_LIBRARIES}
         nlohmann_json
         nlohmann_json::nlohmann_json
+        OpenSSL::SSL
+        OpenSSL::Crypto
         ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/Doppelganger_install/lib/libDoppelganger.a
     )
 elseif (UNIX)
@@ -78,6 +84,8 @@ elseif (UNIX)
         ${Boost_LIBRARIES}
         nlohmann_json
         nlohmann_json::nlohmann_json
+        OpenSSL::SSL
+        OpenSSL::Crypto
     )
 endif ()
 

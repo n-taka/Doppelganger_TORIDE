@@ -39,7 +39,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 	fs::remove_all(room->core->config.at("log").at("dir").get<std::string>());
 
 	// graceful shutdown
-	room->core->ioc.stop();
+	room->core->ioc_.stop();
 }
 
 #endif
