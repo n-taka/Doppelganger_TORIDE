@@ -22,6 +22,8 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 	////
 	// [IN]
 	// parameters = {
+	//     "removeLog": true|false,
+	//     "removeOutput": true|false
 	// }
 
 	// [OUT]
@@ -34,12 +36,60 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 	response = nlohmann::json::object();
 	broadcast = nlohmann::json::object();
 
-	// we remove logs directory (graceful shutdown)
-	//   by removing this directory, we can easily erase log by core and all rooms
-	fs::remove_all(room->core->config.at("log").at("dir").get<std::string>());
+	const bool removeLog = parameters.at("removeLog").get<bool>();
+	const bool removeOutput = parameters.at("removeOutput").get<bool>();
+	// we remove log/output directory
+	{
+		if (removeLog && removeOutput)
+		{
+			fs::remove_all(room->core_->dataDir);
+		}
+		else
+		{
+			if (removeLog)
+			{
+				fs::path logDir(room->core_->dataDir);
+				logDir.append("log");
+				fs::remove_all(logDir);
+			}
+			if (removeOutput)
+			{
+				fs::path outputDir(room->core_->dataDir);
+				outputDir.append("output");
+				fs::remove_all(outputDir);
+			}
+		}
+	}
+	for (const auto &r : room->core_->rooms)
+	{
+		{
+			fs::path installedJson(r.second->dataDir);
+			installedJson.append("installed.json");
+			fs::remove_all(installedJson);
+		}
+		if (removeLog && removeOutput)
+		{
+			fs::remove_all(r.second->dataDir);
+		}
+		else
+		{
+			if (removeLog)
+			{
+				fs::path logDir(r.second->dataDir);
+				logDir.append("log");
+				fs::remove_all(logDir);
+			}
+			if (removeOutput)
+			{
+				fs::path outputDir(r.second->dataDir);
+				outputDir.append("output");
+				fs::remove_all(outputDir);
+			}
+		}
+	}
 
 	// graceful shutdown
-	room->core->ioc_.stop();
+	room->core_->ioc_.stop();
 }
 
 #endif

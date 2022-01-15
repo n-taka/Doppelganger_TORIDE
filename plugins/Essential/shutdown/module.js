@@ -4,6 +4,8 @@ import { request } from "../../js/request.js";
 
 const text = {
     "Are you OK?": { "en": "Are you OK?", "ja": "終了しますか？" },
+    "Remove log": {"en": "Remove log", "ja": "ログを削除する"},
+    "Remove output": {"en": "Remove output", "ja": "出力ファイルを削除する"},
     "If you are OK, please click shutdown.": { "en": "If you are OK, please click shutdown.", "ja": "終了させる場合は、シャットダウンをクリックしてください。" },
     "Shutdown": { "en": "Shutdown", "ja": "シャットダウン" },
     "Cancel": { "en": "Cancel", "ja": "キャンセル" }
@@ -25,6 +27,61 @@ const generateUI = async function () {
                 modalContentDiv.appendChild(heading);
             }
             {
+                const divRow = document.createElement('div');
+                divRow.setAttribute('class', 'row');
+                {
+                    const divCol = document.createElement('div');
+                    divCol.setAttribute('class', 'input-field col s6');
+                    {
+                        const pCheckbox = document.createElement("p");
+                        {
+                            const labelCheckbox = document.createElement("label");
+                            {
+                                const inputCheckbox = document.createElement("input");
+                                inputCheckbox.setAttribute("type", "checkbox")
+                                inputCheckbox.setAttribute("id", "removeLog");
+                                inputCheckbox.checked = true;
+                                labelCheckbox.appendChild(inputCheckbox);
+                            }
+                            {
+                                const spanCheckbox = document.createElement("span");
+                                spanCheckbox.innerText = getText(text, "Remove log");
+                                labelCheckbox.appendChild(spanCheckbox);
+                            }
+                            pCheckbox.appendChild(labelCheckbox);
+                        }
+                        divCol.appendChild(pCheckbox);
+                    }
+                    divRow.appendChild(divCol);
+                }
+                {
+                    const divCol = document.createElement('div');
+                    divCol.setAttribute('class', 'input-field col s6');
+                    {
+                        const pCheckbox = document.createElement("p");
+                        {
+                            const labelCheckbox = document.createElement("label");
+                            {
+                                const inputCheckbox = document.createElement("input");
+                                inputCheckbox.setAttribute("type", "checkbox")
+                                inputCheckbox.setAttribute("id", "removeOutput");
+                                inputCheckbox.checked = true;
+                                labelCheckbox.appendChild(inputCheckbox);
+                            }
+                            {
+                                const spanCheckbox = document.createElement("span");
+                                spanCheckbox.innerText = getText(text, "Remove output");
+                                labelCheckbox.appendChild(spanCheckbox);
+                            }
+                            pCheckbox.appendChild(labelCheckbox);
+                        }
+                        divCol.appendChild(pCheckbox);
+                    }
+                    divRow.appendChild(divCol);
+                }
+                modalContentDiv.appendChild(divRow);
+            }
+            {
                 const p = document.createElement('p');
                 modalContentDiv.appendChild(p);
                 p.innerHTML = getText(text, "If you are OK, please click shutdown.");
@@ -41,7 +98,10 @@ const generateUI = async function () {
                 modalFooterApplyA.setAttribute("href", "#!");
                 modalFooterApplyA.innerHTML = getText(text, "Shutdown");
                 modalFooterApplyA.addEventListener("click", async function () {
-                    await request("shutdown", {});
+                    const json = {};
+                    json["removeLog"] = document.getElementById("removeLog").checked;
+                    json["removeOutput"] = document.getElementById("removeOutput").checked;
+                    await request("shutdown", json);
                 });
                 modalFooterDiv.appendChild(modalFooterApplyA);
             }

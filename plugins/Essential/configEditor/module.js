@@ -415,8 +415,8 @@ const generateUI = async function () {
                                     inputRadioButtons.setAttribute("type", "radio")
                                     inputRadioButtons.setAttribute("name", "outputRadio");
                                     inputRadioButtons.setAttribute("class", "with-gap");
-                                    inputRadioButtons.setAttribute("value", "local");
-                                    inputRadioButtons.checked = configJson["output"] && configJson["output"]["type"] == "local";
+                                    inputRadioButtons.setAttribute("value", "storage");
+                                    inputRadioButtons.checked = configJson["output"] && configJson["output"]["type"] == "storage";
                                     inputRadioButtons.addEventListener("change", function () {
                                         divColDirOpen.style.display = (inputRadioButtons.checked) ? "inline" : "none";
                                     });
@@ -463,7 +463,7 @@ const generateUI = async function () {
                     {
                         // const divColDirOpen = document.createElement('div');
                         divColDirOpen.setAttribute('class', 'col s12');
-                        divColDirOpen.setAttribute('style', (configJson["output"] && configJson["output"]["type"] == "local") ? 'display: inline;' : 'display: none;');
+                        divColDirOpen.setAttribute('style', (configJson["output"] && configJson["output"]["type"] == "storage") ? 'display: inline;' : 'display: none;');
                         {
                             const btn = document.createElement('a');
                             btn.setAttribute('class', 'waves-effect wave-light btn');

@@ -27,10 +27,12 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 	// parameters = [
 	//  {
 	//   "name": "pluginName-A",
+	//   "dest": "core"|"room",
 	//   "version": "new version"
 	//  },
 	//  {
 	//   "name": "pluginName-B",
+	//   "dest": "core"|"room",
 	//   "version": "" (empty string indicates this plugin is not installed)
 	//  },
 	//  ...
@@ -50,18 +52,20 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 	// actual update is performed on the next boot
 
 	// validate the parameters
-	nlohmann::json installedArray = nlohmann::json::array();
+	nlohmann::json installedArrayCore = nlohmann::json::array();
+	nlohmann::json installedArrayRoom = nlohmann::json::array();
 	for (const auto &entry : parameters)
 	{
 		const std::string &name = entry.at("name").get<std::string>();
+		const std::string &dest = entry.at("dest").get<std::string>();
 		const std::string &version = entry.at("version").get<std::string>();
 
-		if (room->core->plugin.find(name) != room->core->plugin.end())
+		if (room->plugin.find(name) != room->plugin.end())
 		{
-			const std::shared_ptr<Doppelganger::Plugin> &plugin = room->core->plugin.at(name);
+			const std::shared_ptr<Doppelganger::Plugin> &plugin = room->plugin.at(name);
 			if (version.size() > 0)
 			{
-				const nlohmann::json &pluginParameters = plugin->parameters;
+				const nlohmann::json &pluginParameters = plugin->parameters_;
 				const std::string actualVersion((version == "latest") ? pluginParameters.at("versions").at(0).at("version").get<std::string>() : version);
 
 				bool versionFound = false;
@@ -70,7 +74,17 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 					const std::string &pluginVersion = versionEntry.at("version").get<std::string>();
 					if (pluginVersion == actualVersion)
 					{
-						installedArray.push_back(entry);
+						if (dest == "core")
+						{
+							installedArrayCore.push_back(entry);
+							plugin->install(room->core_, actualVersion);
+						}
+						else
+						{
+							installedArrayRoom.push_back(entry);
+							plugin->install(room, actualVersion);
+						}
+
 						versionFound = true;
 						break;
 					}
@@ -78,36 +92,42 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 				if (!versionFound)
 				{
 					std::stringstream ss;
-					ss << "Plugin \"";
-					ss << name;
-					ss << "\" invalid version \"";
+					ss << "Plugin \"" << name << "\" invalid version \"";
 					if (version == "latest")
 					{
 						ss << "latest, ";
 					}
-					ss << actualVersion;
-					ss << "\" is specified.";
-					room->core->logger.log(ss.str(), "ERROR");
+					ss << actualVersion << "\" is specified.";
+					room->logger.log(ss.str(), "ERROR");
 				}
 			}
 		}
 		else
 		{
 			std::stringstream ss;
-			ss << "Unknown plugin \"";
-			ss << name;
-			ss << "\" is specified.";
-			room->core->logger.log(ss.str(), "ERROR");
+			ss << "Unknown plugin \"" << name << "\" is specified.";
+			room->logger.log(ss.str(), "ERROR");
 		}
 	}
 
-	fs::path installedPluginJsonPath(room->core->config.at("plugin").at("dir").get<std::string>());
-	installedPluginJsonPath.append("installed.json");
+	// core
+	{
+		fs::path installedPluginJsonPath(room->core_->DoppelgangerRootDir);
+		installedPluginJsonPath.append("plugin");
+		installedPluginJsonPath.append("installed.json");
+		std::ofstream ofs(installedPluginJsonPath.string());
+		ofs << installedArrayCore.dump(4);
+		ofs.close();
+	}
 
-	// write to file
-	std::ofstream ofs(installedPluginJsonPath.string());
-	ofs << installedArray.dump(4);
-	ofs.close();
+	// room
+	{
+		fs::path installedPluginJsonPath(room->dataDir);
+		installedPluginJsonPath.append("installed.json");
+		std::ofstream ofs(installedPluginJsonPath.string());
+		ofs << installedArrayRoom.dump(4);
+		ofs.close();
+	}
 }
 
 #endif

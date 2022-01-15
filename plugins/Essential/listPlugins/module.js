@@ -207,6 +207,10 @@ const generateUI = async function () {
                         {
                             const select = document.createElement('select');
                             select.setAttribute("data-plugin-name", plugin["name"]);
+                            // for single-user system, we always install to core.
+                            select.setAttribute("data-plugin-dest", "core");
+                            // for multiple-user system, we always install to room.
+                            // select.setAttribute("data-plugin-dest", "room");
 
                             // we add special entry "latest"
                             {

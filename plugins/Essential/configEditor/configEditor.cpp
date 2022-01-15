@@ -91,7 +91,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 	broadcast = nlohmann::json::object();
 
 	// current settings
-	response = room->core->configFileContent;
+	response = room->core_->configOrig;
 
 	if (parameters.contains("openDirectory"))
 	{
@@ -107,7 +107,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 #elif defined(__linux__)
 			cmd << "xdg-open \"";
 #endif
-			fs::path pluginDir = room->core->systemParams.workingDir;
+			fs::path pluginDir = room->dataDir;
 			pluginDir.append("plugin");
 			cmd << pluginDir.string();
 			cmd << "\"";
@@ -123,7 +123,9 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 #elif defined(__linux__)
 			cmd << "xdg-open \"";
 #endif
-			cmd << room->outputDir.string();
+			fs::path outputDir = room->dataDir;
+			outputDir.append("output");
+			cmd << outputDir.string();
 			cmd << "\"";
 			system(cmd.str().c_str());
 		}
@@ -148,87 +150,87 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 		// browser availability
 		response.at("browser")["availableBrowsers"] = nlohmann::json::array();
 
-		if(room->core->config.at("server").at("host") == "127.0.0.1")
+		if (room->core_->config.at("server").at("host") == "127.0.0.1")
 		{
-		// chrome
-		{
-#if defined(_WIN64)
-			std::vector<fs::path> chromePaths({fs::path("C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"),
-													   fs::path("C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe")});
-#elif defined(__APPLE__)
-			std::vector<fs::path> chromePaths({fs::path("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")});
-#elif defined(__linux__)
-			std::vector<fs::path> chromePaths({fs::path("/opt/google/chrome/google-chrome")});
-#endif
-			for (auto &p : chromePaths)
+			// chrome
 			{
-				p.make_preferred();
-				if (fs::exists(p))
+#if defined(_WIN64)
+				std::vector<fs::path> chromePaths({fs::path("C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"),
+												   fs::path("C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe")});
+#elif defined(__APPLE__)
+				std::vector<fs::path> chromePaths({fs::path("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")});
+#elif defined(__linux__)
+				std::vector<fs::path> chromePaths({fs::path("/opt/google/chrome/google-chrome")});
+#endif
+				for (auto &p : chromePaths)
 				{
-					response.at("browser").at("availableBrowsers").push_back("chrome");
-					break;
+					p.make_preferred();
+					if (fs::exists(p))
+					{
+						response.at("browser").at("availableBrowsers").push_back("chrome");
+						break;
+					}
 				}
 			}
-		}
 
-		// firefox
-		{
-#if defined(_WIN64)
-			std::vector<fs::path> firefoxPaths({fs::path("C:\\Program Files\\Mozilla Firefox\\firefox.exe"),
-														fs::path("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe")});
-#elif defined(__APPLE__)
-			std::vector<fs::path> firefoxPaths({fs::path("/Applications/Firefox.app/Contents/MacOS/firefox")});
-#elif defined(__linux__)
-			std::vector<fs::path> firefoxPaths({fs::path("/usr/bin/firefox")});
-#endif
-			for (auto &p : firefoxPaths)
+			// firefox
 			{
-				p.make_preferred();
-				if (fs::exists(p))
+#if defined(_WIN64)
+				std::vector<fs::path> firefoxPaths({fs::path("C:\\Program Files\\Mozilla Firefox\\firefox.exe"),
+													fs::path("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe")});
+#elif defined(__APPLE__)
+				std::vector<fs::path> firefoxPaths({fs::path("/Applications/Firefox.app/Contents/MacOS/firefox")});
+#elif defined(__linux__)
+				std::vector<fs::path> firefoxPaths({fs::path("/usr/bin/firefox")});
+#endif
+				for (auto &p : firefoxPaths)
 				{
-					response.at("browser").at("availableBrowsers").push_back("firefox");
-					break;
+					p.make_preferred();
+					if (fs::exists(p))
+					{
+						response.at("browser").at("availableBrowsers").push_back("firefox");
+						break;
+					}
 				}
 			}
-		}
 
-		// edge
-		{
-#if defined(_WIN64)
-			fs::path edgePath("C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe");
-			edgePath.make_preferred();
-			if (fs::exists(edgePath))
+			// edge
 			{
-				response.at("browser").at("availableBrowsers").push_back("edge");
-			}
-#elif defined(__APPLE__)
-			// nothing
-#elif defined(__linux__)
-			// nothing
-#endif
-		}
-
-		// safari
-		{
 #if defined(_WIN64)
-			// nothing
+				fs::path edgePath("C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe");
+				edgePath.make_preferred();
+				if (fs::exists(edgePath))
+				{
+					response.at("browser").at("availableBrowsers").push_back("edge");
+				}
 #elif defined(__APPLE__)
-			// todo update
-			fs::path safariPath("/Applications/Safari.app/Contents/MacOS/safari");
-			safariPath.make_preferred();
-			if (fs::exists(safariPath))
-			{
-				response.at("browser").at("availableBrowsers").push_back("safari");
-			}
+				// nothing
 #elif defined(__linux__)
-			// nothing
+				// nothing
 #endif
-		}
+			}
 
-		// default
-		{
-			response.at("browser").at("availableBrowsers").push_back("default");
-		}
+			// safari
+			{
+#if defined(_WIN64)
+				// nothing
+#elif defined(__APPLE__)
+				// todo update
+				fs::path safariPath("/Applications/Safari.app/Contents/MacOS/safari");
+				safariPath.make_preferred();
+				if (fs::exists(safariPath))
+				{
+					response.at("browser").at("availableBrowsers").push_back("safari");
+				}
+#elif defined(__linux__)
+				// nothing
+#endif
+			}
+
+			// default
+			{
+				response.at("browser").at("availableBrowsers").push_back("default");
+			}
 		}
 	}
 	else
@@ -255,8 +257,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 		// write to config.json
 		//   for human readability, we use .dump(4);
 		{
-			std::lock_guard<std::mutex> lock(room->core->systemParams.mutex);
-			fs::path configPath(room->core->systemParams.workingDir);
+			fs::path configPath(room->core_->DoppelgangerRootDir);
 			configPath.append("config.json");
 			std::ofstream ofs(configPath.string());
 			ofs << response.dump(4);
