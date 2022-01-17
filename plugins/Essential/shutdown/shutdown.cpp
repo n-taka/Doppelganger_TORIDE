@@ -63,9 +63,9 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 	for (const auto &r : room->core_->rooms)
 	{
 		{
-			fs::path installedJson(r.second->dataDir);
-			installedJson.append("installed.json");
-			fs::remove_all(installedJson);
+			fs::path configJson(r.second->dataDir);
+			configJson.append("config.json");
+			fs::remove_all(configJson);
 		}
 		if (removeLog && removeOutput)
 		{

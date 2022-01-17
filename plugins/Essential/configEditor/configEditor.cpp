@@ -90,8 +90,12 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 	response = nlohmann::json::object();
 	broadcast = nlohmann::json::object();
 
-	// current settings
-	response = room->core_->configOrig;
+	// get current config
+	// switch for demo on web (then, we need to get current "room" config)
+	{
+		std::lock_guard<std::mutex> lock(room->core_->mutexConfig);
+		room->core_->getCurrentConfig(response);
+	}
 
 	if (parameters.contains("openDirectory"))
 	{
@@ -107,7 +111,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 #elif defined(__linux__)
 			cmd << "xdg-open \"";
 #endif
-			fs::path pluginDir = room->dataDir;
+			fs::path pluginDir(room->core_->DoppelgangerRootDir);
 			pluginDir.append("plugin");
 			cmd << pluginDir.string();
 			cmd << "\"";
@@ -123,7 +127,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 #elif defined(__linux__)
 			cmd << "xdg-open \"";
 #endif
-			fs::path outputDir = room->dataDir;
+			fs::path outputDir(room->dataDir);
 			outputDir.append("output");
 			cmd << outputDir.string();
 			cmd << "\"";
@@ -139,7 +143,9 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 #elif defined(__linux__)
 			cmd << "xdg-open \"";
 #endif
-			cmd << room->logger.logDir.string();
+			fs::path logDir(room->dataDir);
+			logDir.append("log");
+			cmd << logDir.string();
 			cmd << "\"";
 			system(cmd.str().c_str());
 		}
@@ -150,7 +156,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 		// browser availability
 		response.at("browser")["availableBrowsers"] = nlohmann::json::array();
 
-		if (room->core_->config.at("server").at("host") == "127.0.0.1")
+		if (response.at("server").at("host") == "127.0.0.1")
 		{
 			// chrome
 			{
@@ -238,6 +244,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 		// request for update
 
 		// current config always has 2-depth, we can easily implement as follows;
+		// todo check...
 		for (const auto &parameterItem : parameters.items())
 		{
 			// add parameter if is doesn't exist
@@ -255,13 +262,10 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 		}
 
 		// write to config.json
-		//   for human readability, we use .dump(4);
+		// switch for demo on web (then, we need to update current "room" config)
 		{
-			fs::path configPath(room->core_->DoppelgangerRootDir);
-			configPath.append("config.json");
-			std::ofstream ofs(configPath.string());
-			ofs << response.dump(4);
-			ofs.close();
+			std::lock_guard<std::mutex> lock(room->core_->mutexConfig);
+			room->core_->updateConfig(response);
 		}
 	}
 }

@@ -76,33 +76,46 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 		return pluginInfo;
 	};
 
-	// core
+	// get current config
+	nlohmann::json config;
 	{
-
-	}
-	// room
-	{
-
-	}
-	fs::path installedPluginJsonPath(room->dataDir);
-	installedPluginJsonPath.append("installed.json");
-	std::ifstream ifs(installedPluginJsonPath.string());
-	const nlohmann::json installedPluginJson = nlohmann::json::parse(ifs);
-	ifs.close();
-
-	for (const auto &installedPlugin : installedPluginJson)
-	{
-		const std::string &name = installedPlugin.at("name").get<std::string>();
-		const std::shared_ptr<Doppelganger::Plugin> &plugin = room->plugin.at(name);
-		const nlohmann::json pluginInfo = formatPluginInfo(plugin);
-		response.push_back(pluginInfo);
+		std::lock_guard<std::mutex> lock(room->mutexConfig);
+		room->getCurrentConfig(config);
 	}
 
-	const std::unordered_map<std::string, std::shared_ptr<Doppelganger::Plugin> > &plugins = room->plugin;
+	// get plugin catalogue
+	nlohmann::json pluginCatalogue;
+	room->core_->getPluginCatalogue(config.at("plugin").at("listURL"), pluginCatalogue);
+
+	// initialize Doppelganger::Plugin instances
+	for (const auto &pluginEntry : pluginCatalogue.items())
+	{
+		const std::string &name = pluginEntry.key();
+		if (room->plugin.find(name) == room->plugin.end())
+		{
+			const nlohmann::json &pluginInfo = pluginEntry.value();
+			room->plugin[name] = std::make_shared<Doppelganger::Plugin>(room->core_, name, pluginInfo);
+		}
+	}
+
+	const nlohmann::json installedPluginJson = config.at("plugin").at("installed");
+
+	for (const auto &installedPlugin : installedPluginJson.items())
+	{
+		const std::string &name = installedPlugin.key();
+		if (room->plugin.find(name) != room->plugin.end())
+		{
+			const std::shared_ptr<Doppelganger::Plugin> &plugin = room->plugin.at(name);
+			const nlohmann::json pluginInfo = formatPluginInfo(plugin);
+			response.push_back(pluginInfo);
+		}
+	}
+
+	const std::unordered_map<std::string, std::shared_ptr<Doppelganger::Plugin>> &plugins = room->plugin;
 	for (const auto &name_plugin : plugins)
 	{
 		const std::string &name = name_plugin.first;
-		const std::shared_ptr<Doppelganger::Plugin> plugin = name_plugin.second;
+		const std::shared_ptr<Doppelganger::Plugin> &plugin = name_plugin.second;
 		if (plugin->installedVersion == "")
 		{
 			const nlohmann::json pluginInfo = formatPluginInfo(plugin);

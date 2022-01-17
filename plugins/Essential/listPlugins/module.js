@@ -207,10 +207,7 @@ const generateUI = async function () {
                         {
                             const select = document.createElement('select');
                             select.setAttribute("data-plugin-name", plugin["name"]);
-                            // for single-user system, we always install to core.
-                            select.setAttribute("data-plugin-dest", "core");
-                            // for multiple-user system, we always install to room.
-                            // select.setAttribute("data-plugin-dest", "room");
+
 
                             // we add special entry "latest"
                             {
@@ -298,7 +295,6 @@ const generateUI = async function () {
                         tr.appendChild(tdDown);
                     }
                     tables[plugin["UIPosition"]].querySelectorAll('tbody')[0].appendChild(tr);
-                    // tbody.appendChild(tr);
                 }
             }
             modal.appendChild(modalContentDiv);
