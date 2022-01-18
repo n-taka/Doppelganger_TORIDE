@@ -35,7 +35,7 @@ const text = {
     "FILE": { "en": "FILE", "ja": "ファイル" },
     "Directory for log": { "en": "Directory for log", "ja": "ログ用のディレクトリ" },
     "Open log directory": { "en": "Open log directory", "ja": "ログ用のディレクトリを開く" },
-    "Update & Shutdown": { "en": "Update & Shutdown", "ja": "更新して終了" },
+    "Update & Reload": { "en": "Update & Reload", "ja": "更新して再読み込み" },
     "Cancel": { "en": "Cancel", "ja": "キャンセル" }
 };
 
@@ -44,7 +44,6 @@ const generateUI = async function () {
     //   while constructing a modal, we implicitly assign default values
     return request("configEditor", { "forUIGeneration": true }).then((response) => {
         const configJson = JSON.parse(response);
-        console.log(configJson);
         ////
         // modal
         const modal = document.createElement("div");
@@ -84,19 +83,19 @@ const generateUI = async function () {
                         {
                             {
                                 const option = document.createElement('option');
-                                option.setAttribute("value", "http://");
+                                option.setAttribute("value", "http");
                                 option.setAttribute('style', 'text-align: center; user-select: none;');
                                 option.setAttribute("selected", true);
-                                option.innerText = "http://";
+                                option.innerText = "http";
                                 selectServerProtocol.appendChild(option);
                             }
                             {
                                 const option = document.createElement('option');
-                                option.setAttribute("value", "https://");
+                                option.setAttribute("value", "https");
                                 option.setAttribute('style', 'text-align: center; user-select: none;');
                                 // currently we don't support SSL
                                 option.setAttribute("disabled", true);
-                                option.innerText = "https://";
+                                option.innerText = "https";
                                 selectServerProtocol.appendChild(option);
                             }
                             divCol.appendChild(selectServerProtocol);
@@ -613,7 +612,7 @@ const generateUI = async function () {
                     const modalFooterApplyA = document.createElement("a");
                     modalFooterApplyA.setAttribute("class", "modal-close waves-effect waves-green btn-flat");
                     modalFooterApplyA.setAttribute("href", "#!");
-                    modalFooterApplyA.innerHTML = getText(text, "Update & Shutdown");
+                    modalFooterApplyA.innerHTML = getText(text, "Update & Reload");
                     modalFooterApplyA.addEventListener("click", async function () {
                         const updatedConfigJson = {};
                         // server
@@ -649,7 +648,7 @@ const generateUI = async function () {
                         updatedConfigJson["plugin"] = {};
                         updatedConfigJson["plugin"]["listURL"] = document.getElementById("pluginListURL").value.split("\n").filter((str => (str.length > 0)));
                         await request("configEditor", updatedConfigJson);
-                        await request("shutdown", {});
+                        location.reload();
                     });
                     modalFooterDiv.appendChild(modalFooterApplyA);
                 }

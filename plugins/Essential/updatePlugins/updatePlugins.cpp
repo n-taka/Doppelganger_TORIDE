@@ -51,19 +51,18 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 		nlohmann::json config;
 		std::lock_guard<std::mutex> lock(room->mutexConfig);
 		room->getCurrentConfig(config);
-		config.at("plugin").at("installed") = nlohmann::json::array();
+		config.at("plugin").at("installed") = nlohmann::json::object();
 		room->updateConfig(config);
 	}
 	{
 		nlohmann::json config;
 		std::lock_guard<std::mutex> lock(room->core_->mutexConfig);
 		room->core_->getCurrentConfig(config);
-		config.at("plugin").at("installed") = nlohmann::json::array();
+		config.at("plugin").at("installed") = nlohmann::json::object();
 		room->core_->updateConfig(config);
 	}
 
 	// validate the parameters
-	nlohmann::json installedArray = nlohmann::json::array();
 	for (const auto &entry : parameters)
 	{
 		const std::string &name = entry.at("name").get<std::string>();
@@ -83,9 +82,8 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 					const std::string &pluginVersion = versionEntry.at("version").get<std::string>();
 					if (pluginVersion == actualVersion)
 					{
-						installedArray.push_back(entry);
 						// switch for demo on web (then, we need to use false)
-						plugin->install(room, actualVersion, true);
+						plugin->install(room, version, true);
 
 						versionFound = true;
 						break;

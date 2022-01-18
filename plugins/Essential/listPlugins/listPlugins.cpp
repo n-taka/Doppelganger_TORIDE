@@ -88,6 +88,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 	room->core_->getPluginCatalogue(config.at("plugin").at("listURL"), pluginCatalogue);
 
 	// initialize Doppelganger::Plugin instances
+	//   when plugin is not yet initialized
 	for (const auto &pluginEntry : pluginCatalogue.items())
 	{
 		const std::string &name = pluginEntry.key();
@@ -100,12 +101,19 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 
 	const nlohmann::json installedPluginJson = config.at("plugin").at("installed");
 
+	std::vector<std::string> sortedInstalledPluginName(installedPluginJson.size());
 	for (const auto &installedPlugin : installedPluginJson.items())
 	{
 		const std::string &name = installedPlugin.key();
-		if (room->plugin.find(name) != room->plugin.end())
+		const nlohmann::json &value = installedPlugin.value();
+		const int index = value.at("priority").get<int>();
+		sortedInstalledPluginName.at(index) = name;
+	}
+	for(const auto &pluginName : sortedInstalledPluginName)
+	{
+		if (room->plugin.find(pluginName) != room->plugin.end())
 		{
-			const std::shared_ptr<Doppelganger::Plugin> &plugin = room->plugin.at(name);
+			const std::shared_ptr<Doppelganger::Plugin> &plugin = room->plugin.at(pluginName);
 			const nlohmann::json pluginInfo = formatPluginInfo(plugin);
 			response.push_back(pluginInfo);
 		}

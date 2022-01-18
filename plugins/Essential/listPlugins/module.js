@@ -14,7 +14,7 @@ const text = {
     "Bottom, Right": { "en": "Bottom, Right", "ja": "ボトムメニュー (右)" },
     "No UI": { "en": "No UI", "ja": "UI なし" },
     "Plugin": { "en": "Plugin", "ja": "プラグイン" },
-    "Apply & Shutdown": { "en": "Apply & Shutdown", "ja": "更新して終了" },
+    "Apply & Reload": { "en": "Apply & Reload", "ja": "更新して再読み込み" },
     "Cancel": { "en": "Cancel", "ja": "キャンセル" },
     "Name": { "en": "Name", "ja": "プラグイン名" },
     "Current": { "en": "Current", "ja": "現在のバージョン" },
@@ -307,7 +307,7 @@ const generateUI = async function () {
                 const modalFooterApplyA = document.createElement("a");
                 modalFooterApplyA.setAttribute("class", "modal-close waves-effect waves-green btn-flat");
                 modalFooterApplyA.setAttribute("href", "#!");
-                modalFooterApplyA.innerHTML = getText(text, "Apply & Shutdown");
+                modalFooterApplyA.innerHTML = getText(text, "Apply & Reload");
                 modalFooterApplyA.addEventListener("click", async function () {
                     const update = [];
                     // iterate over table and construct update
@@ -320,8 +320,8 @@ const generateUI = async function () {
                         update.push(json);
                     }
                     await request("updatePlugins", update);
-                    await request("shutdown", {});
-                });
+                    location.reload();
+            });
                 modalFooterDiv.appendChild(modalFooterApplyA);
             }
             {

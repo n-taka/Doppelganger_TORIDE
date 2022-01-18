@@ -244,7 +244,6 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 		// request for update
 
 		// current config always has 2-depth, we can easily implement as follows;
-		// todo check...
 		for (const auto &parameterItem : parameters.items())
 		{
 			// add parameter if is doesn't exist
