@@ -144,7 +144,14 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 	response = nlohmann::json::object();
 	broadcast = nlohmann::json::object();
 
-	const bool saveToLocal = (room->core->config.at("output").at("type").get<std::string>() == "local");
+	// get current config
+	nlohmann::json config;
+	{
+		std::lock_guard<std::mutex> lock(room->mutexConfig);
+		room->getCurrentConfig(config);
+	}
+
+	const bool saveToLocal = (config.at("output").at("type").get<std::string>() == "storage");
 	const std::string &meshFormat = parameters.at("format").get<std::string>();
 
 	{
@@ -158,7 +165,16 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 			////
 			// write file(s)
 			// path to directory
-			const fs::path directoryPath = (saveToLocal ? room->outputDir : fs::temp_directory_path());
+			fs::path directoryPath;
+			if (saveToLocal)
+			{
+				directoryPath = room->dataDir;
+				directoryPath.append("output");
+			}
+			else
+			{
+				directoryPath = fs::temp_directory_path();
+			}
 			// path to mesh
 			fs::path meshFilePath;
 			{
@@ -300,7 +316,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 #elif defined(__linux__)
 				cmd << "xdg-open \"";
 #endif
-				cmd << room->outputDir.string();
+				cmd << directoryPath.string();
 				cmd << "\"";
 				system(cmd.str().c_str());
 			}

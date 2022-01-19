@@ -36,12 +36,6 @@ namespace fs = std::filesystem;
 #define STB_IMAGE_IMPLEMENTATION
 #include "Doppelganger/Util/stb_image.h"
 
-namespace
-{
-	std::unordered_map<std::string, std::pair<std::vector<bool>, std::string>> packetsVec;
-	std::mutex mutexPackets;
-}
-
 extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room> &room, const nlohmann::json &parameters, nlohmann::json &response, nlohmann::json &broadcast)
 {
 	////
@@ -86,7 +80,12 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 	bool allPacketArrived = true;
 	std::string base64Str;
 	{
-		std::lock_guard<std::mutex> lock(mutexPackets);
+		std::lock_guard<std::mutex> lock(room->mutexCustomData);
+		if (room->customData.find("loadTexture") == room->customData.end())
+		{
+			room->customData["loadTexture"] = std::unordered_map<std::string, std::pair<std::vector<bool>, std::string>>();
+		}
+		std::unordered_map<std::string, std::pair<std::vector<bool>, std::string>> &packetsVec = boost::any_cast<std::unordered_map<std::string, std::pair<std::vector<bool>, std::string>> &>(room->customData.at("loadTexture"));
 
 		std::pair<std::vector<bool>, std::string> &packet = packetsVec[fileId];
 		std::vector<bool> &packetArrived = packet.first;
@@ -110,6 +109,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 		if (allPacketArrived)
 		{
 			base64Str = std::move(packetBase64Str);
+			packetsVec.erase(fileId);
 		}
 	}
 
@@ -179,7 +179,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 			ss << "New texture for \"" << meshUUID << "\" is loaded.";
 			room->logger.log(ss.str(), "APICALL");
 			// file
-			room->logger.log(filePath, "APICALL", true);
+			room->logger.log(filePath, "APICALL");
 		}
 
 		// edit history

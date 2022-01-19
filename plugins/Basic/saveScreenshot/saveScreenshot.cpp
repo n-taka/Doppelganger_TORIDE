@@ -33,12 +33,6 @@ namespace fs = std::filesystem;
 #include <mutex>
 #include <fstream>
 
-namespace
-{
-	std::unordered_map<std::string, std::pair<std::vector<bool>, std::string>> packetsVec;
-	std::mutex mutexPackets;
-}
-
 extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room> &room, const nlohmann::json &parameters, nlohmann::json &response, nlohmann::json &broadcast)
 {
 	////
@@ -92,7 +86,12 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 	bool allPacketArrived = true;
 	std::string base64Str;
 	{
-		std::lock_guard<std::mutex> lock(mutexPackets);
+		std::lock_guard<std::mutex> lock(room->mutexCustomData);
+		if (room->customData.find("saveScreenshot") == room->customData.end())
+		{
+			room->customData["saveScreenshot"] = std::unordered_map<std::string, std::pair<std::vector<bool>, std::string>>();
+		}
+		std::unordered_map<std::string, std::pair<std::vector<bool>, std::string>> &packetsVec = boost::any_cast<std::unordered_map<std::string, std::pair<std::vector<bool>, std::string>> &>(room->customData.at("saveScreenshot"));
 
 		std::pair<std::vector<bool>, std::string> &packet = packetsVec[fileId];
 		std::vector<bool> &packetArrived = packet.first;
@@ -116,15 +115,24 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 		if (allPacketArrived)
 		{
 			base64Str = std::move(packetBase64Str);
+			packetsVec.erase(fileId);
 		}
 	}
 
 	if (base64Str.size())
 	{
-		const bool saveToLocal = (room->core->config.at("output").at("type").get<std::string>() == "local");
+		// get current config
+		nlohmann::json config;
+		{
+			std::lock_guard<std::mutex> lock(room->mutexConfig);
+			room->getCurrentConfig(config);
+		}
+
+		const bool saveToLocal = (config.at("output").at("type").get<std::string>() == "storage");
 		if (saveToLocal)
 		{
-			const fs::path directoryPath(room->outputDir);
+			fs::path directoryPath(room->dataDir);
+			directoryPath.append("output");
 			// path to screenshot file
 			fs::path screenshotFilePath;
 			{
@@ -146,7 +154,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 #elif defined(__linux__)
 			cmd << "xdg-open \"";
 #endif
-			cmd << room->outputDir.string();
+			cmd << directoryPath.string();
 			cmd << "\"";
 			system(cmd.str().c_str());
 		}
