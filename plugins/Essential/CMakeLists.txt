@@ -16,15 +16,11 @@ add_subdirectory(sortMeshes)
 # no entry
 
 ### bottom menu (right)
-add_subdirectory(configEditor)
+# add_subdirectory(configEditor)
 add_subdirectory(listPlugins)
-add_subdirectory(shutdown)
+# add_subdirectory(shutdown)
 
 ### others
 add_subdirectory(assets)
-add_subdirectory(updatePlugins)
-add_subdirectory(pullCanvasParameters)
-add_subdirectory(pushCanvasParameters)
-add_subdirectory(pullCurrentMeshes)
-add_subdirectory(syncCursor)
-
+# add_subdirectory(updatePlugins)
+# add_subdirectory(pullCurrentMeshes)

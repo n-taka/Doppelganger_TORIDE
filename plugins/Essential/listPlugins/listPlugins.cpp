@@ -9,17 +9,40 @@
 #define DLLEXPORT __attribute__((visibility("default")))
 #endif
 
-#include <memory>
-#include <nlohmann/json.hpp>
-
-#include "Doppelganger/Core.h"
-#include "Doppelganger/Room.h"
-#include "Doppelganger/Plugin.h"
+#if defined(_WIN64)
+#include <filesystem>
+namespace fs = std::filesystem;
+#elif defined(__APPLE__)
+#include "boost/filesystem.hpp"
+namespace fs = boost::filesystem;
+#elif defined(__linux__)
+#include <filesystem>
+namespace fs = std::filesystem;
+#endif
 
 #include <string>
-#include <fstream>
+#include <nlohmann/json.hpp>
 
-extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room> &room, const nlohmann::json &parameters, nlohmann::json &response, nlohmann::json &broadcast)
+#include "Doppelganger/Util/getPluginCatalogue.h"
+
+namespace
+{
+	char *responseChar_buf;
+}
+
+extern "C" DLLEXPORT void deallocate()
+{
+	free(responseChar_buf);
+}
+
+extern "C" DLLEXPORT void pluginProcess(
+	const char *configCoreChar,
+	const char *configRoomChar,
+	const char *parameterChar,
+	char *modifiedConfigCoreChar,
+	char *modifiedConfigRoomChar,
+	char *responseChar,
+	char *broadcastChar)
 {
 	////
 	// [IN]
@@ -28,108 +51,84 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 
 	// [OUT]
 	// response = [
-	//  {
-	//   "name": "pluginNameA",
-	//   "installedVersion": "" (if text is zero-length, which means not installed),
-	//   "versions": ["1.0.2", "1.0.1", "1.0.0"],
-	//   "description": {
-	//    "en": "description text for this plugin in en",
-	//    "ja": "description text for this plugin in ja",
-	//    ...
-	//   },
-	//   "UIPosition": "topLeft"|"topRight"|"mesh"|"bottomSummary"|"bottomLeft"|"bottomRight",
-	//   "optional": true|false,
-	//   "hasModuleJS": true|false
-	//  },
-	//  {
-	//   "name": "pluginNameB",
-	//   "installedVersion": "" (if text is zero-length, which means not installed),
-	//   "versions": ["1.0.2", "1.0.1", "1.0.0"],
-	//   "description": {
-	//    "en": "description text for this plugin in en",
-	//    "ja": "description text for this plugin in ja",
-	//    ...
-	//   },
-	//   "UIPosition": "topLeft"|"topRight"|"mesh"|"bottomSummary"|"bottomLeft"|"bottomRight",
-	//   "optional": true|false,
-	//   "hasModuleJS": true|false
-	//  },
-	//  ...
+	//     {
+	//         "name": "pluginNameA",
+	//         "installedVersion": "" (if text is zero-length, which means not installed),
+	//         "versions": [
+	//             {
+	//                 "version": "1.0.2",
+	//                 "URL": "https://..."
+	//             },
+	//             ...
+	//         ],
+	//         "description": {
+	//             "en": "description text for this plugin in en",
+	//             "ja": "description text for this plugin in ja",
+	//             ...
+	//         },
+	//         "UIPosition": "topLeft"|"topRight"|"mesh"|"bottomSummary"|"bottomLeft"|"bottomRight",
+	//         "optional": true|false
+	//     },
+	//     ...
 	// ]
-	// broadcast = {
-	// }
 
-	// create response/broadcast
-	response = nlohmann::json::array();
-	broadcast = nlohmann::json::object();
+	// initialize...
+	const nlohmann::json configRoom = nlohmann::json::parse(configRoomChar);
+	modifiedConfigCoreChar = nullptr;
+	modifiedConfigRoomChar = nullptr;
+	// responseChar = nullptr;
+	broadcastChar = nullptr;
 
-	const auto formatPluginInfo = [](const std::shared_ptr<Doppelganger::Plugin> &plugin)
-	{
-		nlohmann::json pluginInfo = nlohmann::json::object();
-		pluginInfo["name"] = plugin->name_;
-		pluginInfo["installedVersion"] = plugin->installedVersion;
-		pluginInfo["versions"] = plugin->parameters_.at("versions");
-		pluginInfo["description"] = plugin->parameters_.at("description");
-		pluginInfo["UIPosition"] = plugin->parameters_.at("UIPosition");
-		pluginInfo["optional"] = plugin->parameters_.at("optional");
-		pluginInfo["hasModuleJS"] = plugin->hasModuleJS;
-		return pluginInfo;
-	};
-
-	// get current config
-	nlohmann::json config;
-	{
-		std::lock_guard<std::mutex> lock(room->mutexConfig);
-		room->getCurrentConfig(config);
-	}
+	// initialize
+	nlohmann::json response = nlohmann::json::array();
 
 	// get plugin catalogue
-	nlohmann::json pluginCatalogue;
-	room->core_->getPluginCatalogue(config.at("plugin").at("listURL"), pluginCatalogue);
-
-	// initialize Doppelganger::Plugin instances
-	//   when plugin is not yet initialized
-	for (const auto &pluginEntry : pluginCatalogue.items())
+	nlohmann::json catalogue;
 	{
-		const std::string &name = pluginEntry.key();
-		if (room->plugin.find(name) == room->plugin.end())
+		fs::path pluginDir(configRoom.at("DoppelgangerRootDir").get<std::string>());
+		pluginDir.append("plugin");
+		std::vector<std::string> listURLList;
+		for (const auto &listURL : configRoom.at("plugin").at("listURL"))
 		{
-			const nlohmann::json &pluginInfo = pluginEntry.value();
-			room->plugin[name] = std::make_shared<Doppelganger::Plugin>(room->core_, name, pluginInfo);
+			listURLList.push_back(listURL.get<std::string>());
 		}
+		Doppelganger::Util::getPluginCatalogue(pluginDir, listURLList, catalogue);
 	}
 
-	const nlohmann::json installedPluginJson = config.at("plugin").at("installed");
-
-	std::vector<std::string> sortedInstalledPluginName(installedPluginJson.size());
-	for (const auto &installedPlugin : installedPluginJson.items())
+	std::unordered_map<std::string, nlohmann::json> plugins;
+	for (const auto &pluginEntry : catalogue)
 	{
-		const std::string &name = installedPlugin.key();
-		const nlohmann::json &value = installedPlugin.value();
-		const int index = value.at("priority").get<int>();
-		sortedInstalledPluginName.at(index) = name;
-	}
-	for(const auto &pluginName : sortedInstalledPluginName)
-	{
-		if (room->plugin.find(pluginName) != room->plugin.end())
-		{
-			const std::shared_ptr<Doppelganger::Plugin> &plugin = room->plugin.at(pluginName);
-			const nlohmann::json pluginInfo = formatPluginInfo(plugin);
-			response.push_back(pluginInfo);
-		}
+		const std::string name = pluginEntry.at("name").get<std::string>();
+		plugins[name] = pluginEntry;
 	}
 
-	const std::unordered_map<std::string, std::shared_ptr<Doppelganger::Plugin>> &plugins = room->plugin;
+	for (const auto &pluginInfo : configRoom.at("plugin").at("installed"))
+	{
+		const std::string name = pluginInfo.at("name").get<std::string>();
+		const std::string version = pluginInfo.at("version").get<std::string>();
+
+		// we manually put installedVersion for listing not-installed plugins
+		plugins.at(name).at("installedVersion") = version;
+
+		response.push_back(plugins.at(name));
+	}
+
 	for (const auto &name_plugin : plugins)
 	{
 		const std::string &name = name_plugin.first;
-		const std::shared_ptr<Doppelganger::Plugin> &plugin = name_plugin.second;
-		if (plugin->installedVersion == "")
+		const nlohmann::json &plugin = name_plugin.second;
+		if (plugin.at("installedVersion").get<std::string>() == "")
 		{
-			const nlohmann::json pluginInfo = formatPluginInfo(plugin);
-			response.push_back(pluginInfo);
+			response.push_back(plugin);
 		}
 	}
+
+	std::string responseStr(response.dump());
+	// null termination
+	responseChar = (char *)malloc(sizeof(char) * (responseStr.size() + 1));
+	responseChar_buf = responseChar;
+
+	strncpy(responseChar, responseStr.c_str(), responseStr.size());
 }
 
 #endif

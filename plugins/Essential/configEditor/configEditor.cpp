@@ -23,250 +23,306 @@ namespace fs = std::filesystem;
 #include <memory>
 #include <nlohmann/json.hpp>
 
-#include "Doppelganger/Room.h"
-#include "Doppelganger/Core.h"
-
 #include <string>
+#include <sstream>
 #include <vector>
-#include <mutex>
 #include <fstream>
 
-extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room> &room, const nlohmann::json &parameters, nlohmann::json &response, nlohmann::json &broadcast)
+////
+// [IN]
+// parameters = {
+//  "openDirectory": "plugin"|"output"|"log",
+//  "browserAvailability": true|false,
+//  "currentConfig": {
+//   "server": {
+//       "protocol": "http://",
+//       "host": "127.0.0.1",
+//       "port": 0
+//   },
+//   "browser": {
+//       "type": "chrome",
+//       "path": "",
+//       "openAs": "app",
+//       "openOnStartup": true
+//   },
+//   "log": {
+//       "dir": "",
+//       "level": [
+//           "SYSTEM",
+//           "APICALL",
+//           "WSCALL",
+//           "ERROR",
+//           "MISC",
+//           "DEBUG"
+//       ],
+//       "type": [
+//           "STDOUT",
+//           "FILE"
+//       ]
+//   },
+//   "output": {
+//       "type": "local",
+//       "dir": ""
+//   },
+//   "plugin": {
+//       "dir": "",
+//       "listURL": [
+//           "https://n-taka.info/nextcloud/s/KKH2dWmTRT5wRA5/download/defaultPluginList.json"
+//       ]
+//   },
+//  "update": {
+//   "server": {
+//       "protocol": "http://",
+//       "host": "127.0.0.1",
+//       "port": 0
+//   },
+//   "browser": {
+//       "type": "chrome",
+//       "path": "",
+//       "openAs": "app",
+//       "openOnStartup": true
+//   },
+//   "log": {
+//       "dir": "",
+//       "level": [
+//           "SYSTEM",
+//           "APICALL",
+//           "WSCALL",
+//           "ERROR",
+//           "MISC",
+//           "DEBUG"
+//       ],
+//       "type": [
+//           "STDOUT",
+//           "FILE"
+//       ]
+//   },
+//   "output": {
+//       "type": "local",
+//       "dir": ""
+//   },
+//   "plugin": {
+//       "dir": "",
+//       "listURL": [
+//           "https://n-taka.info/nextcloud/s/KKH2dWmTRT5wRA5/download/defaultPluginList.json"
+//       ]
+//   }
+//  }
+// }
+
+// [OUT]
+// response = {
+//  current JSON parameters (with browser availability) when forUIGeneration == true
+// }
+// response = {
+//  updated JSON parameters when forUIGeneration == false
+// }
+// broadcast = {
+// }
+
+namespace
 {
-	////
-	// [IN]
-	// parameters = {
-	//  "forUIGeneration": true|false,
-	//  "openDirectory": "plugin"|"output"|"log",
-	//  "server": {
-	//      "protocol": "http://",
-	//      "host": "127.0.0.1",
-	//      "port": 0
-	//  },
-	//  "browser": {
-	//      "type": "chrome",
-	//      "path": "",
-	//      "openAs": "app",
-	//      "openOnStartup": true
-	//  },
-	//  "log": {
-	//      "dir": "",
-	//      "level": [
-	//          "SYSTEM",
-	//          "APICALL",
-	//          "WSCALL",
-	//          "ERROR",
-	//          "MISC",
-	//          "DEBUG"
-	//      ],
-	//      "type": [
-	//          "STDOUT",
-	//          "FILE"
-	//      ]
-	//  },
-	//  "output": {
-	//      "type": "local",
-	//      "dir": ""
-	//  },
-	//  "plugin": {
-	//      "dir": "",
-	//      "listURL": [
-	//          "https://n-taka.info/nextcloud/s/KKH2dWmTRT5wRA5/download/defaultPluginList.json"
-	//      ]
-	//  }
-	// }
-
-	// [OUT]
-	// response = {
-	//  current JSON parameters (with browser availability) when forUIGeneration == true
-	// }
-	// response = {
-	//  updated JSON parameters when forUIGeneration == false
-	// }
-	// broadcast = {
-	// }
-
-	// create response/broadcast
-	response = nlohmann::json::object();
-	broadcast = nlohmann::json::object();
-
-	// get current config
-	// switch for demo on web (then, we need to get current "room" config)
+	void pluginProcess(
+		const char *info,
+		const char *parameter,
+		char *response,
+		char *broadcast)
 	{
-		std::lock_guard<std::mutex> lock(room->core_->mutexConfig);
-		room->core_->getCurrentConfig(response);
-	}
+		const nlohmann::json infoJson = nlohmann::json::parse(info);
+		const nlohmann::json parameterJson = nlohmann::json::parse(parameter);
+		response = nullptr;
+		broadcast = nullptr;
 
-	if (parameters.contains("openDirectory"))
-	{
-		// request for open directory
-		const std::string &target = parameters.at("openDirectory").get<std::string>();
-		if (target == "plugin")
-		{
-			std::stringstream cmd;
-#if defined(_WIN64)
-			cmd << "start \"\" \"";
-#elif defined(__APPLE__)
-			cmd << "open \"";
-#elif defined(__linux__)
-			cmd << "xdg-open \"";
-#endif
-			fs::path pluginDir(room->core_->DoppelgangerRootDir);
-			pluginDir.append("plugin");
-			cmd << pluginDir.string();
-			cmd << "\"";
-			system(cmd.str().c_str());
-		}
-		else if (target == "output")
-		{
-			std::stringstream cmd;
-#if defined(_WIN64)
-			cmd << "start \"\" \"";
-#elif defined(__APPLE__)
-			cmd << "open \"";
-#elif defined(__linux__)
-			cmd << "xdg-open \"";
-#endif
-			fs::path outputDir(room->dataDir);
-			outputDir.append("output");
-			cmd << outputDir.string();
-			cmd << "\"";
-			system(cmd.str().c_str());
-		}
-		else if (target == "log")
-		{
-			std::stringstream cmd;
-#if defined(_WIN64)
-			cmd << "start \"\" \"";
-#elif defined(__APPLE__)
-			cmd << "open \"";
-#elif defined(__linux__)
-			cmd << "xdg-open \"";
-#endif
-			fs::path logDir(room->dataDir);
-			logDir.append("log");
-			cmd << logDir.string();
-			cmd << "\"";
-			system(cmd.str().c_str());
-		}
-	}
-	else if (parameters.contains("forUIGeneration") && parameters.at("forUIGeneration").get<bool>())
-	{
-		// request for generateUI
-		// browser availability
-		response.at("browser")["availableBrowsers"] = nlohmann::json::array();
+		// create response/broadcast
+		nlohmann::json responseJson = nlohmann::json::object();
+		nlohmann::json broadcastJson = nlohmann::json::object();
 
-		if (response.at("server").at("host") == "127.0.0.1")
+		responseJson = parameterJson.at("currentConfig");
+		responseJson.update(parameterJson.at("update"));
+
+		if (parameterJson.contains("openDirectory"))
 		{
-			// chrome
+			// request for open directory
+			const std::string &target = parameterJson.at("openDirectory").get<std::string>();
+			if (target == "plugin")
 			{
+				std::stringstream cmd;
 #if defined(_WIN64)
-				std::vector<fs::path> chromePaths({fs::path("C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"),
-												   fs::path("C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe")});
+				cmd << "start \"\" \"";
 #elif defined(__APPLE__)
-				std::vector<fs::path> chromePaths({fs::path("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")});
+				cmd << "open \"";
 #elif defined(__linux__)
-				std::vector<fs::path> chromePaths({fs::path("/opt/google/chrome/google-chrome")});
+				cmd << "xdg-open \"";
 #endif
-				for (auto &p : chromePaths)
+				fs::path pluginDir(infoJson.at("pluginDir").get<std::string>());
+				pluginDir.append("plugin");
+				cmd << pluginDir.string();
+				cmd << "\"";
+				system(cmd.str().c_str());
+			}
+			else if (target == "output")
+			{
+				std::stringstream cmd;
+#if defined(_WIN64)
+				cmd << "start \"\" \"";
+#elif defined(__APPLE__)
+				cmd << "open \"";
+#elif defined(__linux__)
+				cmd << "xdg-open \"";
+#endif
+				fs::path outputDir(infoJson.at("dataDir").get<std::string>());
+				outputDir.append("output");
+				cmd << outputDir.string();
+				cmd << "\"";
+				system(cmd.str().c_str());
+			}
+			else if (target == "log")
+			{
+				std::stringstream cmd;
+#if defined(_WIN64)
+				cmd << "start \"\" \"";
+#elif defined(__APPLE__)
+				cmd << "open \"";
+#elif defined(__linux__)
+				cmd << "xdg-open \"";
+#endif
+				fs::path logDir(infoJson.at("dataDir").get<std::string>());
+				logDir.append("log");
+				cmd << logDir.string();
+				cmd << "\"";
+				system(cmd.str().c_str());
+			}
+		}
+		else if (parameterJson.contains("browserAvailability") && parameterJson.at("browserAvailability").get<bool>())
+		{
+			// request for generateUI
+			// browser availability
+			responseJson.at("browser")["availableBrowsers"] = nlohmann::json::array();
+
+			if (responseJson.at("server").at("host") == "127.0.0.1")
+			{
+				// chrome
 				{
-					p.make_preferred();
-					if (fs::exists(p))
+#if defined(_WIN64)
+					std::vector<fs::path> chromePaths({fs::path("C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"),
+													   fs::path("C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe")});
+#elif defined(__APPLE__)
+					std::vector<fs::path> chromePaths({fs::path("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")});
+#elif defined(__linux__)
+					std::vector<fs::path> chromePaths({fs::path("/opt/google/chrome/google-chrome")});
+#endif
+					for (auto &p : chromePaths)
 					{
-						response.at("browser").at("availableBrowsers").push_back("chrome");
-						break;
+						p.make_preferred();
+						if (fs::exists(p))
+						{
+							responseJson.at("browser").at("availableBrowsers").push_back("chrome");
+							break;
+						}
 					}
 				}
-			}
 
-			// firefox
-			{
-#if defined(_WIN64)
-				std::vector<fs::path> firefoxPaths({fs::path("C:\\Program Files\\Mozilla Firefox\\firefox.exe"),
-													fs::path("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe")});
-#elif defined(__APPLE__)
-				std::vector<fs::path> firefoxPaths({fs::path("/Applications/Firefox.app/Contents/MacOS/firefox")});
-#elif defined(__linux__)
-				std::vector<fs::path> firefoxPaths({fs::path("/usr/bin/firefox")});
-#endif
-				for (auto &p : firefoxPaths)
+				// firefox
 				{
-					p.make_preferred();
-					if (fs::exists(p))
+#if defined(_WIN64)
+					std::vector<fs::path> firefoxPaths({fs::path("C:\\Program Files\\Mozilla Firefox\\firefox.exe"),
+														fs::path("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe")});
+#elif defined(__APPLE__)
+					std::vector<fs::path> firefoxPaths({fs::path("/Applications/Firefox.app/Contents/MacOS/firefox")});
+#elif defined(__linux__)
+					std::vector<fs::path> firefoxPaths({fs::path("/usr/bin/firefox")});
+#endif
+					for (auto &p : firefoxPaths)
 					{
-						response.at("browser").at("availableBrowsers").push_back("firefox");
-						break;
+						p.make_preferred();
+						if (fs::exists(p))
+						{
+							responseJson.at("browser").at("availableBrowsers").push_back("firefox");
+							break;
+						}
 					}
 				}
-			}
 
-			// edge
-			{
-#if defined(_WIN64)
-				fs::path edgePath("C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe");
-				edgePath.make_preferred();
-				if (fs::exists(edgePath))
+				// edge
 				{
-					response.at("browser").at("availableBrowsers").push_back("edge");
-				}
-#elif defined(__APPLE__)
-				// nothing
-#elif defined(__linux__)
-				// nothing
-#endif
-			}
-
-			// safari
-			{
 #if defined(_WIN64)
-				// nothing
+					fs::path edgePath("C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe");
+					edgePath.make_preferred();
+					if (fs::exists(edgePath))
+					{
+						responseJson.at("browser").at("availableBrowsers").push_back("edge");
+					}
 #elif defined(__APPLE__)
-				// todo update
-				fs::path safariPath("/Applications/Safari.app/Contents/MacOS/safari");
-				safariPath.make_preferred();
-				if (fs::exists(safariPath))
-				{
-					response.at("browser").at("availableBrowsers").push_back("safari");
-				}
+					// nothing
 #elif defined(__linux__)
-				// nothing
+					// nothing
 #endif
-			}
+				}
 
-			// default
+				// safari
+				{
+#if defined(_WIN64)
+					// nothing
+#elif defined(__APPLE__)
+					// todo update
+					fs::path safariPath("/Applications/Safari.app/Contents/MacOS/safari");
+					safariPath.make_preferred();
+					if (fs::exists(safariPath))
+					{
+						responseJson.at("browser").at("availableBrowsers").push_back("safari");
+					}
+#elif defined(__linux__)
+					// nothing
+#endif
+				}
+
+				// default
+				{
+					responseJson.at("browser").at("availableBrowsers").push_back("default");
+				}
+			}
+		}
+		else
+		{
+
+			// write to config.json
+			// switch for demo on web (then, we need to update current "room" config)
 			{
-				response.at("browser").at("availableBrowsers").push_back("default");
+				std::lock_guard<std::mutex> lock(room->core_->mutexConfig);
+				room->core_->updateConfig(response);
 			}
 		}
 	}
-	else
-	{
-		// request for update
+}
 
-		// current config always has 2-depth, we can easily implement as follows;
-		for (const auto &parameterItem : parameters.items())
-		{
-			// add parameter if is doesn't exist
-			if (!response.contains(parameterItem.key()))
-			{
-				response[parameterItem.key()] = nlohmann::json::object();
-			}
+extern "C" DLLEXPORT void corePluginProcess(
+	char *info,
+	char *parameter,
+	char *response,
+	char *broadcast)
+{
+	const nlohmann::json parameterJson = nlohmann::json::parse(parameter);
+	response = nullptr;
+	broadcast = nullptr;
+}
 
-			const nlohmann::json &parametersJson = parameters.at(parameterItem.key());
-			nlohmann::json &responseJson = response.at(parameterItem.key());
-			for (const auto &item : parametersJson.items())
-			{
-				responseJson[item.key()] = item.value();
-			}
-		}
+extern "C" DLLEXPORT void roomPluginProcess(
+	char *info,
+	char *parameter,
+	char *response,
+	char *broadcast)
+{
+}
 
-		// write to config.json
-		// switch for demo on web (then, we need to update current "room" config)
-		{
-			std::lock_guard<std::mutex> lock(room->core_->mutexConfig);
-			room->core_->updateConfig(response);
-		}
-	}
+extern "C" DLLEXPORT void meshPluginProcess(
+	const char *info,
+	const char *parameter,
+	char *response,
+	char *broadcast)
+{
+	// do nothing
+	response = nullptr;
+	broadcast = nullptr;
 }
 
 #endif

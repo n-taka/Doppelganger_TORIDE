@@ -4,7 +4,6 @@
     "description": "Set of plugins for Doppelganger",
     "homepage": "https://github.com/n-taka/Doppelganger_Plugin",
     "dependencies": [
-        "boost-any",
         "boost-asio",
         "boost-beast",
         "boost-random",
@@ -12,6 +11,7 @@
         "boost-filesystem",
         "nlohmann-json",
         "eigen3",
+        "minizip",
         "embree3",
         "openssl"
     ]

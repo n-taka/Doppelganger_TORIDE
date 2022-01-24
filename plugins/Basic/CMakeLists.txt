@@ -33,4 +33,6 @@ add_subdirectory(crossSectionalView)
 add_subdirectory(outlineOnClick)
 add_subdirectory(fitToFrame)
 add_subdirectory(alignCamera)
+add_subdirectory(syncViewport)
+add_subdirectory(syncCursor)
 
