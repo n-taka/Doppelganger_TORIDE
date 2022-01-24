@@ -1,6 +1,6 @@
 {
-    "name": "doppelganger-plugin-core",
-    "version-string": "2021.10",
+    "name": "doppelganger-plugin",
+    "version-string": "2.0",
     "description": "Set of plugins for Doppelganger",
     "homepage": "https://github.com/n-taka/Doppelganger_Plugin",
     "dependencies": [
