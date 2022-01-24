@@ -1,5 +1,6 @@
-{
-    "loadCADData": {
+[
+    {
+        "name": "loadCADData",
         "description": {
             "en": "Load CAD data (iges, step)",
             "ja": "CADデータを読み込みます(iges, step)"
@@ -13,7 +14,8 @@
             }
         ]
     },
-    "splitIntoIslands": {
+    {
+        "name": "splitIntoIslands",
         "description": {
             "en": "Split a mesh into connected components",
             "ja": "メッシュをアイランド単位に分離します"
@@ -27,7 +29,8 @@
             }
         ]
     },
-    "hollowMesh": {
+    {
+        "name": "hollowMesh",
         "description": {
             "en": "Hollow single mesh",
             "ja": "メッシュを中空にします"
@@ -41,7 +44,8 @@
             }
         ]
     },
-    "repairMesh": {
+    {
+        "name": "repairMesh",
         "description": {
             "en": "Repair single mesh",
             "ja": "単一のメッシュのエラーを修正します"
@@ -55,7 +59,8 @@
             }
         ]
     },
-    "estimateThickness": {
+    {
+        "name": "estimateThickness",
         "description": {
             "en": "Estimate thickness",
             "ja": "厚みをチェックします"
@@ -69,7 +74,8 @@
             }
         ]
     },
-    "repairAllMeshes": {
+    {
+        "name": "repairAllMeshes",
         "description": {
             "en": "Repair all meshes",
             "ja": "すべてのメッシュのエラーを修正します"
@@ -83,4 +89,4 @@
             }
         ]
     }
-}
+]

@@ -1,5 +1,6 @@
-{
-    "sortMeshes": {
+[
+    {
+        "name": "sortMeshes",
         "description": {
             "en": "Sort meshes based on name or #triangles",
             "ja": "名前もしくはポリゴン数でメッシュをソートします"
@@ -13,7 +14,8 @@
             }
         ]
     },
-    "configEditor": {
+    {
+        "name": "configEditor",
         "description": {
             "en": "Edit config file",
             "ja": "設定ファイルを編集します"
@@ -27,7 +29,8 @@
             }
         ]
     },
-    "listPlugins": {
+    {
+        "name": "listPlugins",
         "description": {
             "en": "List all available plugins",
             "ja": "利用できるプラグインをリストアップします"
@@ -41,7 +44,8 @@
             }
         ]
     },
-    "shutdown": {
+    {
+        "name": "shutdown",
         "description": {
             "en": "Graceful shutdown",
             "ja": "正常終了を行います"
@@ -55,7 +59,8 @@
             }
         ]
     },
-    "assets": {
+    {
+        "name": "assets",
         "description": {
             "en": "Set of files for HTML client",
             "ja": "HTMLクライアントのためのファイル群です"
@@ -69,7 +74,8 @@
             }
         ]
     },
-    "updatePlugins": {
+    {
+        "name": "updatePlugins",
         "description": {
             "en": "Update plugins",
             "ja": "プラグインの更新を行います"
@@ -83,7 +89,8 @@
             }
         ]
     },
-    "pullCanvasParameters": {
+    {
+        "name": "pullCanvasParameters",
         "description": {
             "en": "Get parameters for camera on startup",
             "ja": "接続時にカメラのパラメタを取得します"
@@ -97,7 +104,8 @@
             }
         ]
     },
-    "pushCanvasParameters": {
+    {
+        "name": "pushCanvasParameters",
         "description": {
             "en": "Synchronize parameters for camera across clients",
             "ja": "全クライアント間でカメラのパラメタを共有します"
@@ -111,7 +119,8 @@
             }
         ]
     },
-    "pullCurrentMeshes": {
+    {
+        "name": "pullCurrentMeshes",
         "description": {
             "en": "Get already loaded meshes on startup",
             "ja": "接続時にすでに読み込まれているメッシュを取得します"
@@ -125,7 +134,8 @@
             }
         ]
     },
-    "syncCursor": {
+    {
+        "name": "syncCursor",
         "description": {
             "en": "Synchronize cursors across clients",
             "ja": "全クライアント間でカーソル位置を共有します"
@@ -139,4 +149,4 @@
             }
         ]
     }
-}
+]
