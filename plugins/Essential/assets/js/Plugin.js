@@ -5,14 +5,19 @@ export const Plugin = {};
 Plugin.loadPlugin = async function (name, version) {
     // http://example.com/<roomUUID>/plugin/APIName_version/module.js
     const path = "../plugin/" + name + "_" + version + "/module.js";
-    const module = await import(path);
-    await module.init();
+    try {
+        const module = await import(path);
+        await module.init();
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 Plugin.init = async function () {
     Plugin.pluginList = JSON.parse(await request("listPlugins", {}));
+    console.log(Plugin.pluginList);
     for (let plugin of Plugin.pluginList) {
-        if (plugin["installedVersion"].length > 0 && plugin["hasModuleJS"]) {
+        if (plugin["installedVersion"] && plugin["hasModuleJS"]) {
             // we explicitly load plugin sequentially
             await Plugin.loadPlugin(plugin["name"], plugin["installedVersion"] == "latest" ? plugin["versions"][0]["version"] : plugin["installedVersion"]);
         }

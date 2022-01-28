@@ -252,7 +252,7 @@ const generateUI = async function () {
                                     const option = document.createElement('option');
                                     option.setAttribute("value", mode);
                                     option.setAttribute('style', 'text-align: center; user-select: none;');
-                                    if (configJson["browser"] && configJson["browser"]["openAs"] && configJson["browser"]["openAs"] == mode) {
+                                    if (configJson["browser"] && configJson["browser"]["openMode"] && configJson["browser"]["openMode"] == mode) {
                                         option.setAttribute("selected", true);
                                     }
 
@@ -269,7 +269,7 @@ const generateUI = async function () {
                             }
                             {
                                 const label = document.createElement('label');
-                                label.innerText = getText(text, "Open as...");
+                                label.innerText = getText(text, "Open mode");
                                 divCol.appendChild(label);
                             }
                             divSelect.appendChild(divCol);
@@ -506,7 +506,7 @@ const generateUI = async function () {
                                     const inputCheckbox = document.createElement("input");
                                     inputCheckbox.setAttribute("type", "checkbox")
                                     inputCheckbox.setAttribute("id", "log" + level);
-                                    inputCheckbox.checked = configJson["log"] && configJson["log"]["level"] && configJson["log"]["level"].includes(level);
+                                    inputCheckbox.checked = configJson["log"] && configJson["log"]["level"] && configJson["log"]["level"][level];
                                     labelCheckbox.appendChild(inputCheckbox);
                                 }
                                 {
@@ -540,7 +540,7 @@ const generateUI = async function () {
                                     const inputCheckbox = document.createElement("input");
                                     inputCheckbox.setAttribute("type", "checkbox")
                                     inputCheckbox.setAttribute("id", "log" + dest);
-                                    inputCheckbox.checked = configJson["log"] && configJson["log"]["type"] && configJson["log"]["type"].includes(dest);
+                                    inputCheckbox.checked = configJson["log"] && configJson["log"]["type"] && configJson["log"]["type"][dest];
                                     if (dest == "FILE") {
                                         divColDirOpen.setAttribute('style', (inputCheckbox.checked) ? 'display: inline;' : 'display: none;');
                                         inputCheckbox.addEventListener("change", function () {
@@ -630,16 +630,12 @@ const generateUI = async function () {
                         updatedConfigJson["log"]["level"] = [];
                         const logLevels = ["SYSTEM", "APICALL", "WSCALL", "ERROR", "MISC", "DEBUG"];
                         for (let level of logLevels) {
-                            if (document.getElementById("log" + level).checked) {
-                                updatedConfigJson["log"]["level"].push(level);
-                            }
+                            updatedConfigJson["log"]["level"][level] = (document.getElementById("log" + level).checked);
                         }
                         updatedConfigJson["log"]["type"] = [];
                         const destinations = ["STDOUT", "FILE"];
                         for (let dest of destinations) {
-                            if (document.getElementById("log" + dest).checked) {
-                                updatedConfigJson["log"]["type"].push(dest);
-                            }
+                            updatedConfigJson["log"]["type"][dest] = (document.getElementById("log" + dest).checked);
                         }
                         // output
                         updatedConfigJson["output"] = {};

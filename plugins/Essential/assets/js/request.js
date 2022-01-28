@@ -18,6 +18,8 @@ export async function request(path, parameterJson, contentType) {
         requestInfo["headers"] = {};
         requestInfo["headers"]["Content-Type"] = contentType;
     }
+    console.log(uri);
+    console.log(payloadJson);
     return fetch(uri, requestInfo).then(async response => {
         if (response.ok) {
             return response.text();

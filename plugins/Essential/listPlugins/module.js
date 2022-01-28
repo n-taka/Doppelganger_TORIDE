@@ -208,7 +208,6 @@ const generateUI = async function () {
                             const select = document.createElement('select');
                             select.setAttribute("data-plugin-name", plugin["name"]);
 
-
                             // we add special entry "latest"
                             {
                                 const option = document.createElement('option');
@@ -234,10 +233,11 @@ const generateUI = async function () {
                             if (plugin["optional"]) {
                                 const option = document.createElement('option');
                                 option.setAttribute('value', "");
-                                if (plugin["installedVersion"] == "") {
+                                if (!plugin["installedVersion"]) {
+                                    // undefined or empty string
                                     option.setAttribute('selected', "");
                                 }
-                                option.innerText = getText(text, ((plugin["installedVersion"].length > 0) ? "Uninstall" : "Don't install"));
+                                option.innerText = getText(text, ((plugin["installedVersion"]) ? "Uninstall" : "Don't install"));
                                 select.appendChild(option);
                             }
 

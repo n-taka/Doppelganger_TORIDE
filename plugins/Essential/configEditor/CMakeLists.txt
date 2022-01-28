@@ -20,8 +20,6 @@ if (APPLE)
 endif ()
 # json
 find_package(nlohmann_json CONFIG REQUIRED)
-# openSSL
-find_package(OpenSSL REQUIRED)
 
 
 ##############################################
@@ -43,8 +41,7 @@ target_sources(
 ### include directories
 ##############################################
 target_include_directories(${PROJECT_NAME} PUBLIC
-    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/submodule/libigl/include
-    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/Doppelganger_install/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../
 )
 
 
@@ -57,9 +54,6 @@ if(WIN32)
         ${PROJECT_NAME} PRIVATE
         nlohmann_json
         nlohmann_json::nlohmann_json
-        OpenSSL::SSL
-        OpenSSL::Crypto
-        ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/Doppelganger_install/lib/Doppelganger.lib
     )
 elseif (APPLE)
     target_link_libraries(
@@ -67,17 +61,12 @@ elseif (APPLE)
         ${Boost_LIBRARIES}
         nlohmann_json
         nlohmann_json::nlohmann_json
-        OpenSSL::SSL
-        OpenSSL::Crypto
     )
 elseif (UNIX)
     target_link_libraries(
         ${PROJECT_NAME} PRIVATE
-        ${Boost_LIBRARIES}
         nlohmann_json
         nlohmann_json::nlohmann_json
-        OpenSSL::SSL
-        OpenSSL::Crypto
     )
 endif ()
 

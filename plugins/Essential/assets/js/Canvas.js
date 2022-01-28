@@ -5,8 +5,8 @@ import { RenderPass } from 'https://cdn.skypack.dev/three@v0.132/examples/jsm/po
 import { EffectComposer } from 'https://cdn.skypack.dev/three@v0.132/examples/jsm/postprocessing/EffectComposer.js';
 
 import { UI } from './UI.js';
-import { Core } from './Core.js';
-import { WS } from './WS.js';
+// import { Core } from './Core.js';
+// import { WS } from './WS.js';
 import { request } from './request.js';
 import { MouseKey } from './MouseKey.js';
 
@@ -20,6 +20,8 @@ import { constructMeshLiFromParameters } from './constructMeshLiFrom.js';
 ////
 
 export const Canvas = {};
+
+Canvas.drawLoopTasks = [];
 
 Canvas.init = async function () {
     // default color
@@ -131,104 +133,105 @@ Canvas.init = async function () {
         Canvas.effectComposer.setSize(Canvas.width, Canvas.height);
     });
 
-    await Canvas.pullCanvasParameters();
-
     Canvas.drawLoop();
     return;
 };
 
-Canvas.drawLoop = function () {
+Canvas.drawLoop = async function () {
     Canvas.controls.update();
-    Canvas.pushCanvasParameters();
+    // Canvas.pushCanvasParameters();
+    for (let handler of Canvas.drawLoopTasks) {
+        await handler();
+    }
     requestAnimationFrame(Canvas.drawLoop);
     Canvas.effectComposer.render();
 };
 
-Canvas.pullCanvasParameters = async function () {
-    const json = JSON.parse(await request("pullCanvasParameters", {}));
-    Canvas.controls.target.set(json["controls"]["target"].x, json["controls"]["target"].y, json["controls"]["target"].z);
-    Canvas.camera.position.set(json["camera"]["position"].x, json["camera"]["position"].y, json["camera"]["position"].z);
-    Canvas.camera.up.set(json["camera"]["up"].x, json["camera"]["up"].y, json["camera"]["up"].z);
-    Canvas.camera.zoom = json["camera"]["zoom"]["value"];
-    Canvas.camera.updateProjectionMatrix();
-    Canvas.camera.lookAt(Canvas.controls.target.clone());
-    Canvas.camera.updateMatrixWorld(true);
+// Canvas.pullCanvasParameters = async function () {
+//     const json = JSON.parse(await request("pullCanvasParameters", {}));
+//     Canvas.controls.target.set(json["controls"]["target"].x, json["controls"]["target"].y, json["controls"]["target"].z);
+//     Canvas.camera.position.set(json["camera"]["position"].x, json["camera"]["position"].y, json["camera"]["position"].z);
+//     Canvas.camera.up.set(json["camera"]["up"].x, json["camera"]["up"].y, json["camera"]["up"].z);
+//     Canvas.camera.zoom = json["camera"]["zoom"]["value"];
+//     Canvas.camera.updateProjectionMatrix();
+//     Canvas.camera.lookAt(Canvas.controls.target.clone());
+//     Canvas.camera.updateMatrixWorld(true);
 
-    // for avoiding (semi-)infinite messaging.
-    Canvas.lastControlTarget["value"] = Canvas.controls.target.clone();
-    Canvas.lastControlTarget["timestamp"] = json["controls"]["target"]["timestamp"];
-    Canvas.lastCameraPosition["value"] = Canvas.camera.position.clone();
-    Canvas.lastCameraPosition["timestamp"] = json["camera"]["position"]["timestamp"];
-    Canvas.lastCameraUp["value"] = Canvas.camera.up.clone();
-    Canvas.lastCameraUp["timestamp"] = json["camera"]["up"]["timestamp"];
-    Canvas.lastCameraZoom["value"] = Canvas.camera.zoom;
-    Canvas.lastCameraZoom["timestamp"] = json["camera"]["zoom"]["timestamp"];
+//     // for avoiding (semi-)infinite messaging.
+//     Canvas.lastControlTarget["value"] = Canvas.controls.target.clone();
+//     Canvas.lastControlTarget["timestamp"] = json["controls"]["target"]["timestamp"];
+//     Canvas.lastCameraPosition["value"] = Canvas.camera.position.clone();
+//     Canvas.lastCameraPosition["timestamp"] = json["camera"]["position"]["timestamp"];
+//     Canvas.lastCameraUp["value"] = Canvas.camera.up.clone();
+//     Canvas.lastCameraUp["timestamp"] = json["camera"]["up"]["timestamp"];
+//     Canvas.lastCameraZoom["value"] = Canvas.camera.zoom;
+//     Canvas.lastCameraZoom["timestamp"] = json["camera"]["zoom"]["timestamp"];
 
-    // cursor
-    for (let sessionUUID in json["cursors"]) {
-        if (!MouseKey["cursors"][sessionUUID]) {
-            // new entry
-            MouseKey["cursors"][sessionUUID] = { "dir": new THREE.Vector2(0, 0), "idx": json["cursors"][sessionUUID]["idx"], "img": new Image() };
-            const style = MouseKey["cursors"][sessionUUID].img.style;
-            style.position = "fixed";
-            style["z-index"] = "1000"; // material css sidenav has 999
-            style["pointer-events"] = "none";
-            MouseKey["cursors"][sessionUUID].img.src = "../icon/cursorIcon" + (MouseKey["cursors"][sessionUUID].idx % 10) + ".png";
+//     // cursor
+//     for (let sessionUUID in json["cursors"]) {
+//         if (!MouseKey["cursors"][sessionUUID]) {
+//             // new entry
+//             MouseKey["cursors"][sessionUUID] = { "dir": new THREE.Vector2(0, 0), "idx": json["cursors"][sessionUUID]["idx"], "img": new Image() };
+//             const style = MouseKey["cursors"][sessionUUID].img.style;
+//             style.position = "fixed";
+//             style["z-index"] = "1000"; // material css sidenav has 999
+//             style["pointer-events"] = "none";
+//             MouseKey["cursors"][sessionUUID].img.src = "../icon/cursorIcon" + (MouseKey["cursors"][sessionUUID].idx % 10) + ".png";
 
-            document.body.appendChild(MouseKey["cursors"][sessionUUID].img);
-        }
-        MouseKey["cursors"][sessionUUID]["dir"].set(json["cursors"][sessionUUID]["dir"].x, json["cursors"][sessionUUID]["dir"].y);
+//             document.body.appendChild(MouseKey["cursors"][sessionUUID].img);
+//         }
+//         MouseKey["cursors"][sessionUUID]["dir"].set(json["cursors"][sessionUUID]["dir"].x, json["cursors"][sessionUUID]["dir"].y);
 
-        const vector = MouseKey["cursors"][sessionUUID]["dir"].clone();
-        const clientX = vector.x + window.innerWidth / 2.0;
-        const clientY = vector.y + window.innerHeight / 2.0;
-        MouseKey["cursors"][sessionUUID].img.style.left = (clientX - 16) + "px";
-        MouseKey["cursors"][sessionUUID].img.style.top = (clientY - 16) + "px";
-    }
-};
+//         const vector = MouseKey["cursors"][sessionUUID]["dir"].clone();
+//         const clientX = vector.x + window.innerWidth / 2.0;
+//         const clientY = vector.y + window.innerHeight / 2.0;
+//         MouseKey["cursors"][sessionUUID].img.style.left = (clientX - 16) + "px";
+//         MouseKey["cursors"][sessionUUID].img.style.top = (clientY - 16) + "px";
+//     }
+// };
 
-Canvas.pushCanvasParameters = async function () {
-    if (Core["UUID"]) {
-        const targetnEq = (!Canvas.lastControlTarget["value"].equals(Canvas.controls.target));
-        const posnEq = (!Canvas.lastCameraPosition["value"].equals(Canvas.camera.position));
-        const upnEq = (!Canvas.lastCameraUp["value"].equals(Canvas.camera.up));
-        const zoomnEq = (Canvas.lastCameraZoom["value"] != Canvas.camera.zoom);
+// Canvas.pushCanvasParameters = async function () {
+//     if (Core["UUID"]) {
+//         const targetnEq = (!Canvas.lastControlTarget["value"].equals(Canvas.controls.target));
+//         const posnEq = (!Canvas.lastCameraPosition["value"].equals(Canvas.camera.position));
+//         const upnEq = (!Canvas.lastCameraUp["value"].equals(Canvas.camera.up));
+//         const zoomnEq = (Canvas.lastCameraZoom["value"] != Canvas.camera.zoom);
 
-        const json = {};
-        if (targetnEq) {
-            json["controls"] = {};
-            Canvas.lastControlTarget["value"] = Canvas.controls.target.clone();
-            Canvas.lastControlTarget["timestamp"] = MouseKey.strokeTimeStamp;
-            json["controls"]["target"] = Canvas.lastControlTarget;
-        }
-        if (posnEq) {
-            json["camera"] = {};
-            Canvas.lastCameraPosition["value"] = Canvas.camera.position.clone();
-            Canvas.lastCameraPosition["timestamp"] = MouseKey.strokeTimeStamp;
-            json["camera"]["position"] = Canvas.lastCameraPosition;
-        }
-        if (upnEq) {
-            if (!json["camera"]) {
-                json["camera"] = {};
-            }
-            Canvas.lastCameraUp["value"] = Canvas.camera.up.clone();
-            Canvas.lastCameraUp["timestamp"] = MouseKey.strokeTimeStamp;
-            json["camera"]["up"] = Canvas.lastCameraUp;
-        }
-        if (zoomnEq) {
-            if (!json["camera"]) {
-                json["camera"] = {};
-            }
-            Canvas.lastCameraZoom["value"] = Canvas.camera.zoom;
-            Canvas.lastCameraZoom["timestamp"] = MouseKey.strokeTimeStamp;
-            json["camera"]["zoom"] = Canvas.lastCameraZoom;
-        }
+//         const json = {};
+//         if (targetnEq) {
+//             json["controls"] = {};
+//             Canvas.lastControlTarget["value"] = Canvas.controls.target.clone();
+//             Canvas.lastControlTarget["timestamp"] = MouseKey.strokeTimeStamp;
+//             json["controls"]["target"] = Canvas.lastControlTarget;
+//         }
+//         if (posnEq) {
+//             json["camera"] = {};
+//             Canvas.lastCameraPosition["value"] = Canvas.camera.position.clone();
+//             Canvas.lastCameraPosition["timestamp"] = MouseKey.strokeTimeStamp;
+//             json["camera"]["position"] = Canvas.lastCameraPosition;
+//         }
+//         if (upnEq) {
+//             if (!json["camera"]) {
+//                 json["camera"] = {};
+//             }
+//             Canvas.lastCameraUp["value"] = Canvas.camera.up.clone();
+//             Canvas.lastCameraUp["timestamp"] = MouseKey.strokeTimeStamp;
+//             json["camera"]["up"] = Canvas.lastCameraUp;
+//         }
+//         if (zoomnEq) {
+//             if (!json["camera"]) {
+//                 json["camera"] = {};
+//             }
+//             Canvas.lastCameraZoom["value"] = Canvas.camera.zoom;
+//             Canvas.lastCameraZoom["timestamp"] = MouseKey.strokeTimeStamp;
+//             json["camera"]["zoom"] = Canvas.lastCameraZoom;
+//         }
 
-        if (targetnEq || posnEq || upnEq || zoomnEq) {
-            WS.sendMsg("pushCanvasParameters", json);
-        }
-    }
-};
+//         if (targetnEq || posnEq || upnEq || zoomnEq) {
+//             WS.sendMsg("pushCanvasParameters", json);
+//         }
+//     }
+// };
 
 Canvas.pullCurrentMeshes = async function () {
     const parameters = JSON.parse(await request("pullCurrentMeshes"));
