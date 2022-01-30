@@ -5,6 +5,7 @@ export const WSTasks = {};
 
 WSTasks["initializeSession"] = initializeSession;
 WSTasks["isServerBusy"] = isServerBusy;
+WSTasks["forceReload"] = forceReload;
 // WSTasks["syncMeshes"] = syncMeshes;
 
 async function initializeSession(parameters) {
@@ -23,4 +24,12 @@ async function isServerBusy(parameters) {
     //  "isBusy": boolean value that represents the server is busy
     // }
     UI.setBusyMode(parameters["isBusy"]);
+}
+
+async function forceReload(parameters) {
+    ////
+    // [IN]
+    // parameters = {
+    // }
+    location.reload();
 }

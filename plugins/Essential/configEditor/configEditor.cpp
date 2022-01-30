@@ -82,7 +82,7 @@ extern "C" DLLEXPORT void pluginProcess(
 
 	// initialize
 	const nlohmann::json configCore = nlohmann::json::parse(configCoreChar);
-	const nlohmann::json parameter = nlohmann::json::parse(parameterChar);
+	nlohmann::json parameter = nlohmann::json::parse(parameterChar);
 	// for single user: update Core/Room
 	// for multiple user (e.g. web demo): update Room
 
@@ -90,7 +90,6 @@ extern "C" DLLEXPORT void pluginProcess(
 	{
 		// case 1.
 		// request for generateUI
-
 		nlohmann::json response = configCore;
 		// browser availability
 		response.at("browser")["availableBrowsers"] = nlohmann::json::array();
@@ -238,6 +237,9 @@ extern "C" DLLEXPORT void pluginProcess(
 	else
 	{
 		// case 3. otherwise
+		writeJSONToChar(configRoomUpdateChar, parameter);
+		// "forceReload" in Core reloads all rooms
+		parameter["forceReload"] = true;
 		writeJSONToChar(configCoreUpdateChar, parameter);
 	}
 }

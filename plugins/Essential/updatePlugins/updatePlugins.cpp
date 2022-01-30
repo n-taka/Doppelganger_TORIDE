@@ -58,8 +58,10 @@ extern "C" DLLEXPORT void pluginProcess(
 	configRoomUpdate.at("plugin")["installed"] = parameter;
 
 	// write result
-	writeJSONToChar(configCoreUpdateChar, configCoreUpdate);
 	writeJSONToChar(configRoomUpdateChar, configRoomUpdate);
+	// "forceReload" in Core reloads all rooms
+	configCoreUpdate["forceReload"] = true;
+	writeJSONToChar(configCoreUpdateChar, configCoreUpdate);
 }
 
 #endif

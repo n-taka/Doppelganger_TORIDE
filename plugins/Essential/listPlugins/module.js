@@ -320,7 +320,6 @@ const generateUI = async function () {
                         update.push(json);
                     }
                     await request("updatePlugins", update);
-                    location.reload();
             });
                 modalFooterDiv.appendChild(modalFooterApplyA);
             }
