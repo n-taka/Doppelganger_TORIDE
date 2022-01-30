@@ -627,12 +627,12 @@ const generateUI = async function () {
                         updatedConfigJson["browser"]["openOnStartup"] = inputCheckboxOpenOnStartup.checked;
                         // log
                         updatedConfigJson["log"] = {};
-                        updatedConfigJson["log"]["level"] = [];
+                        updatedConfigJson["log"]["level"] = {};
                         const logLevels = ["SYSTEM", "APICALL", "WSCALL", "ERROR", "MISC", "DEBUG"];
                         for (let level of logLevels) {
                             updatedConfigJson["log"]["level"][level] = (document.getElementById("log" + level).checked);
                         }
-                        updatedConfigJson["log"]["type"] = [];
+                        updatedConfigJson["log"]["type"] = {};
                         const destinations = ["STDOUT", "FILE"];
                         for (let dest of destinations) {
                             updatedConfigJson["log"]["type"][dest] = (document.getElementById("log" + dest).checked);
@@ -644,7 +644,6 @@ const generateUI = async function () {
                         updatedConfigJson["plugin"] = {};
                         updatedConfigJson["plugin"]["listURL"] = document.getElementById("pluginListURL").value.split("\n").filter((str => (str.length > 0)));
                         await request("configEditor", updatedConfigJson);
-                        location.reload();
                     });
                     modalFooterDiv.appendChild(modalFooterApplyA);
                 }
