@@ -79,63 +79,9 @@ extern "C" DLLEXPORT void pluginProcess(
 	nlohmann::json configRoomUpdate = nlohmann::json::object();
 
 	const nlohmann::json &fileJson = parameter.at("mesh").at("file");
-	const std::string &fileId = fileJson.at("id").get<std::string>();
-	const int &fileSize = fileJson.at("size").get<int>();
-	const int &packetId = fileJson.at("packetId").get<int>();
-	const int &packetSize = fileJson.at("packetSize").get<int>();
-	const int &packetTotal = fileJson.at("packetTotal").get<int>();
 	const std::string &fileType = fileJson.at("type").get<std::string>();
-	const std::string &base64Packet = fileJson.at("base64Packet").get<std::string>();
+	const std::string &base64Str = fileJson.at("base64Str").get<std::string>();
 
-	configRoomUpdate["extension"]["loadPolygonMesh"] = nlohmann::json::object();
-	// read existing data
-	if (configRoom.at("extension").contains("loadPolygonMesh"))
-	{
-		configRoomUpdate.at("extension").at("loadPolygonMesh").update(configRoom.at("extension").at("loadPolygonMesh"));
-	}
-	// allocate for new file
-	if (!configRoomUpdate.at("extension").at("loadPolygonMesh").contains(fileId))
-	{
-		configRoomUpdate.at("extension").at("loadPolygonMesh")[fileId] = nlohmann::json::object();
-		configRoomUpdate.at("extension").at("loadPolygonMesh").at(fileId)["packetArrived"] = nlohmann::json::array();
-		for (int packet = 0; packet < packetTotal; ++packet)
-		{
-			configRoomUpdate.at("extension").at("loadPolygonMesh").at(fileId).at("packetArrived").push_back(false);
-		}
-		configRoomUpdate.at("extension").at("loadPolygonMesh").at(fileId)["base64Str"] = std::string(fileSize, '\0');
-	}
-
-	// read from this packet
-	bool allPacketArrived = true;
-	std::string base64Str;
-	{
-		std::string packetBase64Str = configRoomUpdate.at("extension").at("loadPolygonMesh").at(fileId).at("base64Str").get<std::string>();
-		configRoomUpdate.at("extension").at("loadPolygonMesh").at(fileId).at("packetArrived").at(packetId) = true;
-
-		packetBase64Str.replace(packetId * packetSize, base64Packet.size(), base64Packet);
-
-		for (const auto &b : configRoomUpdate.at("extension").at("loadPolygonMesh").at(fileId).at("packetArrived"))
-		{
-			allPacketArrived &= b.get<bool>();
-		}
-
-		if (allPacketArrived)
-		{
-			base64Str = std::move(packetBase64Str);
-			configRoomUpdate.at("extension").at("loadPolygonMesh").erase(fileId);
-		}
-		else
-		{
-			configRoomUpdate.at("extension").at("loadPolygonMesh").at(fileId).at("base64Str") = packetBase64Str;
-		}
-	}
-
-	if (base64Str.empty())
-	{
-		// some packets are missing
-		writeJSONToChar(configRoomUpdateChar, configRoomUpdate);
-	}
-	else
 	{
 		// for log
 		const fs::path roomDataDir(configRoom.at("dataDir").get<std::string>());
