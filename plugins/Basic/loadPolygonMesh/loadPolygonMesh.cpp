@@ -2,14 +2,6 @@
 #define LOADPOLYGONMESH_CPP
 
 #if defined(_WIN64)
-#define DLLEXPORT __declspec(dllexport)
-#elif defined(__APPLE__)
-#define DLLEXPORT __attribute__((visibility("default")))
-#elif defined(__linux__)
-#define DLLEXPORT __attribute__((visibility("default")))
-#endif
-
-#if defined(_WIN64)
 #include <filesystem>
 namespace fs = std::filesystem;
 #elif defined(__APPLE__)
@@ -20,18 +12,20 @@ namespace fs = boost::filesystem;
 namespace fs = std::filesystem;
 #endif
 
+#include "pluginCommon.h"
+
 #include <memory>
 #include <nlohmann/json.hpp>
 
 #include "Doppelganger/Room.h"
 #include "Doppelganger/triangleMesh.h"
-#include "Doppelganger/Logger.h"
 #include "Doppelganger/Util/uuid.h"
 #include "Doppelganger/Util/writeBase64ToFile.h"
+#include "Doppelganger/Util/log.h"
+#include "Doppelganger/Util/storeHistory.h"
 
 #include <string>
 #include <sstream>
-#include <mutex>
 
 #include "igl/readOBJ.h"
 #include "igl/readPLY.h"
@@ -44,7 +38,14 @@ namespace fs = std::filesystem;
 #include "igl/per_face_normals.h"
 #include "igl/per_vertex_normals.h"
 
-extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room> &room, const nlohmann::json &parameters, nlohmann::json &response, nlohmann::json &broadcast)
+extern "C" DLLEXPORT void pluginProcess(
+	const char *&configCoreChar,
+	const char *&configRoomChar,
+	const char *&parameterChar,
+	char *&configCoreUpdateChar,
+	char *&configRoomUpdateChar,
+	char *&responseChar,
+	char *&broadcastChar)
 {
 	////
 	// [IN]
@@ -72,76 +73,106 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 	//  }
 	// }
 
-	// create empty response/broadcast
-	response = nlohmann::json::object();
-	broadcast = nlohmann::json::object();
+	// initialize
+	const nlohmann::json configRoom = nlohmann::json::parse(configRoomChar);
+	const nlohmann::json parameter = nlohmann::json::parse(parameterChar);
+	nlohmann::json configRoomUpdate = nlohmann::json::object();
 
-	const std::string &fileId = parameters.at("mesh").at("file").at("id").get<std::string>();
-	const int &fileSize = parameters.at("mesh").at("file").at("size").get<int>();
-	const int &packetId = parameters.at("mesh").at("file").at("packetId").get<int>();
-	const int &packetSize = parameters.at("mesh").at("file").at("packetSize").get<int>();
-	const int &packetTotal = parameters.at("mesh").at("file").at("packetTotal").get<int>();
-	const std::string &fileType = parameters.at("mesh").at("file").at("type").get<std::string>();
-	const std::string &base64Packet = parameters.at("mesh").at("file").at("base64Packet").get<std::string>();
+	const nlohmann::json &fileJson = parameter.at("mesh").at("file");
+	const std::string &fileId = fileJson.at("id").get<std::string>();
+	const int &fileSize = fileJson.at("size").get<int>();
+	const int &packetId = fileJson.at("packetId").get<int>();
+	const int &packetSize = fileJson.at("packetSize").get<int>();
+	const int &packetTotal = fileJson.at("packetTotal").get<int>();
+	const std::string &fileType = fileJson.at("type").get<std::string>();
+	const std::string &base64Packet = fileJson.at("base64Packet").get<std::string>();
 
+	configRoomUpdate["extension"]["loadPolygonMesh"] = nlohmann::json::object();
+	// read existing data
+	if (configRoom.at("extension").contains("loadPolygonMesh"))
+	{
+		configRoomUpdate.at("extension").at("loadPolygonMesh").update(configRoom.at("extension").at("loadPolygonMesh"));
+	}
+	// allocate for new file
+	if (!configRoomUpdate.at("extension").at("loadPolygonMesh").contains(fileId))
+	{
+		configRoomUpdate.at("extension").at("loadPolygonMesh")[fileId] = nlohmann::json::object();
+		configRoomUpdate.at("extension").at("loadPolygonMesh").at(fileId)["packetArrived"] = nlohmann::json::array();
+		for (int packet = 0; packet < packetTotal; ++packet)
+		{
+			configRoomUpdate.at("extension").at("loadPolygonMesh").at(fileId).at("packetArrived").push_back(false);
+		}
+		configRoomUpdate.at("extension").at("loadPolygonMesh").at(fileId)["base64Str"] = std::string(fileSize, '\0');
+	}
+
+	// read from this packet
 	bool allPacketArrived = true;
 	std::string base64Str;
-
 	{
-		std::lock_guard<std::mutex> lock(room->mutexCustomData);
-		if (room->customData.find("loadPolygonMesh") == room->customData.end())
-		{
-			room->customData["loadPolygonMesh"] = std::unordered_map<std::string, std::pair<std::vector<bool>, std::string>>();
-		}
-		std::unordered_map<std::string, std::pair<std::vector<bool>, std::string>> &packetsVec = boost::any_cast<std::unordered_map<std::string, std::pair<std::vector<bool>, std::string>> &>(room->customData.at("loadPolygonMesh"));
+		std::string packetBase64Str = configRoomUpdate.at("extension").at("loadPolygonMesh").at(fileId).at("base64Str").get<std::string>();
+		configRoomUpdate.at("extension").at("loadPolygonMesh").at(fileId).at("packetArrived").at(packetId) = true;
 
-		std::pair<std::vector<bool>, std::string> &packet = packetsVec[fileId];
-		std::vector<bool> &packetArrived = packet.first;
-		std::string &packetBase64Str = packet.second;
-
-		if (packetArrived.size() == 0)
-		{
-			// initialize.
-			packetArrived.resize(packetTotal, false);
-			packetBase64Str = std::string(fileSize, '\0');
-		}
-
-		packetArrived.at(packetId) = true;
 		packetBase64Str.replace(packetId * packetSize, base64Packet.size(), base64Packet);
 
-		for (const auto &b : packetArrived)
+		for (const auto &b : configRoomUpdate.at("extension").at("loadPolygonMesh").at(fileId).at("packetArrived"))
 		{
-			allPacketArrived &= b;
+			allPacketArrived &= b.get<bool>();
 		}
 
 		if (allPacketArrived)
 		{
 			base64Str = std::move(packetBase64Str);
-			packetsVec.erase(fileId);
+			configRoomUpdate.at("extension").at("loadPolygonMesh").erase(fileId);
+		}
+		else
+		{
+			configRoomUpdate.at("extension").at("loadPolygonMesh").at(fileId).at("base64Str") = packetBase64Str;
 		}
 	}
 
-	if (base64Str.size())
+	if (base64Str.empty())
 	{
+		// some packets are missing
+		writeJSONToChar(configRoomUpdateChar, configRoomUpdate);
+	}
+	else
+	{
+		// for log
+		const fs::path roomDataDir(configRoom.at("dataDir").get<std::string>());
+		Doppelganger::Util::LogConfig roomLogConfig;
+		{
+			for (const auto &level_value : configRoom.at("log").at("level").items())
+			{
+				const std::string &level = level_value.key();
+				const bool &value = level_value.value().get<bool>();
+				roomLogConfig.level[level] = value;
+			}
+			for (const auto &type_value : configRoom.at("log").at("type").items())
+			{
+				const std::string &type = type_value.key();
+				const bool &value = type_value.value().get<bool>();
+				roomLogConfig.type[type] = value;
+			}
+		}
+
 		fs::path filePath = fs::temp_directory_path();
 		filePath /= Doppelganger::Util::uuid("DoppelgangerTmpFile-");
 		filePath += ".";
 		filePath += fileType;
 		Doppelganger::Util::writeBase64ToFile(base64Str, filePath);
 
-		const std::string meshUUID = Doppelganger::Util::uuid("mesh-");
-		std::shared_ptr<Doppelganger::triangleMesh> mesh = std::make_shared<Doppelganger::triangleMesh>(meshUUID);
+		Doppelganger::TriangleMesh mesh;
+		mesh.UUID_ = Doppelganger::Util::uuid("mesh-");
+		mesh.name_ = parameter.at("mesh").at("name").get<std::string>();
 
-		const std::string &meshName = parameters.at("mesh").at("name").get<std::string>();
-		mesh->name = meshName;
-		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &V = mesh->V;
-		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &VN = mesh->VN;
-		Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> &F = mesh->F;
-		Eigen::Matrix<int, Eigen::Dynamic, 1> &FG = mesh->FG;
-		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &FN = mesh->FN;
-		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &VC = mesh->VC;
-		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &TC = mesh->TC;
-		Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> &FTC = mesh->FTC;
+		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &V = mesh.V_;
+		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &VN = mesh.VN_;
+		Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> &F = mesh.F_;
+		Eigen::Matrix<int, Eigen::Dynamic, 1> &FG = mesh.FG_;
+		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &FN = mesh.FN_;
+		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &VC = mesh.VC_;
+		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &TC = mesh.TC_;
+		Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> &FTC = mesh.FTC_;
 
 		std::vector<std::vector<double>> VVec;
 		std::vector<std::vector<double>> TCVec;
@@ -229,7 +260,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 			ss << "file type ";
 			ss << fileType;
 			ss << " is not yet supported.";
-			room->logger.log(ss.str(), "ERROR");
+			Doppelganger::Util::log(ss.str(), "ERROR", roomDataDir, roomLogConfig);
 		}
 
 		// format parsed info
@@ -296,19 +327,23 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 		}
 
 		// register to this room
-		room->meshes[meshUUID] = mesh;
+		configRoomUpdate["meshes"] = nlohmann::json::object();
+		configRoomUpdate.at("meshes")[mesh.UUID_] = mesh;
 
-		// write response/broadcast
+		// write broadcast
+		nlohmann::json broadcast = nlohmann::json::object();
+		nlohmann::json meshJsonf;
+		Doppelganger::to_json(meshJsonf, mesh, true);
 		broadcast["meshes"] = nlohmann::json::object();
-		broadcast.at("meshes")[meshUUID] = mesh->dumpToJson(true);
+		broadcast.at("meshes")[mesh.UUID_] = meshJsonf;
 
 		{
 			// message
 			std::stringstream ss;
-			ss << "New mesh \"" << meshUUID << "\" is loaded.";
-			room->logger.log(ss.str(), "APICALL");
+			ss << "New mesh \"" << mesh.UUID_ << "\" is loaded.";
+			Doppelganger::Util::log(ss.str(), "APICALL", roomDataDir, roomLogConfig);
 			// file
-			room->logger.log(filePath, "APICALL");
+			Doppelganger::Util::log(filePath, "APICALL", roomDataDir, roomLogConfig);
 		}
 
 		{
@@ -316,13 +351,19 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 			nlohmann::json diff = nlohmann::json::object();
 			nlohmann::json diffInv = nlohmann::json::object();
 			diff["meshes"] = nlohmann::json::object();
-			diff["meshes"][meshUUID] = mesh->dumpToJson(false);
-			diff["meshes"][meshUUID]["remove"] = false;
+			diff.at("meshes")[mesh.UUID_] = configRoomUpdate.at("meshes").at(mesh.UUID_);
+			diff.at("meshes").at(mesh.UUID_)["remove"] = false;
 			diffInv["meshes"] = nlohmann::json::object();
-			diffInv["meshes"][meshUUID] = nlohmann::json::object();
-			diffInv["meshes"][meshUUID]["remove"] = true;
-			room->storeHistory(diff, diffInv);
+			diffInv.at("meshes")[mesh.UUID_] = nlohmann::json::object();
+			diffInv.at("meshes").at(mesh.UUID_)["remove"] = true;
+
+			configRoomUpdate["history"] = nlohmann::json::object();
+			Doppelganger::Util::storeHistory(configRoom.at("history"), diff, diffInv, configRoomUpdate.at("history"));
 		}
+
+		// write result
+		writeJSONToChar(configRoomUpdateChar, configRoomUpdate);
+		writeJSONToChar(broadcastChar, broadcast);
 	}
 }
 
