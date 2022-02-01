@@ -77,25 +77,3 @@ MouseKey.syncCursor = function () {
     }
 }
 
-// function customClick(e) {
-//     if (e.button > 0) {
-//         var mouse = new THREE.Vector2();
-//         var clientX = e.clientX;
-//         var clientY = e.clientY;
-//         mouse.x = clientX - window.innerWidth / 2.0;
-//         mouse.y = clientY - window.innerHeight / 2.0;
-
-//         if (e.button == 0) {
-//             // left click
-//             // left click cannot used. somehow...
-//         }
-//         else if (e.button == 2) {
-//             // right click
-//         }
-//         else if (e.button == 1) {
-//             // middle click
-//         }
-//     }
-// }
-
-

@@ -48,6 +48,11 @@ Canvas.init = async function () {
     {
         Canvas.camera = new THREE.OrthographicCamera(-Canvas.width / 2.0, Canvas.width / 2.0, Canvas.height / 2.0, -Canvas.height / 2.0, 0.0, 2000.0);
         Canvas.predefGroup.add(Canvas.camera);
+
+        Canvas.camera.position.set(-30.0, 40.0, 30.0);
+        Canvas.camera.up.set(0.0, 1.0, 0.0);
+        Canvas.camera.zoom = 1.0;
+        Canvas.camera.updateProjectionMatrix();
     }
 
     // light (need to tweak??)
@@ -95,6 +100,9 @@ Canvas.init = async function () {
     {
         Canvas.controls = new TrackballControls(Canvas.camera, Canvas.renderer.domElement);
         Canvas.controls.panSpeed = 0.3 * 5;
+        Canvas.controls.target.set(0.0, 0.0, 0.0);
+        Canvas.camera.lookAt(Canvas.controls.target.clone());
+        Canvas.camera.updateMatrixWorld(true);
     }
 
     // bounding sphere (for tweaking camera parameters)
