@@ -13,26 +13,26 @@ add_subdirectory(loadPolygonMesh)
 # add_subdirectory(saveScreenshot)
 # add_subdirectory(removeMesh)
 # add_subdirectory(toggleMeshVisibility)
-# add_subdirectory(meshInfo)
+add_subdirectory(meshInfo)
 # add_subdirectory(meshErrorInfo)
 
 ### summary
-# add_subdirectory(allMeshesInfo)
+add_subdirectory(allMeshesInfo)
 
 ### bottom menu (left)
 # add_subdirectory(saveAllMeshes)
 # add_subdirectory(saveScreenshotAll)
 # add_subdirectory(removeAllMeshes)
-# add_subdirectory(toggleAxesVisibility)
+add_subdirectory(toggleAxesVisibility)
 
 ### bottom menu (right)
 # no entry
 
 ### others
-# add_subdirectory(crossSectionalView)
-# add_subdirectory(outlineOnClick)
-# add_subdirectory(fitToFrame)
-# add_subdirectory(alignCamera)
+add_subdirectory(alignCamera)
+add_subdirectory(crossSectionalView)
+add_subdirectory(fitToFrame)
+add_subdirectory(outlineOnClick)
 # add_subdirectory(syncViewport)
 # add_subdirectory(syncCursor)
 
