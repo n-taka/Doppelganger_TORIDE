@@ -6,12 +6,24 @@
 #include <nlohmann/json.hpp>
 #include "Doppelganger/TriangleMesh.h"
 
-extern "C" DLLEXPORT void pluginProcess(
+void getPtrStrArrayForPartialConfig(
+	const char *&parameterChar,
+	char *&ptrStrArrayCoreChar,
+	char *&ptrStrArrayRoomChar)
+{
+	nlohmann::json ptrStrArrayCore = nlohmann::json::array();
+	writeJSONToChar(ptrStrArrayCoreChar, ptrStrArrayCore);
+	nlohmann::json ptrStrArrayRoom = nlohmann::json::array();
+	ptrStrArrayRoom.push_back("/meshes");
+	writeJSONToChar(ptrStrArrayRoomChar, ptrStrArrayRoom);
+}
+
+void pluginProcess(
 	const char *&configCoreChar,
 	const char *&configRoomChar,
 	const char *&parameterChar,
-	char *&configCoreUpdateChar,
-	char *&configRoomUpdateChar,
+	char *&configCorePatchChar,
+	char *&configRoomPatchChar,
 	char *&responseChar,
 	char *&broadcastChar)
 {

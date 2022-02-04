@@ -16,14 +16,42 @@ namespace fs = std::filesystem;
 #include <string>
 #include <nlohmann/json.hpp>
 
-#include <iostream>
+void getPtrStrArrayForPartialConfig(
+	const char *&parameterChar,
+	char *&ptrStrArrayCoreChar,
+	char *&ptrStrArrayRoomChar)
+{
+	const nlohmann::json parameter = nlohmann::json::parse(parameterChar);
 
-extern "C" DLLEXPORT void pluginProcess(
+	nlohmann::json ptrStrArrayCore = nlohmann::json::array();
+	nlohmann::json ptrStrArrayRoom = nlohmann::json::array();
+
+	if (parameter.contains("forUIGeneration") && parameter.at("forUIGeneration").get<bool>())
+	{
+		// case 1.
+		ptrStrArrayCore.push_back("");
+	}
+	else if (parameter.contains("openDirectory"))
+	{
+		// case 2.
+		ptrStrArrayCore.push_back("/server/host");
+		ptrStrArrayCore.push_back("/doppelgangerRootDir");
+		ptrStrArrayCore.push_back("/dataDir");
+	}
+	else
+	{
+		// case 3. otherwise
+	}
+	writeJSONToChar(ptrStrArrayCoreChar, ptrStrArrayCore);
+	writeJSONToChar(ptrStrArrayRoomChar, ptrStrArrayRoom);
+}
+
+void pluginProcess(
 	const char *&configCoreChar,
 	const char *&configRoomChar,
 	const char *&parameterChar,
-	char *&configCoreUpdateChar,
-	char *&configRoomUpdateChar,
+	char *&configCorePatchChar,
+	char *&configRoomPatchChar,
 	char *&responseChar,
 	char *&broadcastChar)
 {
@@ -76,8 +104,8 @@ extern "C" DLLEXPORT void pluginProcess(
 	//     <open corresponding directory>
 	// }
 	// case 3. otherwise
-	// config(Core|Room)Update = {
-	//     updated JSON parameters
+	// config(Core|Room)Patch = {
+	//     json patch to be applied
 	// }
 
 	// initialize
@@ -183,7 +211,7 @@ extern "C" DLLEXPORT void pluginProcess(
 		if (configCore.at("server").at("host") == "127.0.0.1")
 		{
 			// request for open directory
-			const std::string &target = parameter.at("openDirectory").get<std::string>();
+			const std::string target = parameter.at("openDirectory").get<std::string>();
 			if (target == "plugin")
 			{
 				std::stringstream cmd;
@@ -237,10 +265,10 @@ extern "C" DLLEXPORT void pluginProcess(
 	else
 	{
 		// case 3. otherwise
-		writeJSONToChar(configRoomUpdateChar, parameter);
+		writeJSONToChar(configRoomPatchChar, parameter);
 		// "forceReload" in Core reloads all rooms
 		parameter["forceReload"] = true;
-		writeJSONToChar(configCoreUpdateChar, parameter);
+		writeJSONToChar(configCorePatchChar, parameter);
 	}
 }
 

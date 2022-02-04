@@ -5,12 +5,23 @@
 #include <string>
 #include <nlohmann/json.hpp>
 
-extern "C" DLLEXPORT void pluginProcess(
+void getPtrStrArrayForPartialConfig(
+	const char *&parameterChar,
+	char *&ptrStrArrayCoreChar,
+	char *&ptrStrArrayRoomChar)
+{
+	nlohmann::json ptrStrArrayCore = nlohmann::json::array();
+	writeJSONToChar(ptrStrArrayCoreChar, ptrStrArrayCore);
+	nlohmann::json ptrStrArrayRoom = nlohmann::json::array();
+	writeJSONToChar(ptrStrArrayRoomChar, ptrStrArrayRoom);
+}
+
+void pluginProcess(
 	const char *&configCoreChar,
 	const char *&configRoomChar,
 	const char *&parameterChar,
-	char *&configCoreUpdateChar,
-	char *&configRoomUpdateChar,
+	char *&configCorePatchChar,
+	char *&configRoomPatchChar,
 	char *&responseChar,
 	char *&broadcastChar)
 {
@@ -29,7 +40,7 @@ extern "C" DLLEXPORT void pluginProcess(
 	// ]
 
 	// [OUT]
-	// config(Core|Room)Update = {
+	// config(Core|Room)Patch = {
 	//     "plugin": {
 	//         "installed": [
 	//             {
@@ -49,19 +60,20 @@ extern "C" DLLEXPORT void pluginProcess(
 	const nlohmann::json parameter = nlohmann::json::parse(parameterChar);
 	// for single user: update Core/Room
 	// for multiple user (e.g. web demo): update Room
-	nlohmann::json configCoreUpdate = nlohmann::json::object();
-	nlohmann::json configRoomUpdate = nlohmann::json::object();
-
-	configCoreUpdate["plugin"] = nlohmann::json::object();
-	configCoreUpdate.at("plugin")["installed"] = parameter;
-	configRoomUpdate["plugin"] = nlohmann::json::object();
-	configRoomUpdate.at("plugin")["installed"] = parameter;
+	nlohmann::json configRoomPatch = nlohmann::json::object();
+	configRoomPatch["plugin"] = nlohmann::json::object();
+	configRoomPatch.at("plugin")["installed"] = parameter;
+	configRoomPatch.at("plugin")["reInstall"] = true;
+	nlohmann::json configCorePatch = nlohmann::json::object();
+	configCorePatch["plugin"] = nlohmann::json::object();
+	configCorePatch.at("plugin")["installed"] = parameter;
+	configCorePatch.at("plugin")["reInstall"] = true;
 
 	// write result
-	writeJSONToChar(configRoomUpdateChar, configRoomUpdate);
+	writeJSONToChar(configRoomPatchChar, configRoomPatch);
 	// "forceReload" in Core reloads all rooms
-	configCoreUpdate["forceReload"] = true;
-	writeJSONToChar(configCoreUpdateChar, configCoreUpdate);
+	configCorePatch["forceReload"] = true;
+	writeJSONToChar(configCorePatchChar, configCorePatch);
 }
 
 #endif

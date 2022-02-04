@@ -317,10 +317,12 @@ const generateUI = async function () {
                         const json = {};
                         json["name"] = selectElem.getAttribute("data-plugin-name");;
                         json["version"] = instance.getSelectedValues()[0];
-                        update.push(json);
+                        if (json["version"].length > 0) {
+                            update.push(json);
+                        }
                     }
                     await request("updatePlugins", update);
-            });
+                });
                 modalFooterDiv.appendChild(modalFooterApplyA);
             }
             {

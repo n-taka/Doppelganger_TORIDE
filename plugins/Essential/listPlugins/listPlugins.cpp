@@ -15,17 +15,27 @@ namespace fs = std::filesystem;
 #include "pluginCommon.h"
 #include <string>
 #include <nlohmann/json.hpp>
-
 #include "Doppelganger/Util/getPluginCatalogue.h"
 
-#include <iostream>
+void getPtrStrArrayForPartialConfig(
+	const char *&parameterChar,
+	char *&ptrStrArrayCoreChar,
+	char *&ptrStrArrayRoomChar)
+{
+	nlohmann::json ptrStrArrayCore = nlohmann::json::array();
+	writeJSONToChar(ptrStrArrayCoreChar, ptrStrArrayCore);
+	nlohmann::json ptrStrArrayRoom = nlohmann::json::array();
+	ptrStrArrayRoom.push_back("/DoppelgangerRootDir");
+	ptrStrArrayRoom.push_back("/plugin");
+	writeJSONToChar(ptrStrArrayRoomChar, ptrStrArrayRoom);
+}
 
-extern "C" DLLEXPORT void pluginProcess(
+void pluginProcess(
 	const char *&configCoreChar,
 	const char *&configRoomChar,
 	const char *&parameterChar,
-	char *&configCoreUpdateChar,
-	char *&configRoomUpdateChar,
+	char *&configCorePatchChar,
+	char *&configRoomPatchChar,
 	char *&responseChar,
 	char *&broadcastChar)
 {
