@@ -1,25 +1,44 @@
 #ifndef TOGGLEMESHVISIBILITY_CPP
 #define TOGGLEMESHVISIBILITY_CPP
 
-#if defined(_WIN64)
-#define DLLEXPORT __declspec(dllexport)
-#elif defined(__APPLE__)
-#define DLLEXPORT __attribute__((visibility("default")))
-#elif defined(__linux__)
-#define DLLEXPORT __attribute__((visibility("default")))
-#endif
+#include "pluginCommon.h"
 
 #include <memory>
 #include <nlohmann/json.hpp>
 
-#include "Doppelganger/Room.h"
-#include "Doppelganger/triangleMesh.h"
+#include "Doppelganger/TriangleMesh.h"
+#include "Doppelganger/Util/storeHistory.h"
 
 #include <string>
-#include <sstream>
-#include <mutex>
 
-extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room> &room, const nlohmann::json &parameters, nlohmann::json &response, nlohmann::json &broadcast)
+void getPtrStrArrayForPartialConfig(
+	const char *&parameterChar,
+	char *&ptrStrArrayCoreChar,
+	char *&ptrStrArrayRoomChar)
+{
+	const nlohmann::json parameter = nlohmann::json::parse(parameterChar);
+
+	nlohmann::json ptrStrArrayCore = nlohmann::json::array();
+	writeJSONToChar(ptrStrArrayCoreChar, ptrStrArrayCore);
+	nlohmann::json ptrStrArrayRoom = nlohmann::json::array();
+	for (const auto &UUID : parameter.at("meshes"))
+	{
+		std::string targetMeshPath("/meshes/");
+		targetMeshPath += UUID.get<std::string>();
+		ptrStrArrayRoom.push_back(targetMeshPath);
+	}
+	ptrStrArrayRoom.push_back("/history");
+	writeJSONToChar(ptrStrArrayRoomChar, ptrStrArrayRoom);
+}
+
+void pluginProcess(
+	const char *&configCoreChar,
+	const char *&configRoomChar,
+	const char *&parameterChar,
+	char *&configCorePatchChar,
+	char *&configRoomPatchChar,
+	char *&responseChar,
+	char *&broadcastChar)
 {
 	////
 	// [IN]
@@ -32,40 +51,47 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 	// }
 
 	// [OUT]
-	// response = {
-	// }
 	// broadcast = {
 	// 	"meshes" : {
 	//    "<meshUUID>": JSON object that represents the loaded mesh
 	//  }
 	// }
 
-	// create empty response/broadcast
-	response = nlohmann::json::object();
-	broadcast = nlohmann::json::object();
+	// initialize
+	const nlohmann::json configRoom = nlohmann::json::parse(configRoomChar);
+	const nlohmann::json parameter = nlohmann::json::parse(parameterChar);
+	nlohmann::json configRoomPatch = nlohmann::json::object();
+	nlohmann::json broadcast = nlohmann::json::object();
 	nlohmann::json diff = nlohmann::json::object();
 	nlohmann::json diffInv = nlohmann::json::object();
 
 	broadcast["meshes"] = nlohmann::json::object();
 	diff["meshes"] = nlohmann::json::object();
 	diffInv["meshes"] = nlohmann::json::object();
-	{
-		std::lock_guard<std::mutex> lock(room->mutexMeshes);
 
-		// toggle visibility
-		for (const auto &UUID : parameters.at("meshes"))
-		{
-			const std::string &meshUUID = UUID.get<std::string>();
-			const std::shared_ptr<Doppelganger::triangleMesh> &mesh = room->meshes.at(meshUUID);
-			diffInv.at("meshes")[meshUUID] = mesh->dumpToJson(false);
-			diffInv.at("meshes").at(meshUUID)["remove"] = false;
-			mesh->visibility = !mesh->visibility;
-			diff.at("meshes")[meshUUID] = mesh->dumpToJson(false);
-			diff.at("meshes").at(meshUUID)["remove"] = false;
-			broadcast.at("meshes")[meshUUID] = mesh->dumpToJson(true);
-		}
+	// toggle visibility
+	for (const auto &UUID : parameter.at("meshes"))
+	{
+		const std::string meshUUID = UUID.get<std::string>();
+		Doppelganger::TriangleMesh mesh = configRoom.at("meshes").at(meshUUID).get<Doppelganger::TriangleMesh>();
+
+		diffInv.at("meshes")[meshUUID] = mesh;
+		mesh.visibility_ = !mesh.visibility_;
+		diff.at("meshes")[meshUUID] = mesh;
+
+		nlohmann::json meshJsonf;
+		Doppelganger::to_json(meshJsonf, mesh, true);
+		broadcast.at("meshes")[meshUUID] = meshJsonf;
 	}
-	room->storeHistory(diff, diffInv);
+	configRoomPatch = diff;
+
+	// history
+	configRoomPatch["history"] = nlohmann::json::object();
+	Doppelganger::Util::storeHistory(configRoom.at("history"), diff, diffInv, configRoomPatch.at("history"));
+
+	// write result
+	writeJSONToChar(configRoomPatchChar, configRoomPatch);
+	writeJSONToChar(broadcastChar, broadcast);
 }
 
 #endif
