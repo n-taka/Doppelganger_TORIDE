@@ -14,7 +14,7 @@ add_subdirectory(loadTexture)
 # add_subdirectory(removeMesh)
 # add_subdirectory(toggleMeshVisibility)
 add_subdirectory(meshInfo)
-# add_subdirectory(meshErrorInfo)
+add_subdirectory(meshErrorInfo)
 
 ### summary
 add_subdirectory(allMeshesInfo)

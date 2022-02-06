@@ -30,6 +30,7 @@ add_library(${PROJECT_NAME} MODULE)
 target_sources(
     ${PROJECT_NAME} PRIVATE
     ${PROJECT_NAME}.cpp
+    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/src/Doppelganger/TriangleMesh.cpp
 )
 
 
@@ -37,8 +38,9 @@ target_sources(
 ### include directories
 ##############################################
 target_include_directories(${PROJECT_NAME} PUBLIC
+    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/include
     ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/submodule/libigl/include
-    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/Doppelganger_install/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../
 )
 
 
@@ -51,14 +53,12 @@ if(WIN32)
         ${PROJECT_NAME} PRIVATE
         nlohmann_json
         nlohmann_json::nlohmann_json
-        ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/Doppelganger_install/lib/Doppelganger.lib
     )
 elseif (APPLE)
     target_link_libraries(
         ${PROJECT_NAME} PRIVATE
         nlohmann_json
         nlohmann_json::nlohmann_json
-        ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/Doppelganger_install/lib/libDoppelganger.a
     )
 elseif (UNIX)
     target_link_libraries(
