@@ -3,31 +3,31 @@ import { UI } from './UI.js';
 ////
 // [IN]
 // parameters = {
-//  "meshes": {
-//   "<UUID>": {
-//    "UUID": UUID of this mesh,
-//    "remove" (optional): boolean flag for mesh remove,
-//    "name": name of this mesh,
-//    "visibility": visibility of this mesh,
-//    "V": base64-encoded vertices (#V),
-//    "F": base64-encoded facets (#F),
-//    "VC": base64-encoded vertex colors (#V),
-//    "TC": base64-encoded texture coordinates (#V),
-//    "FC": base64-encoded vertices (#F, only for edit history),
-//    "FTC": base64-encoded vertices (#F, only for edit history),
-//    "textures": [
-//     {
-//      "name": original filename for this texture
-//      "width" = width of this texture
-//      "height" = height of this texture
-//      "texData" = base64-encoded texture data
+//     "meshes": {
+//         "<UUID>": {
+//             "UUID": UUID of this mesh,
+//             "name": name of this mesh,
+//             "visibility": visibility of this mesh,
+//             "V": base64-encoded vertices (#V),
+//             "F": base64-encoded facets (#F),
+//             "VC": base64-encoded vertex colors (#V),
+//             "TC": base64-encoded texture coordinates (#V),
+//             "FC": base64-encoded vertices (#F, only for edit history),
+//             "FTC": base64-encoded vertices (#F, only for edit history),
+//             "textures": [
+//                 {
+//                     "name": original filename for this texture
+//                     "width" = width of this texture
+//                     "height" = height of this texture
+//                     "texData" = base64-encoded texture data
+//                 },
+//                 ...
+//             ]
+//         },
+//         "<UUID>": null, // to be removed
+//         ...
 //     }
-//    ]
-//   },
-//   ...
-//  }
-// }
-// 
+// }// 
 // [OUT]
 // nothing
 
@@ -50,7 +50,7 @@ export const constructMeshLiFromParameters = async function (parameters) {
                     tooltipInstance.destroy();
                 }
             }
-            if (!parameters["meshes"][meshUUID]["remove"]) {
+            if (parameters["meshes"][meshUUID] != null) {
                 const updatedMeshLi = await constructMeshLiFromJson(parameters["meshes"][meshUUID]);
                 collectionFrag.appendChild(updatedMeshLi);
                 UI.UUIDToMeshLi[meshUUID] = updatedMeshLi;
@@ -63,23 +63,6 @@ export const constructMeshLiFromParameters = async function (parameters) {
     {
         await handler();
     }
-
-    //     for (var c of meshCollection.children) {
-    //         meshCollectionFrag.appendChild(c.cloneNode(true));
-
-    //         // manually clone handlers
-    //         DoppelCore.toolHandlerGenerator.forEach((generator) => {
-    //             if (generator.hasOwnProperty("id")) {
-    //                 var doppelIdSub = parseInt(c.id.substring(4));
-    //                 var aPlugin = meshCollectionFrag.getElementById("a" + generator.id + doppelIdSub);
-    //                 aPlugin.onclick = function () {
-    //                     DoppelCore.selectedDoppelId = [doppelIdSub];
-    //                     generator.handler();
-    //                 };
-    //             }
-    //         });
-
-    //     }
 }
 // handlers that need to be called when we call constructMeshLiFromParameters
 // function (void) { ... }
@@ -88,23 +71,23 @@ constructMeshLiFromParameters.handlers = [];
 ////
 // [IN]
 // json = {
-//  "UUID": UUID of this mesh,
-//  "name": name of this mesh,
-//  "visibility": visibility of this mesh,
-//  "V": base64-encoded vertices (#V),
-//  "F": base64-encoded facets (#F),
-//  "VC": base64-encoded vertex colors (#V),
-//  "TC": base64-encoded texture coordinates (#V),
-//  "FC": base64-encoded vertices (#F, only for edit history),
-//  "FTC": base64-encoded vertices (#F, only for edit history),
-//  "textures": [
-//   {
-//    "name": original filename for this texture
-//    "width" = width of this texture
-//    "height" = height of this texture
-//    "texData" = base64-encoded texture data
-//   }
-//  ]
+//     "UUID": UUID of this mesh,
+//     "name": name of this mesh,
+//     "visibility": visibility of this mesh,
+//     "V": base64-encoded vertices (#V),
+//     "F": base64-encoded facets (#F),
+//     "VC": base64-encoded vertex colors (#V),
+//     "TC": base64-encoded texture coordinates (#V),
+//     "FC": base64-encoded vertices (#F, only for edit history),
+//     "FTC": base64-encoded vertices (#F, only for edit history),
+//     "textures": [
+//         {
+//             "name": original filename for this texture
+//             "width" = width of this texture
+//             "height" = height of this texture
+//             "texData" = base64-encoded texture data
+//         }
+//     ]
 // }
 // 
 // [OUT]

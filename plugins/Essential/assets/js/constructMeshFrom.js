@@ -4,29 +4,30 @@ import { Canvas } from './Canvas.js';
 ////
 // [IN]
 // parameters = {
-//  "meshes": {
-//   "<UUID>": {
-//    "UUID": UUID of this mesh,
-//    "remove" (optional): boolean flag for mesh remove,
-//    "name": name of this mesh,
-//    "visibility": visibility of this mesh,
-//    "V": base64-encoded vertices (#V),
-//    "F": base64-encoded facets (#F),
-//    "VC": base64-encoded vertex colors (#V),
-//    "TC": base64-encoded texture coordinates (#V),
-//    "FC": base64-encoded vertices (#F, only for edit history),
-//    "FTC": base64-encoded vertices (#F, only for edit history),
-//    "textures": [
-//     {
-//      "name": original filename for this texture
-//      "width" = width of this texture
-//      "height" = height of this texture
-//      "texData" = base64-encoded texture data
+//     "meshes": {
+//         "<UUID>": {
+//             "UUID": UUID of this mesh,
+//             "name": name of this mesh,
+//             "visibility": visibility of this mesh,
+//             "V": base64-encoded vertices (#V),
+//             "F": base64-encoded facets (#F),
+//             "VC": base64-encoded vertex colors (#V),
+//             "TC": base64-encoded texture coordinates (#V),
+//             "FC": base64-encoded vertices (#F, only for edit history),
+//             "FTC": base64-encoded vertices (#F, only for edit history),
+//             "textures": [
+//                 {
+//                     "name": original filename for this texture
+//                     "width" = width of this texture
+//                     "height" = height of this texture
+//                     "texData" = base64-encoded texture data
+//                 },
+//                 ...
+//             ]
+//         },
+//         "<UUID>": null, // to be removed
+//         ...
 //     }
-//    ]
-//   },
-//   ...
-//  }
 // }
 // 
 // [OUT]
@@ -49,7 +50,7 @@ export const constructMeshFromParameters = async function (parameters) {
                 mesh.geometry.dispose();
                 mesh.material.dispose();
             }
-            if (!parameters["meshes"][meshUUID]["remove"]) {
+            if (parameters["meshes"][meshUUID] != null) {
                 const updatedMesh = await constructMeshFromJson(parameters["meshes"][meshUUID]);
                 Canvas.meshGroup.add(updatedMesh);
                 Canvas.UUIDToMesh[meshUUID] = updatedMesh;
@@ -74,23 +75,23 @@ constructMeshFromParameters.handlers = [];
 ////
 // [IN]
 // json = {
-//  "UUID": UUID of this mesh,
-//  "name": name of this mesh,
-//  "visibility": visibility of this mesh,
-//  "V": base64-encoded vertices (#V),
-//  "F": base64-encoded facets (#F),
-//  "VC": base64-encoded vertex colors (#V),
-//  "TC": base64-encoded texture coordinates (#V),
-//  "FC": base64-encoded vertices (#F, only for edit history),
-//  "FTC": base64-encoded vertices (#F, only for edit history),
-//  "textures": [
-//   {
-//    "name": original filename for this texture
-//    "width" = width of this texture
-//    "height" = height of this texture
-//    "texData" = base64-encoded texture data
-//   }
-//  ]
+//     "UUID": UUID of this mesh,
+//     "name": name of this mesh,
+//     "visibility": visibility of this mesh,
+//     "V": base64-encoded vertices (#V),
+//     "F": base64-encoded facets (#F),
+//     "VC": base64-encoded vertex colors (#V),
+//     "TC": base64-encoded texture coordinates (#V),
+//     "FC": base64-encoded vertices (#F, only for edit history),
+//     "FTC": base64-encoded vertices (#F, only for edit history),
+//     "textures": [
+//         {
+//             "name": original filename for this texture
+//             "width" = width of this texture
+//             "height" = height of this texture
+//             "texData" = base64-encoded texture data
+//         }
+//     ]
 // }
 // 
 // [OUT]
@@ -220,7 +221,6 @@ export const constructMeshFromJson = async function (json) {
         await handler(json, mesh);
     }
     return mesh;
-    // await updateToolElement(mesh, meshJson["remove"]);
 }
 // handlers that need to be called when we call constructMeshFromJson
 // function (json, mesh) { ... }
