@@ -22,7 +22,7 @@ add_subdirectory(allMeshesInfo)
 ### bottom menu (left)
 # add_subdirectory(saveAllMeshes)
 # add_subdirectory(saveScreenshotAll)
-# add_subdirectory(removeAllMeshes)
+add_subdirectory(removeAllMeshes)
 add_subdirectory(toggleAxesVisibility)
 
 ### bottom menu (right)

@@ -40,7 +40,6 @@ void pluginProcess(
 	char *&responseChar,
 	char *&broadcastChar)
 {
-
 	////
 	// [IN]
 	// parameters = {

@@ -1,24 +1,44 @@
 #ifndef REMOVEALLMESHES_CPP
 #define REMOVEALLMESHES_CPP
 
-#if defined(_WIN64)
-#define DLLEXPORT __declspec(dllexport)
-#elif defined(__APPLE__)
-#define DLLEXPORT __attribute__((visibility("default")))
-#elif defined(__linux__)
-#define DLLEXPORT __attribute__((visibility("default")))
-#endif
+#include "pluginCommon.h"
 
 #include <memory>
 #include <nlohmann/json.hpp>
 
-#include "Doppelganger/Room.h"
-#include "Doppelganger/triangleMesh.h"
+#include "Doppelganger/TriangleMesh.h"
+#include "Doppelganger/Util/storeHistory.h"
 
 #include <string>
-#include <mutex>
 
-extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room> &room, const nlohmann::json &parameters, nlohmann::json &response, nlohmann::json &broadcast)
+void getPtrStrArrayForPartialConfig(
+	const char *&parameterChar,
+	char *&ptrStrArrayCoreChar,
+	char *&ptrStrArrayRoomChar)
+{
+	const nlohmann::json parameter = nlohmann::json::parse(parameterChar);
+
+	nlohmann::json ptrStrArrayCore = nlohmann::json::array();
+	writeJSONToChar(ptrStrArrayCoreChar, ptrStrArrayCore);
+	nlohmann::json ptrStrArrayRoom = nlohmann::json::array();
+	for (const auto &UUID : parameter.at("meshes"))
+	{
+		std::string targetMeshPath("/meshes/");
+		targetMeshPath += UUID.get<std::string>();
+		ptrStrArrayRoom.push_back(targetMeshPath);
+	}
+	ptrStrArrayRoom.push_back("/history");
+	writeJSONToChar(ptrStrArrayRoomChar, ptrStrArrayRoom);
+}
+
+void pluginProcess(
+	const char *&configCoreChar,
+	const char *&configRoomChar,
+	const char *&parameterChar,
+	char *&configCorePatchChar,
+	char *&configRoomPatchChar,
+	char *&responseChar,
+	char *&broadcastChar)
 {
 	////
 	// [IN]
@@ -31,40 +51,39 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 	// }
 
 	// [OUT]
-	// response = {
-	// }
 	// broadcast = {
 	// 	"meshes" : {
-	//    "<meshUUID>": JSON object that represents the loaded mesh
+	//    "<meshUUID>": null
 	//  }
 	// }
 
-	// create empty response/broadcast
-	response = nlohmann::json::object();
-	broadcast = nlohmann::json::object();
+	// initialize
+	const nlohmann::json configRoom = nlohmann::json::parse(configRoomChar);
+	const nlohmann::json parameter = nlohmann::json::parse(parameterChar);
+	nlohmann::json configRoomPatch = nlohmann::json::object();
+	nlohmann::json broadcast = nlohmann::json::object();
 	nlohmann::json diff = nlohmann::json::object();
 	nlohmann::json diffInv = nlohmann::json::object();
 
 	diff["meshes"] = nlohmann::json::object();
 	diffInv["meshes"] = nlohmann::json::object();
+	// remove mesh
+	for (const auto &UUID : parameter.at("meshes"))
 	{
-		std::lock_guard<std::mutex> lock(room->mutexMeshes);
-
-		// remove mesh
-		for (const auto &UUID : parameters.at("meshes"))
-		{
-			const std::string &meshUUID = UUID.get<std::string>();
-			const std::shared_ptr<Doppelganger::triangleMesh> &mesh = room->meshes.at(meshUUID);
-			diffInv.at("meshes")[meshUUID] = mesh->dumpToJson(false);
-			diffInv.at("meshes").at(meshUUID)["remove"] = false;
-			// remove mesh (from here, shared_ptr "mesh" is invalidated.)
-			room->meshes.erase(meshUUID);
-			diff.at("meshes")[meshUUID] = nlohmann::json::object();
-			diff.at("meshes").at(meshUUID)["remove"] = true;
-		}
-		broadcast = diff;
+		const std::string meshUUID = UUID.get<std::string>();
+		diffInv.at("meshes")[meshUUID] = configRoom.at("meshes").at(meshUUID);
+		diff.at("meshes")[meshUUID] = nlohmann::json(nullptr);
 	}
-	room->storeHistory(diff, diffInv);
+	configRoomPatch = diff;
+	broadcast = diff;
+
+	// history
+	configRoomPatch["history"] = nlohmann::json::object();
+	Doppelganger::Util::storeHistory(configRoom.at("history"), diff, diffInv, configRoomPatch.at("history"));
+
+	// write result
+	writeJSONToChar(configRoomPatchChar, configRoomPatch);
+	writeJSONToChar(broadcastChar, broadcast);
 }
 
 #endif
