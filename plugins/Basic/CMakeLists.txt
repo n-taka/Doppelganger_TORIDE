@@ -8,7 +8,7 @@ add_subdirectory(loadPolygonMesh)
 # add_subdirectory(redo)
 
 ### per-mesh
-# add_subdirectory(loadTexture)
+add_subdirectory(loadTexture)
 # add_subdirectory(saveMesh)
 # add_subdirectory(saveScreenshot)
 # add_subdirectory(removeMesh)
