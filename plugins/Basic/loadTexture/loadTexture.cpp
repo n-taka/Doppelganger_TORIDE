@@ -17,7 +17,7 @@ namespace fs = std::filesystem;
 #include <memory>
 #include <nlohmann/json.hpp>
 
-#include "Doppelganger/triangleMesh.h"
+#include "Doppelganger/TriangleMesh.h"
 #include "Doppelganger/Util/uuid.h"
 #include "Doppelganger/Util/writeBase64ToFile.h"
 #include "Doppelganger/Util/storeHistory.h"

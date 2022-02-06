@@ -6,7 +6,7 @@
 #include <memory>
 #include <nlohmann/json.hpp>
 
-#include "Doppelganger/triangleMesh.h"
+#include "Doppelganger/TriangleMesh.h"
 
 #include "igl/boundary_facets.h"
 #include "igl/is_edge_manifold.h"
