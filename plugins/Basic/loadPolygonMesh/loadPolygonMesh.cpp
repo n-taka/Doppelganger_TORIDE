@@ -20,8 +20,8 @@ namespace fs = std::filesystem;
 #include "Doppelganger/triangleMesh.h"
 #include "Doppelganger/Util/uuid.h"
 #include "Doppelganger/Util/writeBase64ToFile.h"
-#include "Doppelganger/Util/log.h"
 #include "Doppelganger/Util/storeHistory.h"
+#include "Doppelganger/Util/log.h"
 
 #include <string>
 #include <sstream>
@@ -66,13 +66,8 @@ void pluginProcess(
 	// 	"mesh": {
 	// 	 "name": name of this mesh (usually, filename without extension),
 	// 	 "file": {
-	//    "id": unique id for this file,
-	//    "size": bytes of this file,
-	//    "packetId": id for this packet,
-	//    "packetSize": size of each packet,
-	//    "packetTotal": total count of packets,
-	// 	  "type": extensiton of this file,
-	// 	  "base64Packet": base64-encoded fragment
+	// 	  "type": extension of this file,
+	// 	  "base64Str": base64-encoded fragment
 	// 	 }
 	// 	}
 	// }
@@ -90,6 +85,7 @@ void pluginProcess(
 	const nlohmann::json configRoom = nlohmann::json::parse(configRoomChar);
 	const nlohmann::json parameter = nlohmann::json::parse(parameterChar);
 	nlohmann::json configRoomPatch = nlohmann::json::object();
+	nlohmann::json broadcast = nlohmann::json::object();
 
 	const nlohmann::json &fileJson = parameter.at("mesh").at("file");
 	const std::string fileType = fileJson.at("type").get<std::string>();
@@ -272,7 +268,6 @@ void pluginProcess(
 		configRoomPatch.at("meshes")[mesh.UUID_] = mesh;
 
 		// write broadcast
-		nlohmann::json broadcast = nlohmann::json::object();
 		nlohmann::json meshJsonf;
 		Doppelganger::to_json(meshJsonf, mesh, true);
 		broadcast["meshes"] = nlohmann::json::object();
