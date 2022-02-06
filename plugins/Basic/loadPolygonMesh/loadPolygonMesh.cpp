@@ -17,7 +17,6 @@ namespace fs = std::filesystem;
 #include <memory>
 #include <nlohmann/json.hpp>
 
-#include "Doppelganger/Room.h"
 #include "Doppelganger/triangleMesh.h"
 #include "Doppelganger/Util/uuid.h"
 #include "Doppelganger/Util/writeBase64ToFile.h"
@@ -38,12 +37,26 @@ namespace fs = std::filesystem;
 #include "igl/per_face_normals.h"
 #include "igl/per_vertex_normals.h"
 
-extern "C" DLLEXPORT void pluginProcess(
+void getPtrStrArrayForPartialConfig(
+	const char *&parameterChar,
+	char *&ptrStrArrayCoreChar,
+	char *&ptrStrArrayRoomChar)
+{
+	nlohmann::json ptrStrArrayCore = nlohmann::json::array();
+	writeJSONToChar(ptrStrArrayCoreChar, ptrStrArrayCore);
+	nlohmann::json ptrStrArrayRoom = nlohmann::json::array();
+	ptrStrArrayRoom.push_back("/dataDir");
+	ptrStrArrayRoom.push_back("/log");
+	ptrStrArrayRoom.push_back("/history");
+	writeJSONToChar(ptrStrArrayRoomChar, ptrStrArrayRoom);
+}
+
+void pluginProcess(
 	const char *&configCoreChar,
 	const char *&configRoomChar,
 	const char *&parameterChar,
-	char *&configCoreUpdateChar,
-	char *&configRoomUpdateChar,
+	char *&configCorePatchChar,
+	char *&configRoomPatchChar,
 	char *&responseChar,
 	char *&broadcastChar)
 {
@@ -76,31 +89,13 @@ extern "C" DLLEXPORT void pluginProcess(
 	// initialize
 	const nlohmann::json configRoom = nlohmann::json::parse(configRoomChar);
 	const nlohmann::json parameter = nlohmann::json::parse(parameterChar);
-	nlohmann::json configRoomUpdate = nlohmann::json::object();
+	nlohmann::json configRoomPatch = nlohmann::json::object();
 
 	const nlohmann::json &fileJson = parameter.at("mesh").at("file");
-	const std::string &fileType = fileJson.at("type").get<std::string>();
-	const std::string &base64Str = fileJson.at("base64Str").get<std::string>();
+	const std::string fileType = fileJson.at("type").get<std::string>();
+	const std::string base64Str = fileJson.at("base64Str").get<std::string>();
 
 	{
-		// for log
-		const fs::path roomDataDir(configRoom.at("dataDir").get<std::string>());
-		Doppelganger::Util::LogConfig roomLogConfig;
-		{
-			for (const auto &level_value : configRoom.at("log").at("level").items())
-			{
-				const std::string &level = level_value.key();
-				const bool &value = level_value.value().get<bool>();
-				roomLogConfig.level[level] = value;
-			}
-			for (const auto &type_value : configRoom.at("log").at("type").items())
-			{
-				const std::string &type = type_value.key();
-				const bool &value = type_value.value().get<bool>();
-				roomLogConfig.type[type] = value;
-			}
-		}
-
 		fs::path filePath = fs::temp_directory_path();
 		filePath /= Doppelganger::Util::uuid("DoppelgangerTmpFile-");
 		filePath += ".";
@@ -206,7 +201,7 @@ extern "C" DLLEXPORT void pluginProcess(
 			ss << "file type ";
 			ss << fileType;
 			ss << " is not yet supported.";
-			Doppelganger::Util::log(ss.str(), "ERROR", roomDataDir, roomLogConfig);
+			Doppelganger::Util::log(ss.str(), "ERROR", configRoom);
 		}
 
 		// format parsed info
@@ -273,8 +268,8 @@ extern "C" DLLEXPORT void pluginProcess(
 		}
 
 		// register to this room
-		configRoomUpdate["meshes"] = nlohmann::json::object();
-		configRoomUpdate.at("meshes")[mesh.UUID_] = mesh;
+		configRoomPatch["meshes"] = nlohmann::json::object();
+		configRoomPatch.at("meshes")[mesh.UUID_] = mesh;
 
 		// write broadcast
 		nlohmann::json broadcast = nlohmann::json::object();
@@ -287,9 +282,9 @@ extern "C" DLLEXPORT void pluginProcess(
 			// message
 			std::stringstream ss;
 			ss << "New mesh \"" << mesh.UUID_ << "\" is loaded.";
-			Doppelganger::Util::log(ss.str(), "APICALL", roomDataDir, roomLogConfig);
+			Doppelganger::Util::log(ss.str(), "APICALL", configRoom);
 			// file
-			Doppelganger::Util::log(filePath, "APICALL", roomDataDir, roomLogConfig);
+			Doppelganger::Util::log(filePath, "APICALL", configRoom);
 		}
 
 		{
@@ -297,18 +292,16 @@ extern "C" DLLEXPORT void pluginProcess(
 			nlohmann::json diff = nlohmann::json::object();
 			nlohmann::json diffInv = nlohmann::json::object();
 			diff["meshes"] = nlohmann::json::object();
-			diff.at("meshes")[mesh.UUID_] = configRoomUpdate.at("meshes").at(mesh.UUID_);
-			diff.at("meshes").at(mesh.UUID_)["remove"] = false;
+			diff.at("meshes")[mesh.UUID_] = configRoomPatch.at("meshes").at(mesh.UUID_);
 			diffInv["meshes"] = nlohmann::json::object();
-			diffInv.at("meshes")[mesh.UUID_] = nlohmann::json::object();
-			diffInv.at("meshes").at(mesh.UUID_)["remove"] = true;
+			diffInv.at("meshes")[mesh.UUID_] = nlohmann::json(nullptr);
 
-			configRoomUpdate["history"] = nlohmann::json::object();
-			Doppelganger::Util::storeHistory(configRoom.at("history"), diff, diffInv, configRoomUpdate.at("history"));
+			configRoomPatch["history"] = nlohmann::json::object();
+			Doppelganger::Util::storeHistory(configRoom.at("history"), diff, diffInv, configRoomPatch.at("history"));
 		}
 
 		// write result
-		writeJSONToChar(configRoomUpdateChar, configRoomUpdate);
+		writeJSONToChar(configRoomPatchChar, configRoomPatch);
 		writeJSONToChar(broadcastChar, broadcast);
 	}
 }
