@@ -127,28 +127,27 @@ void pluginProcess(
 	// [OUT]
 	// <when configRoom.at("output").at("type") == "download">
 	// response = {
-	//     "meshes" : {
-	//         "<meshUUID-A>" : {
-	//             "mesh": {
-	//                 fileName: fileName,
-	//                 base64Str: base64-encoded data,
-	//                 format: "obj"|"ply"|"stl"|"wrl"
-	//             },
-	//             "material" (optional): {
-	//                 fileName: fileName,
-	//                 base64Str: base64-encoded data,
-	//                 format: "mtl"
-	//             },
-	//             "texture" (optional): {
-	//                 fileName: fileName,
-	//                 base64Str: base64-encoded data,
-	//                 format: "jpg"|"jpeg"|"png"|"bmp"|"tga"
-	//             }
-	//         },
-	//         ...
-	//     }
+	// 	"meshes" : {
+	// 	 "<meshUUID-A>" : {
+	//    "mesh": {
+	//     fileName: fileName,
+	//     base64Str: base64-encoded data,
+	//     format: "obj"|"ply"|"stl"|"wrl"
+	//    },
+	//    "material" (optional): {
+	//     fileName: fileName,
+	//     base64Str: base64-encoded data,
+	//     format: "mtl"
+	//    },
+	//    "texture" (optional): {
+	//     fileName: fileName,
+	//     base64Str: base64-encoded data,
+	//     format: "jpg"|"jpeg"|"png"|"bmp"|"tga"
+	//    }
+	//   }
+	//  }
 	// }
-	// <when configRoom.at("output").at("type") == "local">
+	// <when configRoom.at("output").at("type") == "storage">
 	// response = {
 	// }
 
@@ -159,6 +158,11 @@ void pluginProcess(
 
 	const bool saveToLocal = (configRoom.at("output").at("type").get<std::string>() == "storage");
 	const std::string meshFormat = parameter.at("format").get<std::string>();
+
+	if (!saveToLocal)
+	{
+		response["meshes"] = nlohmann::json::object();
+	}
 
 	for (const auto &UUID : parameter.at("meshes"))
 	{
@@ -369,13 +373,15 @@ void pluginProcess(
 				}
 			}
 
-			response["meshes"] = nlohmann::json::object();
-			response["meshes"][meshUUID] = meshJson;
+			response.at("meshes")[meshUUID] = meshJson;
 		}
 	}
 
-	// write result
-	writeJSONToChar(responseChar, response);
+	if (!saveToLocal)
+	{
+		// write result
+		writeJSONToChar(responseChar, response);
+	}
 }
 
 #endif
