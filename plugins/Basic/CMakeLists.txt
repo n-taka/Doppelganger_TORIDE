@@ -9,7 +9,7 @@ add_subdirectory(loadPolygonMesh)
 
 ### per-mesh
 add_subdirectory(loadTexture)
-# add_subdirectory(saveMesh)
+add_subdirectory(saveMesh)
 # add_subdirectory(saveScreenshot)
 add_subdirectory(removeMesh)
 add_subdirectory(toggleMeshVisibility)
