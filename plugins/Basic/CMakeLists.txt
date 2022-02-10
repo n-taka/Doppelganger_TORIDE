@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 3.15)
 ### per-mesh
 # add_subdirectory(loadTexture)
 # add_subdirectory(saveMesh)
-add_subdirectory(saveScreenshot)
+# add_subdirectory(saveScreenshot)
 # add_subdirectory(removeMesh)
 # add_subdirectory(toggleMeshVisibility)
 # add_subdirectory(meshInfo)
@@ -21,7 +21,7 @@ add_subdirectory(saveScreenshot)
 
 ### bottom menu (left)
 # add_subdirectory(saveAllMeshes)
-# add_subdirectory(saveScreenshotAll)
+add_subdirectory(saveScreenshotAll)
 # add_subdirectory(removeAllMeshes)
 # add_subdirectory(toggleAxesVisibility)
 
