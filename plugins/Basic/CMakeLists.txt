@@ -4,8 +4,8 @@ cmake_minimum_required(VERSION 3.15)
 # add_subdirectory(loadPolygonMesh)
 
 ### top menu (right)
-add_subdirectory(undo)
-# add_subdirectory(redo)
+# add_subdirectory(undo)
+add_subdirectory(redo)
 
 ### per-mesh
 # add_subdirectory(loadTexture)
