@@ -1,24 +1,49 @@
 #ifndef UNDO_CPP
 #define UNDO_CPP
 
+#include "pluginCommon.h"
+
 #if defined(_WIN64)
-#define DLLEXPORT __declspec(dllexport)
+#include <filesystem>
+namespace fs = std::filesystem;
 #elif defined(__APPLE__)
-#define DLLEXPORT __attribute__((visibility("default")))
+#include "boost/filesystem.hpp"
+namespace fs = boost::filesystem;
 #elif defined(__linux__)
-#define DLLEXPORT __attribute__((visibility("default")))
+#include <filesystem>
+namespace fs = std::filesystem;
 #endif
 
 #include <memory>
 #include <nlohmann/json.hpp>
 
-#include "Doppelganger/Room.h"
-#include "Doppelganger/triangleMesh.h"
+#include "Doppelganger/TriangleMesh.h"
 
 #include <string>
-#include <mutex>
 
-extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room> &room, const nlohmann::json &parameters, nlohmann::json &response, nlohmann::json &broadcast)
+void getPtrStrArrayForPartialConfig(
+	const char *&parameterChar,
+	char *&ptrStrArrayCoreChar,
+	char *&ptrStrArrayRoomChar)
+{
+	const nlohmann::json parameter = nlohmann::json::parse(parameterChar);
+
+	nlohmann::json ptrStrArrayCore = nlohmann::json::array();
+	writeJSONToChar(ptrStrArrayCoreChar, ptrStrArrayCore);
+	nlohmann::json ptrStrArrayRoom = nlohmann::json::array();
+	ptrStrArrayRoom.push_back("/history");
+	ptrStrArrayRoom.push_back("/meshes");
+	writeJSONToChar(ptrStrArrayRoomChar, ptrStrArrayRoom);
+}
+
+void pluginProcess(
+	const char *&configCoreChar,
+	const char *&configRoomChar,
+	const char *&parameterChar,
+	char *&configCorePatchChar,
+	char *&configRoomPatchChar,
+	char *&responseChar,
+	char *&broadcastChar)
 {
 	////
 	// [IN]
@@ -26,57 +51,55 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 	// }
 
 	// [OUT]
-	// response = {
-	// }
 	// broadcast = {
-	// 	"meshes" : {
-	//    "<meshUUID>": JSON object that represents the loaded mesh
-	//  }
+	// 	   "meshes" : {
+	//         "<meshUUID>": JSON object that represents the loaded mesh,
+	//         ...,
+	//     }
 	// }
 
-	// create empty response/broadcast
-	response = nlohmann::json::object();
-	broadcast = nlohmann::json::object();
+	// initialize
+	const nlohmann::json configRoom = nlohmann::json::parse(configRoomChar);
+	nlohmann::json configRoomPatch = nlohmann::json::object();
+	nlohmann::json broadcast = nlohmann::json::object();
 
-	// update mesh
-	const int updatedIndex = std::max(0, static_cast<int>(room->editHistory.index - 1));
-	if (updatedIndex != room->editHistory.index)
+	const int currentIndex = configRoom.at("history").at("index").get<int>();
+	const int updatedIndex = std::max(0, currentIndex - 1);
+
+	if (updatedIndex != currentIndex)
 	{
-		// do we surely need this lock...?
-		std::lock_guard<std::mutex> lock(room->mutexMeshes);
+		// perform update
+		configRoomPatch["history"] = configRoom.at("history");
+		configRoomPatch.at("history").at("index") = updatedIndex;
 
-		room->editHistory.index = updatedIndex;
-		broadcast = room->editHistory.diffFromNext.at(room->editHistory.index);
 		// update other parameters (if needed)
 		//  * currently, we only store meshes.
 		// update meshes
-		for (const auto &uuid_mesh : broadcast.at("meshes").items())
+		configRoomPatch["meshes"] = configRoom.at("history").at("diffFromNext").at(updatedIndex).at("meshes");
+
+		// construct broadcast message
+		broadcast["meshes"] = nlohmann::json::object();
+		// we explicitly use float (this double -> float conversion could take time...)
+		for (const auto &uuid_meshJson : configRoom.at("history").at("diffFromNext").at(updatedIndex).at("meshes").items())
 		{
-			const std::string &meshUUID = uuid_mesh.key();
-			nlohmann::json &meshJson = uuid_mesh.value();
-			if (meshJson.contains("remove") && meshJson.at("remove").get<bool>())
+			const std::string &uuid = uuid_meshJson.key();
+			const nlohmann::json &meshJson = uuid_meshJson.value();
+			if (meshJson.is_null())
 			{
-				// remove
-				room->meshes.erase(meshUUID);
-			}
-			else if (room->meshes.find(meshUUID) == room->meshes.end())
-			{
-				// new mesh
-				std::shared_ptr<Doppelganger::triangleMesh> mesh = std::make_shared<Doppelganger::triangleMesh>(meshUUID);
-				mesh->restoreFromJson(meshJson);
-				room->meshes[meshUUID] = mesh;
-				// this dumpToJson looks stupid, but mandatory. 
-				//   Because our editHistory uses double, but the clients use float for save the amount of communication.
-				//   In addition, this conversion is needed to handle faceColors
-				meshJson = mesh->dumpToJson(true);
+				// null indicates removing this mesh
+				broadcast.at("meshes")[uuid] = meshJson;
 			}
 			else
 			{
-				// existing mesh
-				room->meshes[meshUUID]->restoreFromJson(meshJson);
-				meshJson = room->meshes[meshUUID]->dumpToJson(true);
+				nlohmann::json meshJsonf;
+				Doppelganger::to_json(meshJsonf, meshJson.get<Doppelganger::TriangleMesh>(), true);
+				broadcast.at("meshes")[uuid] = meshJsonf;
 			}
 		}
+
+		// write result
+		writeJSONToChar(configRoomPatchChar, configRoomPatch);
+		writeJSONToChar(broadcastChar, broadcast);
 	}
 }
 

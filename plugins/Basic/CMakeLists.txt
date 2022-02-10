@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.15)
 # add_subdirectory(loadPolygonMesh)
 
 ### top menu (right)
-# add_subdirectory(undo)
+add_subdirectory(undo)
 # add_subdirectory(redo)
 
 ### per-mesh
@@ -21,7 +21,7 @@ cmake_minimum_required(VERSION 3.15)
 
 ### bottom menu (left)
 # add_subdirectory(saveAllMeshes)
-add_subdirectory(saveScreenshotAll)
+# add_subdirectory(saveScreenshotAll)
 # add_subdirectory(removeAllMeshes)
 # add_subdirectory(toggleAxesVisibility)
 
