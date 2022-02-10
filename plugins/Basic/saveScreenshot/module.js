@@ -165,55 +165,42 @@ const saveScreenshot = function (visibleMeshUUIDArray, format) {
     }
     Canvas.effectComposer.render();
     const screenshotDataURL = Canvas.renderer.domElement.toDataURL("image/" + format);
-
-    const fileId = Math.random().toString(36).substring(2, 9);
     const base64 = screenshotDataURL.substring(screenshotDataURL.indexOf(',') + 1);
-    // split into 0.5MB packets. Due to the default limit (up to 1MB) of boost beast.
-    const packetSize = 500000;
-    const packetCount = Math.ceil(base64.length / packetSize);
 
-    for (let packet = 0; packet < packetCount; ++packet) {
-        const base64Packet = base64.substring(packet * packetSize, (packet + 1) * packetSize);
-        const json = {
-            "screenshot": {
-                "name": screenshotFileName,
-                "file": {
-                    "id": fileId,
-                    "size": base64.length,
-                    "packetId": packet,
-                    "packetSize": packetSize,
-                    "packetTotal": packetCount,
-                    "type": format.toLowerCase(),
-                    "base64Packet": base64Packet
+    const json = {
+        "screenshot": {
+            "name": screenshotFileName,
+            "file": {
+                "type": format.toLowerCase(),
+                "base64Str": base64
+            }
+        }
+    };
+    request("saveScreenshot", json).then((response) => {
+        const responseJson = JSON.parse(response);
+        if ("screenshots" in responseJson) {
+            for (let screenshotJson of responseJson["screenshots"]) {
+                const fileName = screenshotJson["fileName"] + "." + screenshotJson["format"];
+                const base64Str = screenshotJson["base64Str"];
+
+                const file = toBlob(base64Str);
+                if (window.navigator.msSaveOrOpenBlob) // IE10+
+                    window.navigator.msSaveOrOpenBlob(file, fileName);
+                else { // Others
+                    const a = document.createElement("a");
+                    const url = URL.createObjectURL(file);
+                    a.href = url;
+                    a.download = fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(function () {
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                    }, 0);
                 }
             }
-        };
-        request("saveScreenshot", json).then((response) => {
-            const responseJson = JSON.parse(response);
-            if ("screenshots" in responseJson) {
-                for (let screenshotJson of responseJson["screenshots"]) {
-                    const fileName = screenshotJson["fileName"] + "." + screenshotJson["format"];
-                    const base64Str = screenshotJson["base64Str"];
-
-                    const file = toBlob(base64Str);
-                    if (window.navigator.msSaveOrOpenBlob) // IE10+
-                        window.navigator.msSaveOrOpenBlob(file, fileName);
-                    else { // Others
-                        const a = document.createElement("a");
-                        const url = URL.createObjectURL(file);
-                        a.href = url;
-                        a.download = fileName;
-                        document.body.appendChild(a);
-                        a.click();
-                        setTimeout(function () {
-                            document.body.removeChild(a);
-                            window.URL.revokeObjectURL(url);
-                        }, 0);
-                    }
-                }
-            }
-        });
-    }
+        }
+    });
 
     Canvas.renderer.setClearAlpha(1.0);
     window.URL.revokeObjectURL(screenshotDataURL);
