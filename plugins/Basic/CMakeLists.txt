@@ -33,6 +33,6 @@ cmake_minimum_required(VERSION 3.15)
 # add_subdirectory(crossSectionalView)
 # add_subdirectory(fitToFrame)
 # add_subdirectory(outlineOnClick)
-# add_subdirectory(syncViewport)
-add_subdirectory(syncCursor)
+add_subdirectory(syncViewport)
+# add_subdirectory(syncCursor)
 

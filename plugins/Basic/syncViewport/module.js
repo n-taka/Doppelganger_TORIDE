@@ -1,37 +1,99 @@
 import { Canvas } from '../../js/Canvas.js';
-import { MouseKey } from '../../js/MouseKey.js';
+import { WS } from '../../js/WS.js';
 import { WSTasks } from '../../js/WSTasks.js';
+import { Core } from '../../js/Core.js';
+import { MouseKey } from '../../js/MouseKey.js';
+import { request } from '../../js/request.js';
 
-const pushCanvasParameters = function (parameters) {
+const pullCurrentViewport = async function () {
+    await request("syncViewport", {});
+}
+
+const updateViewportTimestamp = async function () {
+    MouseKey.strokeTimeStamp = Date.now();
+}
+
+const syncViewportSend = async function () {
+    if (Core["UUID"]) {
+        const targetnEq = (!Canvas.lastControlTarget["value"].equals(Canvas.controls.target));
+        const posnEq = (!Canvas.lastCameraPosition["value"].equals(Canvas.camera.position));
+        const upnEq = (!Canvas.lastCameraUp["value"].equals(Canvas.camera.up));
+        const zoomnEq = (Canvas.lastCameraZoom["value"] != Canvas.camera.zoom);
+
+        const json = {};
+        if (targetnEq) {
+            json["controls"] = {};
+            Canvas.lastControlTarget["value"] = Canvas.controls.target.clone();
+            Canvas.lastControlTarget["timestamp"] = MouseKey.strokeTimeStamp;
+            json["controls"]["target"] = Canvas.lastControlTarget;
+        }
+        if (posnEq) {
+            json["camera"] = {};
+            Canvas.lastCameraPosition["value"] = Canvas.camera.position.clone();
+            Canvas.lastCameraPosition["timestamp"] = MouseKey.strokeTimeStamp;
+            json["camera"]["position"] = Canvas.lastCameraPosition;
+        }
+        if (upnEq) {
+            if (!json["camera"]) {
+                json["camera"] = {};
+            }
+            Canvas.lastCameraUp["value"] = Canvas.camera.up.clone();
+            Canvas.lastCameraUp["timestamp"] = MouseKey.strokeTimeStamp;
+            json["camera"]["up"] = Canvas.lastCameraUp;
+        }
+        if (zoomnEq) {
+            if (!json["camera"]) {
+                json["camera"] = {};
+            }
+            Canvas.lastCameraZoom["value"] = { "zoom": Canvas.camera.zoom };
+            Canvas.lastCameraZoom["timestamp"] = MouseKey.strokeTimeStamp;
+            json["camera"]["zoom"] = Canvas.lastCameraZoom;
+        }
+
+        if (targetnEq || posnEq || upnEq || zoomnEq) {
+            WS.sendMsg("syncViewport", json);
+        }
+    }
+}
+
+const syncViewportReceive = async function (parameters) {
     ////
     // [IN]
     // parameters = {
-    //  "controls": {
-    //   "target": {
-    //    "x": x-coordinate,
-    //    "y": y-coordinate,
-    //    "z": z-coordinate,
-    //    "timestamp": timestamp
-    //   },
-    //  },
-    //  "camera": {
-    //   "position": {
-    //    "x": x-coordinate,
-    //    "y": y-coordinate,
-    //    "z": z-coordinate,
-    //    "timestamp": timestamp
-    //   },
-    //   "up": {
-    //    "x": x-coordinate,
-    //    "y": y-coordinate,
-    //    "z": z-coordinate,
-    //    "timestamp": timestamp
-    //   },
-    //   "zoom": {
-    //    "value": zoom parameter,
-    //    "timestamp": timestamp
-    //   }
-    //  }
+    //     "controls": {
+    //         "target": {
+    //             "value": {
+    //                 "x": x-coordinate,
+    //                 "y": y-coordinate,
+    //                 "z": z-coordinate,
+    //             },
+    //             "timestamp": timestamp
+    //         },
+    //     },
+    //     "camera": {
+    //         "position": {
+    //             "value": {
+    //                 "x": x-coordinate,
+    //                 "y": y-coordinate,
+    //                 "z": z-coordinate,
+    //             },
+    //             "timestamp": timestamp
+    //         },
+    //         "up": {
+    //             "value": {
+    //                 "x": x-coordinate,
+    //                 "y": y-coordinate,
+    //                 "z": z-coordinate,
+    //             },
+    //             "timestamp": timestamp
+    //         },
+    //         "zoom": {
+    //             "value": {
+    //                 "zoom": zoom parameter,
+    //             },
+    //             "timestamp": timestamp
+    //         }
+    //     }
     // }
 
     let needUpdate = false;
@@ -73,7 +135,7 @@ const pushCanvasParameters = function (parameters) {
         }
         if ("zoom" in parameters["camera"]) {
             if (Canvas.lastCameraZoom["timestamp"] <= parameters["camera"]["zoom"]["timestamp"]) {
-                Canvas.camera.zoom = parameters["camera"]["zoom"]["value"];
+                Canvas.camera.zoom = parameters["camera"]["zoom"]["value"].zoom;
                 Canvas.lastCameraZoom["value"] = Canvas.camera.zoom;
                 Canvas.lastCameraZoom["timestamp"] = parameters["camera"]["zoom"]["timestamp"];
                 needUpdate = true;
@@ -90,21 +152,13 @@ const pushCanvasParameters = function (parameters) {
 
 export const init = async function () {
     // update strokeTimeStamp on pointerDown
-    document.addEventListener("pointerdown", function (e) {
-        MouseKey.strokeTimeStamp = Date.now();
-        Canvas.lastControlTarget["timestamp"] = MouseKey.strokeTimeStamp;
-        Canvas.lastCameraPosition["timestamp"] = MouseKey.strokeTimeStamp;
-        Canvas.lastCameraUp["timestamp"] = MouseKey.strokeTimeStamp;
-        Canvas.lastCameraZoom["timestamp"] = MouseKey.strokeTimeStamp;
-    });
-    document.addEventListener("wheel", function(e){
-        MouseKey.strokeTimeStamp = Date.now();
-        Canvas.lastControlTarget["timestamp"] = MouseKey.strokeTimeStamp;
-        Canvas.lastCameraPosition["timestamp"] = MouseKey.strokeTimeStamp;
-        Canvas.lastCameraUp["timestamp"] = MouseKey.strokeTimeStamp;
-        Canvas.lastCameraZoom["timestamp"] = MouseKey.strokeTimeStamp;
-    });
+    document.addEventListener("pointerdown", function (e) { updateViewportTimestamp() });
+    document.addEventListener("wheel", function (e) { updateViewportTimestamp() });
 
-    WSTasks["pushCanvasParameters"] = pushCanvasParameters;
+    Canvas.drawLoopTasks.push(syncViewportSend);
+
+    WSTasks["syncViewport"] = syncViewportReceive;
+
+    await pullCurrentViewport();
 }
 
