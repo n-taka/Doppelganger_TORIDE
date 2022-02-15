@@ -29,3 +29,21 @@ export async function request(path, parameterJson, contentType) {
         }
     });
 }
+
+export function beacon(path, parameterJson) {
+    const uri = location.protocol + "//" + location.host + "/" + location.pathname.split('/')[1] + "/" + path;
+
+    const payloadJson = {};
+    payloadJson["sessionUUID"] = Core.UUID;
+    if (parameterJson) {
+        payloadJson["parameters"] = parameterJson;
+    }
+    else {
+        payloadJson["parameters"] = {};
+    }
+    const data = new Blob([JSON.stringify(payloadJson)], {
+        type: "application/json"
+    });
+
+    return navigator.sendBeacon(uri, data);
+}

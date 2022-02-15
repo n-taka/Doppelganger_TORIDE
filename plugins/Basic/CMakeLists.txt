@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.15)
 
 ### top menu (right)
 # add_subdirectory(undo)
-add_subdirectory(redo)
+# add_subdirectory(redo)
 
 ### per-mesh
 # add_subdirectory(loadTexture)
@@ -34,5 +34,5 @@ add_subdirectory(redo)
 # add_subdirectory(fitToFrame)
 # add_subdirectory(outlineOnClick)
 # add_subdirectory(syncViewport)
-# add_subdirectory(syncCursor)
+add_subdirectory(syncCursor)
 

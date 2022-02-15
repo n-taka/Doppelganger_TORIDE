@@ -1,58 +1,75 @@
 #ifndef SYNCCURSOR_CPP
 #define SYNCCURSOR_CPP
 
-#if defined(_WIN64)
-#define DLLEXPORT __declspec(dllexport)
-#elif defined(__APPLE__)
-#define DLLEXPORT __attribute__((visibility("default")))
-#elif defined(__linux__)
-#define DLLEXPORT __attribute__((visibility("default")))
-#endif
+#include "pluginCommon.h"
 
 #include <memory>
 #include <nlohmann/json.hpp>
 
-#include "Doppelganger/Room.h"
-#include "Doppelganger/Plugin.h"
-
-#include <string>
-
-extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room> &room, const nlohmann::json &parameters, nlohmann::json &response, nlohmann::json &broadcast)
+void getPtrStrArrayForPartialConfig(
+	const char *&parameterChar,
+	char *&ptrStrArrayCoreChar,
+	char *&ptrStrArrayRoomChar)
 {
-    ////
-    // [IN]
-    // parameters = {
-    //  "sessionUUID": sessionUUID string,
-    //  "cursor": {
-    //   "dir": {
-    //    "x": x corrdinate of this cursor,
-    //    "y": y corrdinate of this cursor
-    //   },
-    //   "idx": idx for cursor icon
-    //  }
-    // }
+	const nlohmann::json parameter = nlohmann::json::parse(parameterChar);
+
+	nlohmann::json ptrStrArrayCore = nlohmann::json::array();
+	writeJSONToChar(ptrStrArrayCoreChar, ptrStrArrayCore);
+	nlohmann::json ptrStrArrayRoom = nlohmann::json::array();
+	if (parameter.empty())
+	{
+		// currentCursors (part of session initialization)
+		ptrStrArrayRoom.push_back("/extension/syncCursor");
+	}
+	writeJSONToChar(ptrStrArrayRoomChar, ptrStrArrayRoom);
+}
+
+void pluginProcess(
+	const char *&configCoreChar,
+	const char *&configRoomChar,
+	const char *&parameterChar,
+	char *&configCorePatchChar,
+	char *&configRoomPatchChar,
+	char *&responseChar,
+	char *&broadcastChar)
+{
+	////
+	// [IN]
+	// parameters = {
+	//     "sessionUUID": {
+	//         "dir": {
+	//             "x": x corrdinate of this cursor,
+	//             "y": y corrdinate of this cursor
+	//         },
+	//         "icon": idx for cursor icon
+	//     }
+	// }
 
 	// [OUT]
-	// response = {
-	// }
 	// broadcast = parameters
 
-	// create empty response/broadcast
-	response = nlohmann::json::object();
-	broadcast = parameters;
+	// initialize
+	const nlohmann::json parameter = nlohmann::json::parse(parameterChar);
 
+	if (parameter.empty())
 	{
-		std::lock_guard<std::mutex> lock(room->interfaceParams.mutex);
-		// todo support delete operation
+		const nlohmann::json configRoom = nlohmann::json::parse(configRoomChar);
 
-		std::unordered_map<std::string, Doppelganger::Room::cursorInfo> &cursors = room->interfaceParams.cursors;
-		const std::string &sessionUUID = parameters.at("sessionUUID").get<std::string>();
-		const double &x = parameters.at("cursor").at("dir").at("x").get<double>();
-		const double &y = parameters.at("cursor").at("dir").at("y").get<double>();
-		const int &idx = parameters.at("cursor").at("idx").get<int>();
+		if (configRoom.contains("extension") && configRoom.at("extension").contains("syncCursor"))
+		{
+			// write result
+			writeJSONToChar(broadcastChar, configRoom.at("extension").at("syncCursor"));
+		}
+	}
+	else
+	{
+		nlohmann::json configRoomPatch = nlohmann::json::object();
+		configRoomPatch["extension"] = nlohmann::json::object();
+		configRoomPatch.at("extension")["syncCursor"] = parameter;
 
-		// we don't need to check timestamp for cursors
-		cursors[sessionUUID] = Doppelganger::Room::cursorInfo({x, y, idx});
+		// write result
+		writeJSONToChar(configRoomPatchChar, configRoomPatch);
+		writeJSONToChar(broadcastChar, parameter);
 	}
 }
 

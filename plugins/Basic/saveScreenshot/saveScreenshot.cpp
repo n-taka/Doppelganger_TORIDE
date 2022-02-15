@@ -27,8 +27,6 @@ void getPtrStrArrayForPartialConfig(
 	char *&ptrStrArrayCoreChar,
 	char *&ptrStrArrayRoomChar)
 {
-	const nlohmann::json parameter = nlohmann::json::parse(parameterChar);
-
 	nlohmann::json ptrStrArrayCore = nlohmann::json::array();
 	writeJSONToChar(ptrStrArrayCoreChar, ptrStrArrayCore);
 	nlohmann::json ptrStrArrayRoom = nlohmann::json::array();
