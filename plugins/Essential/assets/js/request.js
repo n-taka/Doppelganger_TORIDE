@@ -4,12 +4,14 @@ export async function request(path, parameterJson, contentType) {
     // location.pathname.split('/')[1]: roomUUID
     const splitPathName = location.pathname.split('/');
     let uri = location.protocol + "//" + location.host + "/";
-    for (let i = 1; i < splitPathName.length - 2; ++i) {
-        uri += splitPathName[i]
-        uri += "/";
+    for (let i = 0; i < splitPathName.length - 2; ++i) {
+        if (splitPathName[i].length > 0) {
+            uri += splitPathName[i]
+            uri += "/";
+        }
     }
     uri += path;
-    
+
     const requestInfo = {};
     requestInfo["method"] = "POST";
     const payloadJson = {};
