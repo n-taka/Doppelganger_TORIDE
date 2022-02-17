@@ -39,7 +39,15 @@ function onClose(event) {
 
 WS.init = async function () {
     // location.pathname.split('/')[1]: roomUUID
-    const uri = (location.protocol == "http:" ? "ws://" : "wss://") + location.host + "/" + location.pathname.split('/')[1] + "/";
+    const splitPathName = location.pathname.split('/');
+    let uri = (location.protocol == "http:" ? "ws://" : "wss://") + location.host + "/";
+    for (let i = 0; i < splitPathName.length - 2; ++i) {
+        if (splitPathName[i].length > 0) {
+            uri += splitPathName[i]
+            uri += "/";
+        }
+    }
+
     if (WS.ws == null) {
         WS.ws = new WebSocket(uri);
         WS.ws.onopen = onOpen;
