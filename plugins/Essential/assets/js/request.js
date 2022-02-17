@@ -40,12 +40,16 @@ export async function request(path, parameterJson, contentType) {
 }
 
 export function beacon(path, parameterJson) {
+    // location.pathname.split('/')[1]: roomUUID
     const splitPathName = location.pathname.split('/');
-    const uri = location.protocol + "//" + location.host + "/";
-    for (let i = 1; i < splitPathName.length - 2; ++i) {
-        uri.concat('/', splitPathName[i]);
+    let uri = location.protocol + "//" + location.host + "/";
+    for (let i = 0; i < splitPathName.length - 2; ++i) {
+        if (splitPathName[i].length > 0) {
+            uri += splitPathName[i]
+            uri += "/";
+        }
     }
-    uri.concat('/', path);
+    uri += path;
 
     const payloadJson = {};
     payloadJson["sessionUUID"] = Core.UUID;
