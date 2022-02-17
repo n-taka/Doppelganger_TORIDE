@@ -2,7 +2,14 @@ import { Core } from "./Core.js";
 
 export async function request(path, parameterJson, contentType) {
     // location.pathname.split('/')[1]: roomUUID
-    const uri = location.protocol + "//" + location.host + "/" + location.pathname.split('/')[1] + "/" + path;
+    const splitPathName = location.pathname.split('/');
+    let uri = location.protocol + "//" + location.host + "/";
+    for (let i = 1; i < splitPathName.length - 2; ++i) {
+        uri += splitPathName[i]
+        uri += "/";
+    }
+    uri += path;
+    
     const requestInfo = {};
     requestInfo["method"] = "POST";
     const payloadJson = {};
@@ -31,7 +38,12 @@ export async function request(path, parameterJson, contentType) {
 }
 
 export function beacon(path, parameterJson) {
-    const uri = location.protocol + "//" + location.host + "/" + location.pathname.split('/')[1] + "/" + path;
+    const splitPathName = location.pathname.split('/');
+    const uri = location.protocol + "//" + location.host + "/";
+    for (let i = 1; i < splitPathName.length - 2; ++i) {
+        uri.concat('/', splitPathName[i]);
+    }
+    uri.concat('/', path);
 
     const payloadJson = {};
     payloadJson["sessionUUID"] = Core.UUID;
