@@ -38,7 +38,6 @@ add_library(${PROJECT_NAME} MODULE)
 target_sources(
     ${PROJECT_NAME} PRIVATE
     ${PROJECT_NAME}.cpp
-    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/submodule/libigl/include/igl/tinyply.cpp
     ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/src/Doppelganger/TriangleMesh.cpp
     ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/src/Doppelganger/Util/uuid.cpp
     ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/src/Doppelganger/Util/getCurrentTimestampAsString.cpp
