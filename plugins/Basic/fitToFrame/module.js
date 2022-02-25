@@ -19,8 +19,6 @@ const fitToFrame = function () {
         }
         // for updating camera.clippingNear, clippingFar, making sure that whole of the mesh is visible
         Canvas.resetCamera(false);
-        // Canvas.pushUpdate() is called within next drawLoop
-        // Canvas.pushUpdate();
     }
 }
 
@@ -37,7 +35,7 @@ export const init = async function () {
         }
         const keycode = e.code;
         if (keycode == 'KeyF') {
-            // fitToFrame() updates MouseKey.strokeTimeStamp
+            // fitToFrame() updates MouseKey.lastInteractionTimeStamp
             fitToFrame();
         }
     }));

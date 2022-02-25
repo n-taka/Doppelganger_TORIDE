@@ -34,7 +34,6 @@ import { Canvas } from './Canvas.js';
 // nothing
 //
 export const constructMeshFromParameters = async function (parameters) {
-    const isFirstMesh = (Canvas.meshGroup.children.length == 0);
     if ("meshes" in parameters) {
         for (let meshUUID in parameters["meshes"]) {
             // erase old mesh (not optimal...)
@@ -57,12 +56,6 @@ export const constructMeshFromParameters = async function (parameters) {
             }
         }
         Canvas.resetCamera(true);
-        if (isFirstMesh) {
-            if (Canvas.fitToFrame) {
-                // if user installs plugin "fitToFrame"
-                Canvas.fitToFrame();
-            }
-        }
     }
     for (let handler of constructMeshFromParameters.handlers) {
         await handler();

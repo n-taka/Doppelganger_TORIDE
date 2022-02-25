@@ -113,14 +113,11 @@ Canvas.init = async function () {
     Canvas.lastCameraPosition = {};
     Canvas.lastCameraUp = {};
     Canvas.lastCameraZoom = {};
-    Canvas.lastControlTarget["value"] = new THREE.Vector3(0, 0, 0);
-    Canvas.lastControlTarget["timestamp"] = -1;
-    Canvas.lastCameraPosition["value"] = new THREE.Vector3(0, 0, 0);
-    Canvas.lastCameraPosition["timestamp"] = -1;
-    Canvas.lastCameraUp["value"] = new THREE.Vector3(0, 0, 0);
-    Canvas.lastCameraUp["timestamp"] = -1;
-    Canvas.lastCameraZoom["value"] = 1.0;
-    Canvas.lastCameraZoom["timestamp"] = -1;
+    // for preventing syncing default value on connect
+    Canvas.lastControlTarget["value"] = Canvas.controls.target.clone();
+    Canvas.lastCameraPosition["value"] = Canvas.camera.position.clone();
+    Canvas.lastCameraUp["value"] = Canvas.camera.up.clone();
+    Canvas.lastCameraZoom["value"] = { "zoom": Canvas.camera.zoom };
 
     // parameter for mesh
     Canvas.UUIDToMesh = {};
@@ -170,6 +167,8 @@ Canvas.resetCamera = function (refreshBSphere) {
         clippingFar = (parseFloat(sliderValue[1]) - 50.0) / 50.0;
     }
 
+    MouseKey.lastInteractionTimeStamp = Date.now();
+
     const meshList = Canvas.meshGroup.children.filter(function (obj) { return (obj instanceof THREE.Mesh); });
     if (meshList.length > 0) {
 
@@ -207,9 +206,5 @@ Canvas.resetCamera = function (refreshBSphere) {
         Canvas.camera.near = cameraToBCenter.dot(cameraToTarget) + Canvas.unifiedBSphere.radius * clippingNear;
         Canvas.camera.far = cameraToBCenter.dot(cameraToTarget) + Canvas.unifiedBSphere.radius * clippingFar;
         Canvas.camera.updateProjectionMatrix();
-
-        MouseKey.strokeTimeStamp = Date.now();
-        // Canvas.pushUpdate() is called within next drawLoop
-        // Canvas.pushUpdate();
     }
 };

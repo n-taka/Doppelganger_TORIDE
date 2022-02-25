@@ -37,8 +37,6 @@ target_sources(
 ### include directories
 ##############################################
 target_include_directories(${PROJECT_NAME} PUBLIC
-    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/include
-    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/submodule/libigl/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../../
 )
 

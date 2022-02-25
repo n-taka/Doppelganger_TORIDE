@@ -11,8 +11,6 @@ void getPtrStrArrayForPartialConfig(
 	char *&ptrStrArrayCoreChar,
 	char *&ptrStrArrayRoomChar)
 {
-	const nlohmann::json parameter = nlohmann::json::parse(parameterChar);
-
 	nlohmann::json ptrStrArrayCore = nlohmann::json::array();
 	writeJSONToChar(ptrStrArrayCoreChar, ptrStrArrayCore);
 	nlohmann::json ptrStrArrayRoom = nlohmann::json::array();
@@ -32,15 +30,15 @@ void pluginProcess(
 	////
 	// [IN]
 	// parameters = {
+	//     "timestamp": timestamp,
 	//     "controls": {
 	//         "target": {
 	//             "value": {
 	//                 "x": x-coordinate,
 	//                 "y": y-coordinate,
 	//                 "z": z-coordinate,
-	//             },
-	//             "timestamp": timestamp
-	//         },
+	//             }
+	//         }
 	//     },
 	//     "camera": {
 	//         "position": {
@@ -48,22 +46,19 @@ void pluginProcess(
 	//                 "x": x-coordinate,
 	//                 "y": y-coordinate,
 	//                 "z": z-coordinate,
-	//             },
-	//             "timestamp": timestamp
+	//             }
 	//         },
 	//         "up": {
 	//             "value": {
 	//                 "x": x-coordinate,
 	//                 "y": y-coordinate,
 	//                 "z": z-coordinate,
-	//             },
-	//             "timestamp": timestamp
+	//             }
 	//         },
 	//         "zoom": {
 	//             "value": {
 	//                 "zoom": zoom parameter,
-	//             },
-	//             "timestamp": timestamp
+	//             }
 	//         }
 	//     }
 	// }
@@ -88,8 +83,31 @@ void pluginProcess(
 	}
 	else
 	{
-		nlohmann::json broadcast = nlohmann::json::object();
+		// check timestamp
+		std::int64_t timestampServer = 0;
+		if (configRoom.contains(nlohmann::json::json_pointer("/extension/syncViewport/timestamp")))
+		{
+			timestampServer = configRoom.at(nlohmann::json::json_pointer("/extension/syncViewport/timestamp")).get<std::int64_t>();
+		}
 
+		std::int64_t timestampParameter = 0;
+		if (parameter.contains(nlohmann::json::json_pointer("/timestamp")))
+		{
+			timestampParameter = parameter.at(nlohmann::json::json_pointer("/timestamp")).get<std::int64_t>();
+		}
+
+		// we accept only if timestampParameter is newer
+		if (timestampServer <= timestampParameter)
+		{
+			writeJSONToChar(broadcastChar, parameter);
+
+			nlohmann::json configRoomPatch = nlohmann::json::object();
+			configRoomPatch["extension"] = nlohmann::json::object();
+			configRoomPatch.at("extension")["syncViewport"] = parameter;
+			writeJSONToChar(configRoomPatchChar, configRoomPatch);
+		}
+
+#if 0
 		// controls
 		if (parameter.contains("controls"))
 		{
@@ -98,7 +116,6 @@ void pluginProcess(
 
 			if (controls.contains("target"))
 			{
-				std::int64_t prevTimestamp = -1;
 				if (configRoom.contains(nlohmann::json::json_pointer("/extension/syncViewport/controls/target")))
 				{
 					prevTimestamp = configRoom.at(nlohmann::json::json_pointer("/extension/syncViewport/controls/target/timestamp")).get<std::int64_t>();
@@ -126,7 +143,7 @@ void pluginProcess(
 
 			if (camera.contains("position"))
 			{
-				std::int64_t prevTimestamp = -1;
+				std::int64_t prevTimestamp = 0;
 				if (configRoom.contains(nlohmann::json::json_pointer("/extension/syncViewport/camera/position")))
 				{
 					prevTimestamp = configRoom.at(nlohmann::json::json_pointer("/extension/syncViewport/camera/position/timestamp")).get<std::int64_t>();
@@ -141,7 +158,7 @@ void pluginProcess(
 			}
 			if (camera.contains("up"))
 			{
-				std::int64_t prevTimestamp = -1;
+				std::int64_t prevTimestamp = 0;
 				if (configRoom.contains(nlohmann::json::json_pointer("/extension/syncViewport/camera/up")))
 				{
 					prevTimestamp = configRoom.at(nlohmann::json::json_pointer("/extension/syncViewport/camera/up/timestamp")).get<std::int64_t>();
@@ -156,7 +173,7 @@ void pluginProcess(
 			}
 			if (camera.contains("zoom"))
 			{
-				std::int64_t prevTimestamp = -1;
+				std::int64_t prevTimestamp = 0;
 				if (configRoom.contains(nlohmann::json::json_pointer("/extension/syncViewport/camera/zoom")))
 				{
 					prevTimestamp = configRoom.at(nlohmann::json::json_pointer("/extension/syncViewport/camera/zoom/timestamp")).get<std::int64_t>();
@@ -178,13 +195,8 @@ void pluginProcess(
 		// write result
 		if (!broadcast.empty())
 		{
-			writeJSONToChar(broadcastChar, broadcast);
-
-			nlohmann::json configRoomPatch = nlohmann::json::object();
-			configRoomPatch["extension"] = nlohmann::json::object();
-			configRoomPatch.at("extension")["syncViewport"] = broadcast;
-			writeJSONToChar(configRoomPatchChar, configRoomPatch);
 		}
+#endif
 	}
 }
 

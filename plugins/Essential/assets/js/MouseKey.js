@@ -1,5 +1,3 @@
-import * as THREE from 'https://cdn.skypack.dev/three@v0.132';
-
 export const MouseKey = {};
 
 MouseKey.init = async function () {
@@ -8,8 +6,9 @@ MouseKey.init = async function () {
     MouseKey.iconIdx = Math.floor(Math.random() * 10);
     document.body.style.cursor = "url(../icon/cursorIcon" + MouseKey.iconIdx + ".png) 16 16 , default"
 
-    // initialize timestamp
-    MouseKey.strokeTimeStamp = Date.now();
+    // initialize timestamp (unix time)
+    MouseKey.lastInteractionTimeStamp = -1;
+    MouseKey.activeInteractionTimeStamp = 0;
 
     ////
     // pointer event
@@ -19,4 +18,3 @@ MouseKey.init = async function () {
 
     return;
 };
-
