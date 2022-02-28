@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.15)
 ### project
 ##############################################
 project(saveMesh
-    VERSION 2.0.0
+    VERSION 2022.3.0
     DESCRIPTION "Save single mesh (OBJ, PLY, STL, VRML)"
     HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_Plugin"
     LANGUAGES CXX
@@ -112,7 +112,7 @@ endif()
 add_custom_command(
     TARGET ${PROJECT_NAME}
     POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E tar "cf" "${CMAKE_SOURCE_DIR}/bin/Basic/${PROJECT_NAME}.zip" --format=zip -- .
+    COMMAND ${CMAKE_COMMAND} -E tar "cf" "${CMAKE_SOURCE_DIR}/bin/Basic/${PROJECT_NAME}_${PROJECT_VERSION}.zip" --format=zip -- .
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/Basic/${PROJECT_NAME}/")
 
 # erase temporal directory
