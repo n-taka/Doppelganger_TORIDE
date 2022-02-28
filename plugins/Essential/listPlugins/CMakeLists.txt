@@ -3,10 +3,10 @@ cmake_minimum_required(VERSION 3.15)
 ##############################################
 ### project
 ##############################################
-project(loadPolygonMesh
+project(listPlugins
     VERSION 2.0.0
-    DESCRIPTION "Set of plugins for Doppelganger"
-    HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_Plugin_Core"
+    DESCRIPTION "List all available plugins"
+    HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_Plugin"
     LANGUAGES CXX
 )
 
@@ -16,14 +16,14 @@ project(loadPolygonMesh
 ##############################################
 # Boost
 if (APPLE)
-    find_package(Boost REQUIRED COMPONENTS random)
-elseif (APPLE)
-    find_package(Boost REQUIRED COMPONENTS random filesystem)
+    find_package(Boost REQUIRED COMPONENTS filesystem)
 endif ()
 # json
 find_package(nlohmann_json CONFIG REQUIRED)
-# eigen3
-find_package(Eigen3 CONFIG REQUIRED)
+# minizip
+find_package(minizip CONFIG REQUIRED)
+# openSSL
+find_package(OpenSSL REQUIRED)
 
 
 ##############################################
@@ -38,7 +38,8 @@ add_library(${PROJECT_NAME} MODULE)
 target_sources(
     ${PROJECT_NAME} PRIVATE
     ${PROJECT_NAME}.cpp
-    "../submodule/Doppelganger/submodule/libigl/include/igl/tinyply.cpp"
+    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/src/Doppelganger/Util/getPluginCatalogue.cpp
+    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/src/Doppelganger/Util/download.cpp
 )
 
 
@@ -46,9 +47,9 @@ target_sources(
 ### include directories
 ##############################################
 target_include_directories(${PROJECT_NAME} PUBLIC
-    ${EIGEN3_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../submodule/Doppelganger/submodule/libigl/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../submodule/Doppelganger/Doppelganger_install/include
+    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/include
+    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/submodule/certify/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../
 )
 
 
@@ -59,12 +60,11 @@ if(WIN32)
     # we need to explicitly add bcrypt.lib due to some bug.
     target_link_libraries(
         ${PROJECT_NAME} PRIVATE
-        ${Boost_LIBRARIES}
         nlohmann_json
         nlohmann_json::nlohmann_json
-        Eigen3::Eigen
-        ${CMAKE_CURRENT_SOURCE_DIR}/../submodule/Doppelganger/Doppelganger_install/lib/Doppelganger.lib
-        bcrypt.lib
+        minizip::minizip
+        OpenSSL::SSL
+        OpenSSL::Crypto
     )
 elseif (APPLE)
     target_link_libraries(
@@ -72,8 +72,18 @@ elseif (APPLE)
         ${Boost_LIBRARIES}
         nlohmann_json
         nlohmann_json::nlohmann_json
-        Eigen3::Eigen
-        # ${CMAKE_CURRENT_SOURCE_DIR}/../submodule/Doppelganger/Doppelganger_install/lib/Doppelganger.lib
+        minizip::minizip
+        OpenSSL::SSL
+        OpenSSL::Crypto
+    )
+elseif (UNIX)
+    target_link_libraries(
+        ${PROJECT_NAME} PRIVATE
+        nlohmann_json
+        nlohmann_json::nlohmann_json
+        minizip::minizip
+        OpenSSL::SSL
+        OpenSSL::Crypto
     )
 endif ()
 
@@ -90,6 +100,9 @@ elseif (APPLE)
     # because we support macOS Mojave, we only require C++14 for macOS
     # we use boost::filesystem for macOS
     target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
+elseif (UNIX)
+    # because we want to use std::filesystem, we require C++17 for linux
+    target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 endif ()
 target_compile_definitions(${PROJECT_NAME} PUBLIC _USE_MATH_DEFINES)
 
@@ -98,12 +111,12 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC _USE_MATH_DEFINES)
 ### resources
 ##############################################
 # directory
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_SOURCE_DIR}/../bin/${PROJECT_NAME}")
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}/${CMAKE_SYSTEM_NAME}")
 # dll
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${PROJECT_NAME}>" "${CMAKE_CURRENT_SOURCE_DIR}/../bin/${PROJECT_NAME}/")
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${PROJECT_NAME}>" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}/${CMAKE_SYSTEM_NAME}")
 # module.js
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/module.js")
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/module.js" "${CMAKE_CURRENT_SOURCE_DIR}/../bin/${PROJECT_NAME}/")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/module.js" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}")
 endif()
 
 # create zip archive
@@ -111,12 +124,11 @@ endif()
 add_custom_command(
     TARGET ${PROJECT_NAME}
     POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E tar "cfv" "${CMAKE_CURRENT_SOURCE_DIR}/../bin/${PROJECT_NAME}.zip" --format=zip -- .
-    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../bin/${PROJECT_NAME}/")
+    COMMAND ${CMAKE_COMMAND} -E tar "cf" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}.zip" --format=zip -- .
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}/")
 
 # erase temporal directory
-add_custom_command(
-    TARGET ${PROJECT_NAME}
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E rm "-r" "${CMAKE_CURRENT_SOURCE_DIR}/../bin/${PROJECT_NAME}")
-
+# add_custom_command(
+#     TARGET ${PROJECT_NAME}
+#     POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E rm "-r" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}")

@@ -1,0 +1,98 @@
+[
+    {
+        "name": "loadCADData",
+        "description": {
+            "en": "Load CAD data (iges, step)",
+            "ja": "CADデータを読み込みます(iges, step)"
+        },
+        "optional": true,
+        "UIPosition": "topLeft",
+        "hasModuleJS": true,
+        "versions": [
+            {
+                "version": "2.0.0",
+                "URL": "https://n-taka.info/nextcloud/s/saxW5E9n46MAHmC/download/loadCADData.zip"
+            }
+        ]
+    },
+    {
+        "name": "splitIntoIslands",
+        "description": {
+            "en": "Split a mesh into connected components",
+            "ja": "メッシュをアイランド単位に分離します"
+        },
+        "optional": true,
+        "UIPosition": "mesh",
+        "hasModuleJS": true,
+        "versions": [
+            {
+                "version": "2.0.0",
+                "URL": "https://n-taka.info/nextcloud/s/iLyxHGRP3St6wf8/download/splitIntoIslands.zip"
+            }
+        ]
+    },
+    {
+        "name": "hollowMesh",
+        "description": {
+            "en": "Hollow single mesh",
+            "ja": "メッシュを中空にします"
+        },
+        "optional": true,
+        "UIPosition": "mesh",
+        "hasModuleJS": true,
+        "versions": [
+            {
+                "version": "2.0.0",
+                "URL": "https://n-taka.info/nextcloud/s/QkGzSywAWCHwGB8/download/hollowMesh.zip"
+            }
+        ]
+    },
+    {
+        "name": "repairMesh",
+        "description": {
+            "en": "Repair single mesh",
+            "ja": "単一のメッシュのエラーを修正します"
+        },
+        "optional": true,
+        "UIPosition": "mesh",
+        "hasModuleJS": true,
+        "versions": [
+            {
+                "version": "2.0.0.MeshFix",
+                "URL": "https://n-taka.info/nextcloud/s/P2sY2yd52m4GxpY/download/repairMesh.zip"
+            }
+        ]
+    },
+    {
+        "name": "estimateThickness",
+        "description": {
+            "en": "Estimate thickness",
+            "ja": "厚みをチェックします"
+        },
+        "optional": true,
+        "UIPosition": "mesh",
+        "hasModuleJS": true,
+        "versions": [
+            {
+                "version": "2.0.0",
+                "URL": "https://n-taka.info/nextcloud/s/2NrGjXFs8beD4YB/download/estimateThickness.zip"
+            }
+        ]
+    },
+    {
+        "name": "repairAllMeshes",
+        "description": {
+            "en": "Repair all meshes",
+            "ja": "すべてのメッシュのエラーを修正します"
+        },
+        "optional": true,
+        "UIPosition": "bottomLeft",
+        "hasModuleJS": true,
+        "versions": [
+            {
+                "version": "2.0.0.MeshFix",
+                "URL": "https://n-taka.info/nextcloud/s/7LPzyAZT8TNdGD5/download/repairAllMeshes.zip"
+            }
+        ]
+    }
+]

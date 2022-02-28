@@ -75,30 +75,18 @@ const loadMesh = async function (file) {
     freader.onload = function (event) {
         const fileName = file.name;
         const type = fileName.split('.');
-        const fileId = Math.random().toString(36).substring(2, 9);
         const base64 = freader.result.substring(freader.result.indexOf(',') + 1);
-        // split into 0.5MB packets. Due to the default limit (up to 1MB) of boost beast.
-        const packetSize = 500000;
-        const packetCount = Math.ceil(base64.length / packetSize);
 
-        for (let packet = 0; packet < packetCount; ++packet) {
-            const base64Packet = base64.substring(packet * packetSize, (packet + 1) * packetSize);
-            const json = {
-                "mesh": {
-                    "name": type.slice(0, -1).join("."),
-                    "file": {
-                        "id": fileId,
-                        "size": base64.length,
-                        "packetId": packet,
-                        "packetSize": packetSize,
-                        "packetTotal": packetCount,
-                        "type": type[type.length - 1].toLowerCase(),
-                        "base64Packet": base64Packet
-                    }
+        const json = {
+            "mesh": {
+                "name": type.slice(0, -1).join("."),
+                "file": {
+                    "type": type[type.length - 1].toLowerCase(),
+                    "base64Str": base64
                 }
-            };
-            request("loadPolygonMesh", json);
-        }
+            }
+        };
+        request("loadPolygonMesh", json);
     };
     freader.readAsDataURL(file);
 }

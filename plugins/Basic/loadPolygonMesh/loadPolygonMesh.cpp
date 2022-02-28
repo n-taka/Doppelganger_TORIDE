@@ -1,30 +1,30 @@
 #ifndef LOADPOLYGONMESH_CPP
 #define LOADPOLYGONMESH_CPP
 
-#if defined(_WIN32) || defined(_WIN64)
-#define DLLEXPORT __declspec(dllexport)
-#else
-#define DLLEXPORT __attribute__((visibility("default")))
+#if defined(_WIN64)
+#include <filesystem>
+namespace fs = std::filesystem;
+#elif defined(__APPLE__)
+#include "boost/filesystem.hpp"
+namespace fs = boost::filesystem;
+#elif defined(__linux__)
+#include <filesystem>
+namespace fs = std::filesystem;
 #endif
+
+#include "pluginCommon.h"
+
 #include <memory>
 #include <nlohmann/json.hpp>
 
-#include "Doppelganger/Room.h"
-#include "Doppelganger/triangleMesh.h"
-#include "Doppelganger/Logger.h"
+#include "Doppelganger/TriangleMesh.h"
 #include "Doppelganger/Util/uuid.h"
 #include "Doppelganger/Util/writeBase64ToFile.h"
+#include "Doppelganger/Util/storeHistory.h"
+#include "Doppelganger/Util/log.h"
 
 #include <string>
 #include <sstream>
-#include <mutex>
-#if defined(_WIN32) || defined(_WIN64)
-#include <filesystem>
-namespace fs = std::filesystem;
-#else
-#include "boost/filesystem.hpp"
-namespace fs = boost::filesystem;
-#endif
 
 #include "igl/readOBJ.h"
 #include "igl/readPLY.h"
@@ -37,13 +37,28 @@ namespace fs = boost::filesystem;
 #include "igl/per_face_normals.h"
 #include "igl/per_vertex_normals.h"
 
-namespace
+void getPtrStrArrayForPartialConfig(
+	const char *&parameterChar,
+	char *&ptrStrArrayCoreChar,
+	char *&ptrStrArrayRoomChar)
 {
-	std::unordered_map<std::string, std::pair<std::vector<bool>, std::string>> packetsVec;
-	std::mutex mutexPackets;
+	nlohmann::json ptrStrArrayCore = nlohmann::json::array();
+	writeJSONToChar(ptrStrArrayCoreChar, ptrStrArrayCore);
+	nlohmann::json ptrStrArrayRoom = nlohmann::json::array();
+	ptrStrArrayRoom.push_back("/dataDir");
+	ptrStrArrayRoom.push_back("/log");
+	ptrStrArrayRoom.push_back("/history");
+	writeJSONToChar(ptrStrArrayRoomChar, ptrStrArrayRoom);
 }
 
-extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room> &room, const nlohmann::json &parameters, nlohmann::json &response, nlohmann::json &broadcast)
+void pluginProcess(
+	const char *&configCoreChar,
+	const char *&configRoomChar,
+	const char *&parameterChar,
+	char *&configCorePatchChar,
+	char *&configRoomPatchChar,
+	char *&responseChar,
+	char *&broadcastChar)
 {
 	////
 	// [IN]
@@ -51,13 +66,8 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 	// 	"mesh": {
 	// 	 "name": name of this mesh (usually, filename without extension),
 	// 	 "file": {
-	//    "id": unique id for this file,
-	//    "size": bytes of this file,
-	//    "packetId": id for this packet,
-	//    "packetSize": size of each packet,
-	//    "packetTotal": total count of packets,
-	// 	  "type": extensiton of this file,
-	// 	  "base64Packet": base64-encoded fragment
+	// 	  "type": extension of this file,
+	// 	  "base64Str": base64-encoded fragment
 	// 	 }
 	// 	}
 	// }
@@ -71,49 +81,16 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 	//  }
 	// }
 
-	// create empty response/broadcast
-	response = nlohmann::json::object();
-	broadcast = nlohmann::json::object();
+	// initialize
+	const nlohmann::json configRoom = nlohmann::json::parse(configRoomChar);
+	const nlohmann::json parameter = nlohmann::json::parse(parameterChar);
+	nlohmann::json configRoomPatch = nlohmann::json::object();
+	nlohmann::json broadcast = nlohmann::json::object();
 
-	const std::string &fileId = parameters.at("mesh").at("file").at("id").get<std::string>();
-	const int &fileSize = parameters.at("mesh").at("file").at("size").get<int>();
-	const int &packetId = parameters.at("mesh").at("file").at("packetId").get<int>();
-	const int &packetSize = parameters.at("mesh").at("file").at("packetSize").get<int>();
-	const int &packetTotal = parameters.at("mesh").at("file").at("packetTotal").get<int>();
-	const std::string &fileType = parameters.at("mesh").at("file").at("type").get<std::string>();
-	const std::string &base64Packet = parameters.at("mesh").at("file").at("base64Packet").get<std::string>();
+	const nlohmann::json &fileJson = parameter.at("mesh").at("file");
+	const std::string fileType = fileJson.at("type").get<std::string>();
+	const std::string base64Str = fileJson.at("base64Str").get<std::string>();
 
-	bool allPacketArrived = true;
-	std::string base64Str;
-	{
-		std::lock_guard<std::mutex> lock(mutexPackets);
-
-		std::pair<std::vector<bool>, std::string> &packet = packetsVec[fileId];
-		std::vector<bool> &packetArrived = packet.first;
-		std::string &packetBase64Str = packet.second;
-
-		if (packetArrived.size() == 0)
-		{
-			// initialize.
-			packetArrived.resize(packetTotal, false);
-			packetBase64Str = std::string(fileSize, '\0');
-		}
-
-		packetArrived.at(packetId) = true;
-		packetBase64Str.replace(packetId * packetSize, base64Packet.size(), base64Packet);
-
-		for (const auto &b : packetArrived)
-		{
-			allPacketArrived &= b;
-		}
-
-		if (allPacketArrived)
-		{
-			base64Str = std::move(packetBase64Str);
-		}
-	}
-
-	if (base64Str.size())
 	{
 		fs::path filePath = fs::temp_directory_path();
 		filePath /= Doppelganger::Util::uuid("DoppelgangerTmpFile-");
@@ -121,19 +98,18 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 		filePath += fileType;
 		Doppelganger::Util::writeBase64ToFile(base64Str, filePath);
 
-		const std::string meshUUID = Doppelganger::Util::uuid("mesh-");
-		std::shared_ptr<Doppelganger::triangleMesh> mesh = std::make_shared<Doppelganger::triangleMesh>(meshUUID);
+		Doppelganger::TriangleMesh mesh;
+		mesh.UUID_ = Doppelganger::Util::uuid("mesh-");
+		mesh.name_ = parameter.at("mesh").at("name").get<std::string>();
 
-		const std::string &meshName = parameters.at("mesh").at("name").get<std::string>();
-		mesh->name = meshName;
-		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &V = mesh->V;
-		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &VN = mesh->VN;
-		Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> &F = mesh->F;
-		Eigen::Matrix<int, Eigen::Dynamic, 1> &FG = mesh->FG;
-		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &FN = mesh->FN;
-		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &VC = mesh->VC;
-		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &TC = mesh->TC;
-		Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> &FTC = mesh->FTC;
+		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &V = mesh.V_;
+		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &VN = mesh.VN_;
+		Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> &F = mesh.F_;
+		Eigen::Matrix<int, Eigen::Dynamic, 1> &FG = mesh.FG_;
+		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &FN = mesh.FN_;
+		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &VC = mesh.VC_;
+		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &TC = mesh.TC_;
+		Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> &FTC = mesh.FTC_;
 
 		std::vector<std::vector<double>> VVec;
 		std::vector<std::vector<double>> TCVec;
@@ -221,7 +197,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 			ss << "file type ";
 			ss << fileType;
 			ss << " is not yet supported.";
-			room->logger.log(ss.str(), "ERROR");
+			Doppelganger::Util::log(ss.str(), "ERROR", configRoom);
 		}
 
 		// format parsed info
@@ -288,19 +264,22 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 		}
 
 		// register to this room
-		room->meshes[meshUUID] = mesh;
+		configRoomPatch["meshes"] = nlohmann::json::object();
+		configRoomPatch.at("meshes")[mesh.UUID_] = mesh;
 
-		// write response/broadcast
+		// write broadcast
+		nlohmann::json meshJsonf;
+		Doppelganger::to_json(meshJsonf, mesh, true);
 		broadcast["meshes"] = nlohmann::json::object();
-		broadcast.at("meshes")[meshUUID] = mesh->dumpToJson(true);
+		broadcast.at("meshes")[mesh.UUID_] = meshJsonf;
 
 		{
 			// message
 			std::stringstream ss;
-			ss << "New mesh \"" << meshUUID << "\" is loaded.";
-			room->logger.log(ss.str(), "APICALL");
+			ss << "New mesh \"" << mesh.UUID_ << "\" is loaded.";
+			Doppelganger::Util::log(ss.str(), "APICALL", configRoom);
 			// file
-			room->logger.log(filePath, "APICALL", true);
+			Doppelganger::Util::log(filePath, "APICALL", configRoom);
 		}
 
 		{
@@ -308,13 +287,17 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 			nlohmann::json diff = nlohmann::json::object();
 			nlohmann::json diffInv = nlohmann::json::object();
 			diff["meshes"] = nlohmann::json::object();
-			diff["meshes"][meshUUID] = mesh->dumpToJson(false);
-			diff["meshes"][meshUUID]["remove"] = false;
+			diff.at("meshes")[mesh.UUID_] = configRoomPatch.at("meshes").at(mesh.UUID_);
 			diffInv["meshes"] = nlohmann::json::object();
-			diffInv["meshes"][meshUUID] = nlohmann::json::object();
-			diffInv["meshes"][meshUUID]["remove"] = true;
-			room->storeHistory(diff, diffInv);
+			diffInv.at("meshes")[mesh.UUID_] = nlohmann::json(nullptr);
+
+			configRoomPatch["history"] = nlohmann::json::object();
+			Doppelganger::Util::storeHistory(configRoom.at("history"), diff, diffInv, configRoomPatch.at("history"));
 		}
+
+		// write result
+		writeJSONToChar(configRoomPatchChar, configRoomPatch);
+		writeJSONToChar(broadcastChar, broadcast);
 	}
 }
 
