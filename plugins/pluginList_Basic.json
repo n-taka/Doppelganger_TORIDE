@@ -7,6 +7,7 @@
         },
         "optional": true,
         "UIPosition": "topLeft",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -22,6 +23,7 @@
         },
         "optional": true,
         "UIPosition": "topRight",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -37,6 +39,7 @@
         },
         "optional": true,
         "UIPosition": "topRight",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -52,6 +55,7 @@
         },
         "optional": true,
         "UIPosition": "mesh",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -67,6 +71,7 @@
         },
         "optional": true,
         "UIPosition": "mesh",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -82,6 +87,7 @@
         },
         "optional": true,
         "UIPosition": "mesh",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -97,6 +103,7 @@
         },
         "optional": true,
         "UIPosition": "mesh",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -112,6 +119,7 @@
         },
         "optional": true,
         "UIPosition": "mesh",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -127,6 +135,7 @@
         },
         "optional": true,
         "UIPosition": "mesh",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -142,6 +151,7 @@
         },
         "optional": true,
         "UIPosition": "mesh",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -157,6 +167,7 @@
         },
         "optional": true,
         "UIPosition": "bottomInfo",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -172,6 +183,7 @@
         },
         "optional": true,
         "UIPosition": "bottomLeft",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -187,6 +199,7 @@
         },
         "optional": true,
         "UIPosition": "bottomLeft",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -202,6 +215,7 @@
         },
         "optional": true,
         "UIPosition": "bottomLeft",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -217,6 +231,7 @@
         },
         "optional": true,
         "UIPosition": "bottomLeft",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -232,6 +247,7 @@
         },
         "optional": true,
         "UIPosition": "none",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -247,6 +263,7 @@
         },
         "optional": true,
         "UIPosition": "none",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -262,6 +279,7 @@
         },
         "optional": true,
         "UIPosition": "none",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -277,10 +295,43 @@
         },
         "optional": true,
         "UIPosition": "none",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
                 "URL": "https://n-taka.info/nextcloud/s/bptjPkmpcQrQFfR/download/crossSectionalView.zip"
+            }
+        ]
+    },
+    {
+        "name": "syncViewport",
+        "description": {
+            "en": "Synchronize viewport/camera parameters across clients",
+            "ja": "全クライアント間でビューポート・カメラのパラメタを共有します"
+        },
+        "optional": true,
+        "UIPosition": "none",
+        "hasModuleJS": true,
+        "versions": [
+            {
+                "version": "2.0.0",
+                "URL": "https://n-taka.info/nextcloud/s/cCJyj5DXYXmENEo/download/syncViewport.zip"
+            }
+        ]
+    },
+    {
+        "name": "syncCursor",
+        "description": {
+            "en": "Synchronize cursors across clients",
+            "ja": "全クライアント間でカーソル位置を共有します"
+        },
+        "optional": true,
+        "UIPosition": "none",
+        "hasModuleJS": true,
+        "versions": [
+            {
+                "version": "2.0.0",
+                "URL": "https://n-taka.info/nextcloud/s/3j9K3yoJ2aeZenp/download/syncCursor.zip"
             }
         ]
     }

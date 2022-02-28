@@ -19,6 +19,7 @@ add_subdirectory(sortMeshes)
 add_subdirectory(configEditor)
 add_subdirectory(listPlugins)
 add_subdirectory(shutdown)
+add_subdirectory(info)
 
 ### others
 add_subdirectory(assets)

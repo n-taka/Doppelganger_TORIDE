@@ -7,6 +7,7 @@
         },
         "optional": false,
         "UIPosition": "topRight",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -22,6 +23,7 @@
         },
         "optional": false,
         "UIPosition": "bottomRight",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -37,6 +39,7 @@
         },
         "optional": false,
         "UIPosition": "bottomRight",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -52,10 +55,27 @@
         },
         "optional": false,
         "UIPosition": "bottomRight",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
                 "URL": "https://n-taka.info/nextcloud/s/dnejQJdjnsjCZ73/download/shutdown.zip"
+            }
+        ]
+    },
+    {
+        "name": "info",
+        "description": {
+            "en": "Information about Doppelganger",
+            "ja": "Doppelgangerについての情報"
+        },
+        "optional": false,
+        "UIPosition": "bottomRight",
+        "hasModuleJS": true,
+        "versions": [
+            {
+                "version": "2.0.0",
+                "URL": "https://n-taka.info/nextcloud/s/ZGCWq2ZLWN5nJ9J/download/info.zip"
             }
         ]
     },
@@ -67,6 +87,7 @@
         },
         "optional": false,
         "UIPosition": "none",
+        "hasModuleJS": false,
         "versions": [
             {
                 "version": "2.0.0",
@@ -82,40 +103,11 @@
         },
         "optional": false,
         "UIPosition": "none",
+        "hasModuleJS": false,
         "versions": [
             {
                 "version": "2.0.0",
                 "URL": "https://n-taka.info/nextcloud/s/CnPGtwsBZ8MA3Ne/download/updatePlugins.zip"
-            }
-        ]
-    },
-    {
-        "name": "pullCanvasParameters",
-        "description": {
-            "en": "Get parameters for camera on startup",
-            "ja": "接続時にカメラのパラメタを取得します"
-        },
-        "optional": false,
-        "UIPosition": "none",
-        "versions": [
-            {
-                "version": "2.0.0",
-                "URL": "https://n-taka.info/nextcloud/s/7zGEEECmrx4TYao/download/pushCanvasParameters.zip"
-            }
-        ]
-    },
-    {
-        "name": "pushCanvasParameters",
-        "description": {
-            "en": "Synchronize parameters for camera across clients",
-            "ja": "全クライアント間でカメラのパラメタを共有します"
-        },
-        "optional": false,
-        "UIPosition": "none",
-        "versions": [
-            {
-                "version": "2.0.0",
-                "URL": "https://n-taka.info/nextcloud/s/gSimyKzPH6zZbAy/download/pullCanvasParameters.zip"
             }
         ]
     },
@@ -127,25 +119,11 @@
         },
         "optional": false,
         "UIPosition": "none",
+        "hasModuleJS": false,
         "versions": [
             {
                 "version": "2.0.0",
                 "URL": "https://n-taka.info/nextcloud/s/Xe5CPFnxS5ffg6o/download/pullCurrentMeshes.zip"
-            }
-        ]
-    },
-    {
-        "name": "syncCursor",
-        "description": {
-            "en": "Synchronize cursors across clients",
-            "ja": "全クライアント間でカーソル位置を共有します"
-        },
-        "optional": false,
-        "UIPosition": "none",
-        "versions": [
-            {
-                "version": "2.0.0",
-                "URL": "https://n-taka.info/nextcloud/s/82dNfY3xpYSZdMY/download/syncCursor.zip"
             }
         ]
     }

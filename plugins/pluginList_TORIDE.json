@@ -7,6 +7,7 @@
         },
         "optional": true,
         "UIPosition": "topLeft",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -22,6 +23,7 @@
         },
         "optional": true,
         "UIPosition": "mesh",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -37,6 +39,7 @@
         },
         "optional": true,
         "UIPosition": "mesh",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -52,6 +55,7 @@
         },
         "optional": true,
         "UIPosition": "mesh",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0.MeshFix",
@@ -67,6 +71,7 @@
         },
         "optional": true,
         "UIPosition": "mesh",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0",
@@ -82,6 +87,7 @@
         },
         "optional": true,
         "UIPosition": "bottomLeft",
+        "hasModuleJS": true,
         "versions": [
             {
                 "version": "2.0.0.MeshFix",
