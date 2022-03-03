@@ -23,7 +23,7 @@ fi
 ############
 CONFIG="Release"
 if [ "$(uname)" == "Darwin" ]; then
-    cmake -B build -S . -DVCPKG_TARGET_TRIPLET="${TRIPLET}" -DCMAKE_BUILD_TYPE="${CONFIG}"
+    cmake -B build -S . -DVCPKG_TARGET_TRIPLET="${triplet}" -DCMAKE_BUILD_TYPE="${CONFIG}"
     cmake --build build --config "${CONFIG}"
 elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
     subst X: .

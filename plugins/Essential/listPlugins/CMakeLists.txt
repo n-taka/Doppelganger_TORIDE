@@ -67,6 +67,8 @@ if(WIN32)
         OpenSSL::Crypto
     )
 elseif (APPLE)
+    find_library(CORE_FOUNDATION_LIBRARY CoreFoundation)
+    find_library(SECURITY_LIBRARY Security)
     target_link_libraries(
         ${PROJECT_NAME} PRIVATE
         ${Boost_LIBRARIES}
@@ -75,6 +77,8 @@ elseif (APPLE)
         minizip::minizip
         OpenSSL::SSL
         OpenSSL::Crypto
+        ${CORE_FOUNDATION_LIBRARY}
+        ${SECURITY_LIBRARY}
     )
 elseif (UNIX)
     target_link_libraries(
