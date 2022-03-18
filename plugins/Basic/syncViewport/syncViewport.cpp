@@ -1,7 +1,7 @@
 #ifndef SYNCVIEWPORT_CPP
 #define SYNCVIEWPORT_CPP
 
-#include "pluginCommon.h"
+#include "Doppelganger/pluginCommon.h"
 
 #include <memory>
 #include <nlohmann/json.hpp>

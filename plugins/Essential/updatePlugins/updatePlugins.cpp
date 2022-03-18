@@ -1,7 +1,7 @@
 #ifndef UPDATEPLUGINS_CPP
 #define UPDATEPLUGINS_CPP
 
-#include "pluginCommon.h"
+#include "Doppelganger/pluginCommon.h"
 #include <string>
 #include <nlohmann/json.hpp>
 

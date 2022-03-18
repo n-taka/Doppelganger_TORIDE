@@ -1,7 +1,7 @@
 #ifndef PULLCURRENTMESHES_CPP
 #define PULLCURRENTMESHES_CPP
 
-#include "pluginCommon.h"
+#include "Doppelganger/pluginCommon.h"
 #include <string>
 #include <nlohmann/json.hpp>
 #include "Doppelganger/TriangleMesh.h"

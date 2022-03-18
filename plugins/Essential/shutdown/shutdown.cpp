@@ -1,7 +1,7 @@
 #ifndef SHUTDOWN_CPP
 #define SHUTDOWN_CPP
 
-#include "pluginCommon.h"
+#include "Doppelganger/pluginCommon.h"
 #include <string>
 #include <nlohmann/json.hpp>
 

@@ -1,7 +1,7 @@
 #ifndef REMOVEMESH_CPP
 #define REMOVEMESH_CPP
 
-#include "pluginCommon.h"
+#include "Doppelganger/pluginCommon.h"
 
 #include <memory>
 #include <nlohmann/json.hpp>

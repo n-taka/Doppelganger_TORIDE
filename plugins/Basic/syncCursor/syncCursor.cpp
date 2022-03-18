@@ -1,7 +1,7 @@
 #ifndef SYNCCURSOR_CPP
 #define SYNCCURSOR_CPP
 
-#include "pluginCommon.h"
+#include "Doppelganger/pluginCommon.h"
 
 #include <memory>
 #include <nlohmann/json.hpp>

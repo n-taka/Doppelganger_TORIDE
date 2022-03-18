@@ -37,7 +37,7 @@ target_sources(
 ### include directories
 ##############################################
 target_include_directories(${PROJECT_NAME} PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../
+    ${CMAKE_SOURCE_DIR}/plugins/common/include
 )
 
 

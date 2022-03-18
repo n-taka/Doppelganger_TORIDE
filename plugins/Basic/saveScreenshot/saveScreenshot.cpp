@@ -1,18 +1,9 @@
 #ifndef SAVESCREENSHOT_CPP
 #define SAVESCREENSHOT_CPP
 
-#include "pluginCommon.h"
+#include "Doppelganger/pluginCommon.h"
 
-#if defined(_WIN64)
-#include <filesystem>
-namespace fs = std::filesystem;
-#elif defined(__APPLE__)
-#include "boost/filesystem.hpp"
-namespace fs = boost::filesystem;
-#elif defined(__linux__)
-#include <filesystem>
-namespace fs = std::filesystem;
-#endif
+#include "Doppelganger/Util/filesystem.h"
 
 #include <memory>
 #include <nlohmann/json.hpp>

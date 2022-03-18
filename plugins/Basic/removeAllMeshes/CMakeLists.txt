@@ -30,8 +30,8 @@ add_library(${PROJECT_NAME} MODULE)
 target_sources(
     ${PROJECT_NAME} PRIVATE
     ${PROJECT_NAME}.cpp
-    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/src/Doppelganger/TriangleMesh.cpp
-    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/src/Doppelganger/Util/storeHistory.cpp
+    ${CMAKE_SOURCE_DIR}/plugins/common/src/Doppelganger/TriangleMesh.cpp
+    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger_Util/src/Doppelganger/Util/storeHistory.cpp
 )
 
 
@@ -39,9 +39,9 @@ target_sources(
 ### include directories
 ##############################################
 target_include_directories(${PROJECT_NAME} PUBLIC
-    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/include
-    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/submodule/libigl/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../
+    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger_Util/include
+    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger_Util/submodule/libigl/include
+    ${CMAKE_SOURCE_DIR}/plugins/common/include
 )
 
 
