@@ -1,6 +1,6 @@
 {
     "name": "doppelganger-plugin",
-    "version-string": "2.0",
+    "version-string": "2022.03",
     "description": "Set of plugins for Doppelganger",
     "homepage": "https://github.com/n-taka/Doppelganger_Plugin",
     "dependencies": [
