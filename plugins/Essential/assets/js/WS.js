@@ -32,6 +32,7 @@ function onError(event) {
 }
 
 function onClose(event) {
+    WS.ws.close();
     console.log("disconnected... (websocket)");
     // this is not a good idea, but this works...
     window.open('about:blank','_self').close();
