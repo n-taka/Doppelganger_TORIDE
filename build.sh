@@ -3,16 +3,16 @@
 ############
 # OS detection
 ############
-triplet="x"
+TRIPLET="x"
 if [ "$(uname)" == "Darwin" ]; then
     # we use custom triplet (x64-osx-mojave)
-    triplet="${triplet}64-osx-mojave"
+    TRIPLET="${TRIPLET}64-osx-mojave"
     # copy custom triplet file (for supporting Mojave)
-    cp "${triplet}.cmake" "submodule/Doppelganger_Util/submodule/vcpkg/triplets/${triplet}.cmake"
+    cp "${TRIPLET}.cmake" "submodule/Doppelganger_Util/submodule/vcpkg/triplets/${TRIPLET}.cmake"
 elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
-    triplet="${triplet}64-windows-static"
+    TRIPLET="${TRIPLET}64-windows-static"
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-    triplet="${triplet}64-linux"
+    TRIPLET="${TRIPLET}64-linux"
 else
     echo "This OS is not supported..."
     exit 1
@@ -23,17 +23,17 @@ fi
 ############
 CONFIG="Release"
 if [ "$(uname)" == "Darwin" ]; then
-    cmake -B build -S . -DVCPKG_TARGET_TRIPLET="${triplet}" -DCMAKE_BUILD_TYPE="${CONFIG}"
+    cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="submodule/Doppelganger_Util/submodule/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="${TRIPLET}" -DCMAKE_BUILD_TYPE="${CONFIG}"
     cmake --build build --config "${CONFIG}"
 elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
     subst X: submodule/Doppelganger_Util/submodule
-    cmake -B build -S . -DVCPKG_TARGET_TRIPLET="${triplet}" -DCMAKE_BUILD_TYPE="${CONFIG}"
+    cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="X:/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="${TRIPLET}" -DCMAKE_BUILD_TYPE="${CONFIG}"
     cmake --build build --config "${CONFIG}"
     # revert subst command
     # "/" symbol was comprehended as separator for path in MINGW. Thus, we need to explicitly use "//"
     subst X: //D
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-    cmake -B build -S . -DVCPKG_TARGET_TRIPLET="${triplet}" -DCMAKE_BUILD_TYPE="${CONFIG}"
+    cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="submodule/Doppelganger_Util/submodule/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="${TRIPLET}" -DCMAKE_BUILD_TYPE="${CONFIG}"
     cmake --build build --config "${CONFIG}"
 else
     echo "This OS is not supported..."

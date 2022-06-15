@@ -23,6 +23,10 @@ jobs:
         ref: develop
         submodules: recursive
 
+    - name: Build MeshFix
+      run: sh ${{github.workspace}}/build_MeshFix.sh
+      shell: bash
+
     - name: Bootstrap vcpkg
       run: ${{github.workspace}}/submodule/Doppelganger_Util/submodule/vcpkg/bootstrap-vcpkg.bat
 
