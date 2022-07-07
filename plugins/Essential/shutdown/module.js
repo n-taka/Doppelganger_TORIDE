@@ -1,11 +1,13 @@
+import { WSTasks } from '../../js/WSTasks.js';
+import { WS } from '../../js/WS.js';
 import { UI } from '../../js/UI.js';
 import { getText } from '../../js/Text.js';
 import { request } from "../../js/request.js";
 
 const text = {
     "Are you OK?": { "en": "Are you OK?", "ja": "終了しますか？" },
-    "Remove log": {"en": "Remove log", "ja": "ログを削除する"},
-    "Remove output": {"en": "Remove output", "ja": "出力ファイルを削除する"},
+    "Remove log": { "en": "Remove log", "ja": "ログを削除する" },
+    "Remove output": { "en": "Remove output", "ja": "出力ファイルを削除する" },
     "If you are OK, please click shutdown.": { "en": "If you are OK, please click shutdown.", "ja": "終了させる場合は、シャットダウンをクリックしてください。" },
     "Shutdown": { "en": "Shutdown", "ja": "シャットダウン" },
     "Cancel": { "en": "Cancel", "ja": "キャンセル" }
@@ -84,7 +86,19 @@ const generateUI = async function () {
 };
 
 ////
+// WS API
+const shutdown = async function (parameters) {
+    // do not reconnect (see WS.js)
+    WS.ws.onclose = function () { };
+    // close websocket
+    WS.ws.close();
+    // this is not a good idea, but this works...
+    window.open('about:blank', '_self').close();
+}
+
+////
 // UI
 export const init = async function () {
     await generateUI();
+    WSTasks["shutdown"] = async function () { await shutdown() };
 }

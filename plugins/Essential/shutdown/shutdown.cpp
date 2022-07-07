@@ -27,14 +27,19 @@ void pluginProcess(
 {
 	// [OUT]
 	// configCorePatch = {
+	// }
+	// configRoomPatch = {
 	//     "active": false
 	// }
 
+	// we need empty (not null) JSON object for graceful shutdown (to fire Core::applyCurrentConfig())
 	nlohmann::json configCorePatch = nlohmann::json::object();
-	configCorePatch["active"] = false;
+	nlohmann::json configRoomPatch = nlohmann::json::object();
+	configRoomPatch["active"] = false;
 
 	// write result
 	writeJSONToChar(configCorePatchChar, configCorePatch);
+	writeJSONToChar(configRoomPatchChar, configRoomPatch);
 }
 
 #endif

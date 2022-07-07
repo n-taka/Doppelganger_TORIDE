@@ -32,10 +32,24 @@ function onError(event) {
 }
 
 function onClose(event) {
-    WS.ws.close();
-    console.log("disconnected... (websocket)");
-    // this is not a good idea, but this works...
-    window.open('about:blank','_self').close();
+    // reconnect when WS was disconnected.
+    //    todo: should use ping-pong
+    console.log('Socket is closed. Reconnect will be attempted in 1 second.', event.reason);
+    setTimeout(function () {
+        const splitPathName = location.pathname.split('/');
+        let uri = (location.protocol == "http:" ? "ws://" : "wss://") + location.host + "/";
+        for (let i = 0; i < splitPathName.length - 2; ++i) {
+            if (splitPathName[i].length > 0) {
+                uri += splitPathName[i]
+                uri += "/";
+            }
+        }
+        WS.ws = new WebSocket(uri);
+        WS.ws.onopen = onOpen;
+        WS.ws.onmessage = onMessage;
+        WS.ws.onclose = onClose;
+        WS.ws.onerror = onError;
+    }, 1000);
 }
 
 WS.init = async function () {
