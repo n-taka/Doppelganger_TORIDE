@@ -27,8 +27,8 @@ jobs:
       run: |
         cmake -B build_MeshFix -S ${{github.workspace}}/submodule/MeshFix-V2.1 -DCMAKE_BUILD_TYPE="Release"
         cmake --build build_MeshFix --config "Release"
-        cp ${{github.workspace}}/submodule/MeshFix-V2.1/bin64/Release/MeshFix.exe ${{github.workspace}}/plugins/TORIDE/repairMesh/MeshFix.exe
-        cp ${{github.workspace}}/submodule/MeshFix-V2.1/bin64/Release/MeshFix.exe ${{github.workspace}}/plugins/TORIDE/repairAllMeshes/MeshFix.exe
+        cp ${{github.workspace}}/submodule/MeshFix-V2.1/bin64/Release/MeshFix.exe ${{github.workspace}}/plugins/Print/repairMesh/MeshFix.exe
+        cp ${{github.workspace}}/submodule/MeshFix-V2.1/bin64/Release/MeshFix.exe ${{github.workspace}}/plugins/Print/repairAllMeshes/MeshFix.exe
         rm ${{github.workspace}}/submodule/MeshFix-V2.1/bin64/Release/MeshFix.exe
 
     - name: Bootstrap vcpkg
