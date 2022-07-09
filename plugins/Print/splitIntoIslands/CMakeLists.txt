@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.15)
 ### project
 ##############################################
 project(splitIntoIslands
-    VERSION 2.0.0
+    VERSION 2022.7.0
     DESCRIPTION "Split a mesh into connected components"
     HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_Plugin"
     LANGUAGES CXX
@@ -38,6 +38,11 @@ add_library(${PROJECT_NAME} MODULE)
 target_sources(
     ${PROJECT_NAME} PRIVATE
     ${PROJECT_NAME}.cpp
+    ${CMAKE_SOURCE_DIR}/plugins/common/src/Doppelganger/TriangleMesh.cpp
+    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger_Util/src/Doppelganger/Util/uuid.cpp
+    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger_Util/src/Doppelganger/Util/getCurrentTimestampAsString.cpp
+    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger_Util/src/Doppelganger/Util/storeHistory.cpp
+    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger_Util/src/Doppelganger/Util/log.cpp
 )
 
 
@@ -45,8 +50,9 @@ target_sources(
 ### include directories
 ##############################################
 target_include_directories(${PROJECT_NAME} PUBLIC
-    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/submodule/libigl/include
-    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/Doppelganger_install/include
+    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger_Util/include
+    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger_Util/submodule/libigl/include
+    ${CMAKE_SOURCE_DIR}/plugins/common/include
 )
 
 
@@ -60,7 +66,6 @@ if(WIN32)
         ${Boost_LIBRARIES}
         nlohmann_json
         nlohmann_json::nlohmann_json
-        ${CMAKE_SOURCE_DIR}/submodule/Doppelganger/Doppelganger_install/lib/Doppelganger.lib
         bcrypt.lib
     )
 elseif (APPLE)
@@ -103,12 +108,12 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC _USE_MATH_DEFINES)
 ### resources
 ##############################################
 # directory
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_SOURCE_DIR}/bin/TORIDE/${PROJECT_NAME}/${CMAKE_SYSTEM_NAME}")
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_SOURCE_DIR}/bin/Print/${PROJECT_NAME}/${CMAKE_SYSTEM_NAME}")
 # dll
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${PROJECT_NAME}>" "${CMAKE_SOURCE_DIR}/bin/TORIDE/${PROJECT_NAME}/${CMAKE_SYSTEM_NAME}")
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${PROJECT_NAME}>" "${CMAKE_SOURCE_DIR}/bin/Print/${PROJECT_NAME}/${CMAKE_SYSTEM_NAME}")
 # module.js
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/module.js")
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/module.js" "${CMAKE_SOURCE_DIR}/bin/TORIDE/${PROJECT_NAME}")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/module.js" "${CMAKE_SOURCE_DIR}/bin/Print/${PROJECT_NAME}")
 endif()
 
 # create zip archive
@@ -116,12 +121,12 @@ endif()
 add_custom_command(
     TARGET ${PROJECT_NAME}
     POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E tar "cf" "${CMAKE_SOURCE_DIR}/bin/TORIDE/${PROJECT_NAME}.zip" --format=zip -- .
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/TORIDE/${PROJECT_NAME}/")
+    COMMAND ${CMAKE_COMMAND} -E tar "cf" "${CMAKE_SOURCE_DIR}/bin/Print/${PROJECT_NAME}_${PROJECT_VERSION}.zip" --format=zip -- .
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/Print/${PROJECT_NAME}/")
 
 # erase temporal directory
 # add_custom_command(
 #     TARGET ${PROJECT_NAME}
 #     POST_BUILD
-#     COMMAND ${CMAKE_COMMAND} -E rm "-r" "${CMAKE_SOURCE_DIR}/bin/TORIDE/${PROJECT_NAME}")
+#     COMMAND ${CMAKE_COMMAND} -E rm "-r" "${CMAKE_SOURCE_DIR}/bin/Print/${PROJECT_NAME}")
 

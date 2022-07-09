@@ -1,33 +1,49 @@
 #ifndef SPLITINTOISLANDS_CPP
 #define SPLITINTOISLANDS_CPP
 
-#if defined(_WIN64)
-#define DLLEXPORT __declspec(dllexport)
-#elif defined(__APPLE__)
-#define DLLEXPORT __attribute__((visibility("default")))
-#elif defined(__linux__)
-#define DLLEXPORT __attribute__((visibility("default")))
-#endif
+#include "Doppelganger/pluginCommon.h"
 
 #include <memory>
 #include <nlohmann/json.hpp>
 
-#include "Doppelganger/Room.h"
-#include "Doppelganger/triangleMesh.h"
+#include "Doppelganger/TriangleMesh.h"
 #include "Doppelganger/Util/uuid.h"
+#include "Doppelganger/Util/storeHistory.h"
 
 #include <string>
-#include <mutex>
 #include <vector>
-#include <unordered_map>
 
 #include "igl/facet_components.h"
 #include "igl/remove_unreferenced.h"
 
-#include "igl/per_face_normals.h"
-#include "igl/per_vertex_normals.h"
+void getPtrStrArrayForPartialConfig(
+	const char *&parameterChar,
+	char *&ptrStrArrayCoreChar,
+	char *&ptrStrArrayRoomChar)
+{
+	const nlohmann::json parameter = nlohmann::json::parse(parameterChar);
 
-extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room> &room, const nlohmann::json &parameters, nlohmann::json &response, nlohmann::json &broadcast)
+	nlohmann::json ptrStrArrayCore = nlohmann::json::array();
+	writeJSONToChar(ptrStrArrayCoreChar, ptrStrArrayCore);
+	nlohmann::json ptrStrArrayRoom = nlohmann::json::array();
+	ptrStrArrayRoom.push_back("/history");
+	for (const auto &UUID : parameter.at("meshes"))
+	{
+		std::string targetMeshPath("/meshes/");
+		targetMeshPath += UUID.get<std::string>();
+		ptrStrArrayRoom.push_back(targetMeshPath);
+	}
+	writeJSONToChar(ptrStrArrayRoomChar, ptrStrArrayRoom);
+}
+
+void pluginProcess(
+	const char *&configCoreChar,
+	const char *&configRoomChar,
+	const char *&parameterChar,
+	char *&configCorePatchChar,
+	char *&configRoomPatchChar,
+	char *&responseChar,
+	char *&broadcastChar)
 {
 	////
 	// [IN]
@@ -52,84 +68,108 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 	//  }
 	// }
 
-	// create empty response/broadcast
-	response = nlohmann::json::object();
-	broadcast = nlohmann::json::object();
-	nlohmann::json diff = nlohmann::json::object();
-	nlohmann::json diffInv = nlohmann::json::object();
+	// initialize
+	const nlohmann::json configRoom = nlohmann::json::parse(configRoomChar);
+	const nlohmann::json parameter = nlohmann::json::parse(parameterChar);
+	nlohmann::json configRoomPatch = nlohmann::json::object();
+	nlohmann::json response = nlohmann::json::object();
+	nlohmann::json broadcast = nlohmann::json::object();
 
 	response["meshes"] = nlohmann::json::object();
 	broadcast["meshes"] = nlohmann::json::object();
-	diff["meshes"] = nlohmann::json::object();
-	diffInv["meshes"] = nlohmann::json::object();
+	for (const auto &UUID : parameter.at("meshes"))
 	{
-		std::lock_guard<std::mutex> lock(room->mutexMeshes);
+		const std::string meshUUID = UUID.get<std::string>();
+		const Doppelganger::TriangleMesh mesh = configRoom.at("meshes").at(meshUUID).get<Doppelganger::TriangleMesh>();
 
-		// remove mesh
-		for (const auto &UUID : parameters.at("meshes"))
+		Eigen::Matrix<int, Eigen::Dynamic, 1> C;
+		igl::facet_components(mesh.F_, C);
+		response.at("meshes")[meshUUID] = nlohmann::json::object();
+		response.at("meshes").at(meshUUID)["islandCount"] = C.maxCoeff() + 1;
+		if (!parameter.at("dryRun").get<bool>())
 		{
-			const std::string &meshUUID = UUID.get<std::string>();
-			// we copy pointer (because we call room->meshes.erase(meshUUID) later)
-			const std::shared_ptr<Doppelganger::triangleMesh> mesh = room->meshes.at(meshUUID);
-
-			Eigen::Matrix<int, Eigen::Dynamic, 1> C;
-			igl::facet_components(mesh->F, C);
-			response.at("meshes")[meshUUID] = nlohmann::json::object();
-			response.at("meshes").at(meshUUID)["islandCount"] = C.maxCoeff() + 1;
-
-			if (!parameters.at("dryRun").get<bool>())
+			// componentId -> triangles
+			std::vector<std::vector<int>> faceIdVec;
+			faceIdVec.resize(C.maxCoeff() + 1);
+			for (int f = 0; f < C.rows(); ++f)
 			{
-				// store current mesh
-				// current mesh is removed and new mesh is constructed for each connected component
-				diffInv.at("meshes")[meshUUID] = mesh->dumpToJson(false);
-				diffInv.at("meshes").at(meshUUID)["remove"] = false;
-				room->meshes.erase(meshUUID);
-				broadcast.at("meshes")[meshUUID] = nlohmann::json::object();
-				broadcast.at("meshes").at(meshUUID)["remove"] = true;
-				diff.at("meshes")[meshUUID] = nlohmann::json::object();
-				diff.at("meshes").at(meshUUID)["remove"] = true;
+				faceIdVec.at(C(f, 0)).push_back(f);
+			}
 
-				std::unordered_map<int, std::vector<int>> faceIdVec;
-				for (int f = 0; f < C.rows(); ++f)
+			// generate and register to this room
+			//   + generate broadcast message
+			{
+				configRoomPatch["meshes"] = nlohmann::json::object();
+
+				// remove original mesh
+				configRoomPatch.at("meshes")[mesh.UUID_] = nlohmann::json(nullptr);
+				broadcast.at("meshes")[mesh.UUID_] = nlohmann::json(nullptr);
+
+				for (int id = 0; id < faceIdVec.size(); ++id)
 				{
-					faceIdVec[C(f, 0)].push_back(f);
-				}
-				for (const auto &id_faces : faceIdVec)
-				{
-					const int &id = id_faces.first;
-					const std::vector<int> &faces = id_faces.second;
+					const std::vector<int> &faces = faceIdVec.at(id);
+
+					// generate and assign UUID/name
+					Doppelganger::TriangleMesh componentMesh;
+					componentMesh.UUID_ = Doppelganger::Util::uuid("mesh-");
+					componentMesh.name_ = mesh.name_;
+					componentMesh.name_ += "_";
+					componentMesh.name_ += std::to_string(id);
 
 					Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> tmpF;
-					tmpF.resize(faces.size(), mesh->F.cols());
+					tmpF.resize(faces.size(), mesh.F_.cols());
 					for (int ff = 0; ff < faces.size(); ++ff)
 					{
-						tmpF.row(ff) = mesh->F.row(faces.at(ff));
+						tmpF.row(ff) = mesh.F_.row(faces.at(ff));
 					}
-					const std::string componentUUID = Doppelganger::Util::uuid("mesh-");
-					std::shared_ptr<Doppelganger::triangleMesh> componentMesh = std::make_shared<Doppelganger::triangleMesh>(componentUUID);
-					componentMesh->name = mesh->name;
-					componentMesh->name += "_";
-					componentMesh->name += std::to_string(id);
 					Eigen::Matrix<int, Eigen::Dynamic, 1> I;
-					igl::remove_unreferenced(mesh->V, tmpF, componentMesh->V, componentMesh->F, I);
+					igl::remove_unreferenced(mesh.V_, tmpF, componentMesh.V_, componentMesh.F_, I);
 
-					// project attributes
-					// for better performance, we should NOT use this and use result of remove_unreferenced (i.e. Matrix I, J)
-					//   (projectMeshAttributes uses signed distance and its slow...)
-					componentMesh->projectMeshAttributes(mesh);
+					// todo: copy attributes
+					//   * VC
+					//   * UV
+					//   * etc...
 
-					room->meshes[componentUUID] = componentMesh;
-					broadcast["meshes"][componentUUID] = componentMesh->dumpToJson(true);
-					broadcast["meshes"][componentUUID]["remove"] = false;
-					diff["meshes"][componentUUID] = componentMesh->dumpToJson(false);
-					diff["meshes"][componentUUID]["remove"] = false;
-					diffInv["meshes"][componentUUID] = nlohmann::json::object();
-					diffInv["meshes"][componentUUID]["remove"] = true;
+					configRoomPatch.at("meshes")[componentMesh.UUID_] = componentMesh;
+
+					nlohmann::json meshJsonf;
+					Doppelganger::to_json(meshJsonf, componentMesh, true);
+					broadcast.at("meshes")[componentMesh.UUID_] = meshJsonf;
 				}
+			}
+
+			{
+				// edit history
+				nlohmann::json diff = nlohmann::json::object();
+				nlohmann::json diffInv = nlohmann::json::object();
+				diff["meshes"] = nlohmann::json::object();
+				diffInv["meshes"] = nlohmann::json::object();
+
+				// original mesh
+				diff.at("meshes")[mesh.UUID_] = nlohmann::json(nullptr);
+				diffInv.at("meshes")[mesh.UUID_] = configRoom.at("meshes").at(meshUUID);
+				// component meshes
+				for (const auto &uuid_meshJson : configRoomPatch.at("meshes").items())
+				{
+					const std::string &uuid = uuid_meshJson.key();
+					const nlohmann::json &meshJson = uuid_meshJson.value();
+					if (!meshJson.is_null())
+					{
+						diff.at("meshes")[uuid] = meshJson;
+						diffInv.at("meshes")[uuid] = nlohmann::json(nullptr);
+					}
+				}
+
+				configRoomPatch["history"] = nlohmann::json::object();
+				Doppelganger::Util::storeHistory(configRoom.at("history"), diff, diffInv, configRoomPatch.at("history"));
 			}
 		}
 	}
-	room->storeHistory(diff, diffInv);
+
+	// write result
+	writeJSONToChar(configRoomPatchChar, configRoomPatch);
+	writeJSONToChar(responseChar, response);
+	writeJSONToChar(broadcastChar, broadcast);
 }
 
 #endif
