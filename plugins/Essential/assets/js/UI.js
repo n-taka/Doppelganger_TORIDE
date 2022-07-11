@@ -33,7 +33,8 @@ UI.init = function () {
             // WebGL canvas
             {
                 UI.webGLDiv = document.createElement('div');
-                UI.webGLDiv.setAttribute('style', 'height: 100%; width: calc(100% - 450px); order: 0;');
+                // todo: dynamically resize based on #plugins installed
+                UI.webGLDiv.setAttribute('style', 'height: 100%; width: calc(100% - 500px); order: 0;');
                 {
                     UI.webGLOutputDiv = document.createElement('div');
                     UI.webGLOutputDiv.setAttribute('style', 'height: 100%; width: 100%;');
@@ -44,7 +45,8 @@ UI.init = function () {
             // sidebar (sidenav)
             {
                 UI.sideNavDiv = document.createElement('div');
-                UI.sideNavDiv.setAttribute('style', 'height: 100%; width: 450px; order: 1; position: relative;');
+                // todo: dynamically resize based on #plugins installed
+                UI.sideNavDiv.setAttribute('style', 'height: 100%; width: 500px; order: 1; position: relative;');
                 // top navbar
                 {
                     UI.topNavBar = document.createElement('nav');

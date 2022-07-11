@@ -16,7 +16,7 @@ add_subdirectory(repairMesh)
 # no entry
 
 ### bottom menu (left)
-# add_subdirectory(repairAllMeshes)
+add_subdirectory(repairAllMeshes)
 
 ### bottom menu (right)
 # no entry
