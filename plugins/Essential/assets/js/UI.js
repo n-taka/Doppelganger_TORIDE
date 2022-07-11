@@ -2,7 +2,7 @@ export const UI = {};
 
 UI.init = function () {
     // title
-    document.title = 'Doppelganger - HTML5 GUI for geometry processing with C++ backend';
+    document.title = 'TORIDE';
 
     // language setting
     {
