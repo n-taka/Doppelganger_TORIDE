@@ -1,22 +1,15 @@
 #ifndef HOLLOWMESH_CPP
 #define HOLLOWMESH_CPP
 
-#if defined(_WIN64)
-#define DLLEXPORT __declspec(dllexport)
-#elif defined(__APPLE__)
-#define DLLEXPORT __attribute__((visibility("default")))
-#elif defined(__linux__)
-#define DLLEXPORT __attribute__((visibility("default")))
-#endif
+#include "Doppelganger/pluginCommon.h"
 
 #include <memory>
 #include <nlohmann/json.hpp>
 
-#include "Doppelganger/Room.h"
-#include "Doppelganger/triangleMesh.h"
+#include "Doppelganger/TriangleMesh.h"
+#include "Doppelganger/Util/storeHistory.h"
 
 #include <string>
-#include <mutex>
 #include <vector>
 #include <unordered_map>
 
@@ -31,7 +24,34 @@
 #include "igl/triangle_triangle_adjacency.h"
 #include "igl/vertex_triangle_adjacency.h"
 
-extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room> &room, const nlohmann::json &parameters, nlohmann::json &response, nlohmann::json &broadcast)
+void getPtrStrArrayForPartialConfig(
+	const char *&parameterChar,
+	char *&ptrStrArrayCoreChar,
+	char *&ptrStrArrayRoomChar)
+{
+	const nlohmann::json parameter = nlohmann::json::parse(parameterChar);
+
+	nlohmann::json ptrStrArrayCore = nlohmann::json::array();
+	writeJSONToChar(ptrStrArrayCoreChar, ptrStrArrayCore);
+	nlohmann::json ptrStrArrayRoom = nlohmann::json::array();
+	ptrStrArrayRoom.push_back("/history");
+	for (const auto &UUID : parameter.at("meshes"))
+	{
+		std::string targetMeshPath("/meshes/");
+		targetMeshPath += UUID.get<std::string>();
+		ptrStrArrayRoom.push_back(targetMeshPath);
+	}
+	writeJSONToChar(ptrStrArrayRoomChar, ptrStrArrayRoom);
+}
+
+void pluginProcess(
+	const char *&configCoreChar,
+	const char *&configRoomChar,
+	const char *&parameterChar,
+	char *&configCorePatchChar,
+	char *&configRoomPatchChar,
+	char *&responseChar,
+	char *&broadcastChar)
 {
 	////
 	// [IN]
@@ -55,36 +75,40 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 	//  }
 	// }
 
-	// create empty response/broadcast
-	response = nlohmann::json::object();
-	broadcast = nlohmann::json::object();
-	nlohmann::json diff = nlohmann::json::object();
-	nlohmann::json diffInv = nlohmann::json::object();
-
+	// initialize
+	const nlohmann::json configRoom = nlohmann::json::parse(configRoomChar);
+	const nlohmann::json parameter = nlohmann::json::parse(parameterChar);
+	nlohmann::json configRoomPatch = nlohmann::json::object();
+	nlohmann::json broadcast = nlohmann::json::object();
 	broadcast["meshes"] = nlohmann::json::object();
-	diff["meshes"] = nlohmann::json::object();
-	diffInv["meshes"] = nlohmann::json::object();
+	configRoomPatch["meshes"] = nlohmann::json::object();
+
+	const double oneVoxelSize = parameter.at("oneVoxelSize").get<double>();
+	const double shellThickness = parameter.at("shellThickness").get<double>();
+	const bool largestVoidOnly = parameter.at("largestVoidOnly").get<bool>();
+
+	for (const auto &UUID : parameter.at("meshes"))
 	{
-		std::lock_guard<std::mutex> lock(room->mutexMeshes);
+		const std::string meshUUID = UUID.get<std::string>();
+		const Doppelganger::TriangleMesh mesh = configRoom.at("meshes").at(meshUUID).get<Doppelganger::TriangleMesh>();
 
-		const double &oneVoxelSize = parameters.at("oneVoxelSize").get<double>();
-		const double &shellThickness = parameters.at("shellThickness").get<double>();
-		const bool &largestVoidOnly = parameters.at("largestVoidOnly").get<bool>();
+		nlohmann::json diff = nlohmann::json::object();
+		nlohmann::json diffInv = nlohmann::json::object();
+		diff["meshes"] = nlohmann::json::object();
+		diffInv["meshes"] = nlohmann::json::object();
 
-		// remove mesh
-		for (const auto &UUID : parameters.at("meshes"))
+		// store current mesh
+		diffInv.at("meshes")[mesh.UUID_] = configRoom.at("meshes").at(meshUUID);
+
+		// hollow
+		Doppelganger::TriangleMesh hollowedMesh = mesh;
+		hollowedMesh.name_ += "_hollow";
 		{
-			const std::string &meshUUID = UUID.get<std::string>();
-			const std::shared_ptr<Doppelganger::triangleMesh> &mesh = room->meshes.at(meshUUID);
-			// store current mesh
-			diffInv.at("meshes")[meshUUID] = mesh->dumpToJson(false);
-			diffInv.at("meshes").at(meshUUID)["remove"] = false;
-
 			Eigen::Matrix<double, 1, Eigen::Dynamic> BBmin, BBmax, BB, BBcenter;
 			{
 				// calculate BB
-				BBmin = mesh->V.colwise().minCoeff();
-				BBmax = mesh->V.colwise().maxCoeff();
+				BBmin = hollowedMesh.V_.colwise().minCoeff();
+				BBmax = hollowedMesh.V_.colwise().maxCoeff();
 				BB = BBmax - BBmin;
 				BBcenter = (BBmax + BBmin) * 0.5;
 			}
@@ -119,7 +143,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 				Eigen::Matrix<double, Eigen::Dynamic, 1> S;
 				Eigen::Matrix<int, Eigen::Dynamic, 1> I;
 				Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> C, N;
-				igl::signed_distance(GV, mesh->V, mesh->F, igl::SIGNED_DISTANCE_TYPE_FAST_WINDING_NUMBER, S, I, C, N);
+				igl::signed_distance(GV, hollowedMesh.V_, hollowedMesh.F_, igl::SIGNED_DISTANCE_TYPE_FAST_WINDING_NUMBER, S, I, C, N);
 				S.array() += shellThickness;
 				igl::copyleft::marching_cubes(S, GV, res(0), res(1), res(2), SV, SF);
 
@@ -167,7 +191,7 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 					if (maxVolId > -1)
 					{
 						const std::vector<int> &faces = faceIdVec.at(maxVolId);
-						Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> SV_ = SV;
+						Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> SV_ = std::move(SV);
 						Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> SF_;
 
 						SF_.resize(faces.size(), SF.cols());
@@ -184,109 +208,120 @@ extern "C" DLLEXPORT void pluginProcess(const std::shared_ptr<Doppelganger::Room
 			// merge to original mesh
 			{
 				// vertex
-				const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> VPrev = std::move(mesh->V);
+				const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> VPrev = std::move(hollowedMesh.V_);
 				{
-					mesh->V.resize(VPrev.rows() + SV.rows(), 3);
-					mesh->V << VPrev, SV;
+					hollowedMesh.V_.resize(VPrev.rows() + SV.rows(), 3);
+					hollowedMesh.V_ << VPrev, SV;
 				}
 				// faces
-				const Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> FPrev = std::move(mesh->F);
+				const Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> FPrev = std::move(hollowedMesh.F_);
 				{
-					mesh->F.resize(FPrev.rows() + SF.rows(), 3);
-					mesh->F << FPrev, (SF.array() + VPrev.rows());
+					hollowedMesh.F_.resize(FPrev.rows() + SF.rows(), 3);
+					hollowedMesh.F_ << FPrev, (SF.array() + VPrev.rows());
 				}
 
 				// face normal (re-calculate)
-				igl::per_face_normals(mesh->V, mesh->F, mesh->FN);
+				igl::per_face_normals(hollowedMesh.V_, hollowedMesh.F_, hollowedMesh.FN_);
 				// vertex normal (re-calculate)
-				igl::per_vertex_normals(mesh->V, mesh->F, mesh->FN, mesh->VN);
+				igl::per_vertex_normals(hollowedMesh.V_, hollowedMesh.F_, hollowedMesh.FN_, hollowedMesh.VN_);
 
 				// vertex color
-				if (VPrev.rows() == mesh->VC.rows())
+				if (VPrev.rows() == hollowedMesh.VC_.rows())
 				{
-					const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> VCPrev = std::move(mesh->VC);
+					const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> VCPrev = std::move(hollowedMesh.VC_);
 
-					mesh->VC.resize(mesh->V.rows(), VCPrev.cols());
-					mesh->VC.setOnes();
-					mesh->VC.block(0, 0, VCPrev.rows(), VCPrev.cols()) = VCPrev;
+					hollowedMesh.VC_.resize(hollowedMesh.V_.rows(), VCPrev.cols());
+					hollowedMesh.VC_.setOnes();
+					hollowedMesh.VC_.block(0, 0, VCPrev.rows(), VCPrev.cols()) = VCPrev;
 				}
 				// face color
-				if (FPrev.rows() == mesh->FC.rows())
+				if (FPrev.rows() == hollowedMesh.FC_.rows())
 				{
-					const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> FCPrev = std::move(mesh->FC);
+					const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> FCPrev = std::move(hollowedMesh.FC_);
 
-					mesh->FC.resize(mesh->F.rows(), FCPrev.cols());
-					mesh->FC.setOnes();
-					mesh->FC.block(0, 0, FCPrev.rows(), FCPrev.cols()) = FCPrev;
+					hollowedMesh.FC_.resize(hollowedMesh.F_.rows(), FCPrev.cols());
+					hollowedMesh.FC_.setOnes();
+					hollowedMesh.FC_.block(0, 0, FCPrev.rows(), FCPrev.cols()) = FCPrev;
 				}
 
 				// face group
-				if (FPrev.rows() == mesh->FG.rows())
+				if (FPrev.rows() == hollowedMesh.FG_.rows())
 				{
-					const Eigen::Matrix<int, Eigen::Dynamic, 1> FGPrev = std::move(mesh->FG);
+					const Eigen::Matrix<int, Eigen::Dynamic, 1> FGPrev = std::move(hollowedMesh.FG_);
 
-					mesh->FG.resize(mesh->F.rows(), FGPrev.cols());
+					hollowedMesh.FG_.resize(hollowedMesh.F_.rows(), FGPrev.cols());
 					const int freshGroupIdx = FGPrev.maxCoeff() + 1;
-					mesh->FG.setOnes();
-					mesh->FG *= freshGroupIdx;
-					mesh->FG.block(0, 0, FGPrev.rows(), FGPrev.cols()) = FGPrev;
+					hollowedMesh.FG_.setOnes();
+					hollowedMesh.FG_ *= freshGroupIdx;
+					hollowedMesh.FG_.block(0, 0, FGPrev.rows(), FGPrev.cols()) = FGPrev;
 				}
 
 				// texture coordinates
 				{
-					if (FPrev.rows() == mesh->FTC.rows())
+					if (FPrev.rows() == hollowedMesh.FTC_.rows())
 					{
 						// face texture coordinates (FTC)
 						// this implementation is not perfect ...
 						//   FTC could contain different uv-coordinate on the same vertex
-						const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> TCPrev = std::move(mesh->TC);
-						const Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> FTCPrev = std::move(mesh->FTC);
+						const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> TCPrev = std::move(hollowedMesh.TC_);
+						const Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> FTCPrev = std::move(hollowedMesh.FTC_);
 
-						mesh->TC.resize(mesh->V.rows(), 2);
+						hollowedMesh.TC_.resize(hollowedMesh.V_.rows(), 2);
 						// we assign (0 ,0) for vertices on the internal void.
-						mesh->TC.setZero();
+						hollowedMesh.TC_.setZero();
 						for (int f = 0; f < FPrev.rows(); ++f)
 						{
 							for (int fv = 0; fv < FPrev.cols(); ++fv)
 							{
-								mesh->TC.row(FPrev(f, fv)) = TCPrev.row(FTCPrev(f, fv));
+								hollowedMesh.TC_.row(FPrev(f, fv)) = TCPrev.row(FTCPrev(f, fv));
 							}
 						}
-						mesh->FTC = mesh->F;
+						hollowedMesh.FTC_ = hollowedMesh.F_;
 					}
-					else if (VPrev.rows() == mesh->TC.rows())
+					else if (VPrev.rows() == hollowedMesh.TC_.rows())
 					{
 						// (vertex) texture coordinates
-						const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> TCPrev = std::move(mesh->TC);
+						const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> TCPrev = std::move(hollowedMesh.TC_);
 
-						mesh->TC.resize(mesh->V.rows(), TCPrev.cols());
+						hollowedMesh.TC_.resize(hollowedMesh.V_.rows(), TCPrev.cols());
 						// we assign (0 ,0) for vertices on the internal void.
-						mesh->TC.setZero();
-						mesh->TC.block(0, 0, TCPrev.rows(), TCPrev.cols()) = TCPrev;
+						hollowedMesh.TC_.setZero();
+						hollowedMesh.TC_.block(0, 0, TCPrev.rows(), TCPrev.cols()) = TCPrev;
 					}
 				}
 
 				// misc
 				{
-					igl::triangle_triangle_adjacency(mesh->F, mesh->TT, mesh->TTi);
-					igl::vertex_triangle_adjacency(mesh->V, mesh->F, mesh->VF, mesh->VFi);
-					mesh->AABB.init(mesh->V, mesh->F);
-					mesh->principalComponent.resize(0, mesh->V.cols());
-					mesh->PD1.resize(0, mesh->V.cols());
-					mesh->PD2.resize(0, mesh->V.cols());
-					mesh->PV1.resize(0, 1);
-					mesh->PV2.resize(0, 1);
-					mesh->K.resize(0, 1);
+					igl::triangle_triangle_adjacency(
+						hollowedMesh.F_,
+						hollowedMesh.TT_,
+						hollowedMesh.TTi_);
+					igl::vertex_triangle_adjacency(
+						hollowedMesh.V_,
+						hollowedMesh.F_,
+						hollowedMesh.VF_,
+						hollowedMesh.VFi_);
 				}
 			}
-
-			broadcast["meshes"][meshUUID] = mesh->dumpToJson(true);
-			broadcast["meshes"][meshUUID]["remove"] = false;
-			diff["meshes"][meshUUID] = mesh->dumpToJson(false);
-			diff["meshes"][meshUUID]["remove"] = false;
 		}
+
+		// store modified mesh
+		diff.at("meshes")[hollowedMesh.UUID_] = hollowedMesh;
+		configRoomPatch.at("meshes")[hollowedMesh.UUID_] = hollowedMesh;
+
+		// update broadcast
+		nlohmann::json meshJsonf;
+		Doppelganger::to_json(meshJsonf, hollowedMesh, true);
+		broadcast.at("meshes")[hollowedMesh.UUID_] = meshJsonf;
+
+		// store history
+		configRoomPatch["history"] = nlohmann::json::object();
+		Doppelganger::Util::storeHistory(configRoom.at("history"), diff, diffInv, configRoomPatch.at("history"));
 	}
-	room->storeHistory(diff, diffInv);
+
+	// write result
+	writeJSONToChar(configRoomPatchChar, configRoomPatch);
+	writeJSONToChar(broadcastChar, broadcast);
 }
 
 #endif
