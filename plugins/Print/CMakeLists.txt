@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 3.15)
 add_subdirectory(splitIntoIslands)
 add_subdirectory(hollowMesh)
 add_subdirectory(repairMesh)
-# add_subdirectory(estimateThickness)
+add_subdirectory(estimateThickness)
 
 ### summary
 # no entry
