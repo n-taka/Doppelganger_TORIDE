@@ -10,8 +10,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2.0.0",
-                "URL": "https://n-taka.info/nextcloud/s/jZzAeW7eMsmD3Yr/download/sortMeshes.zip"
+                "version": "2022.3.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.03/sortMeshes_2022.3.0.zip"
             }
         ]
     },
@@ -26,8 +26,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2.0.0",
-                "URL": "https://n-taka.info/nextcloud/s/wrk2dsKdLP7c882/download/configEditor.zip"
+                "version": "2022.3.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.03/configEditor_2022.3.0.zip"
             }
         ]
     },
@@ -42,8 +42,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2.0.0",
-                "URL": "https://n-taka.info/nextcloud/s/dtDEcMJ9DEe5WLW/download/listPlugins.zip"
+                "version": "2022.3.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.03/listPlugins_2022.3.0.zip"
             }
         ]
     },
@@ -58,8 +58,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2.0.0",
-                "URL": "https://n-taka.info/nextcloud/s/dnejQJdjnsjCZ73/download/shutdown.zip"
+                "version": "2022.7.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.07/shutdown_2022.7.0.zip"
             }
         ]
     },
@@ -74,8 +74,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2.0.0",
-                "URL": "https://n-taka.info/nextcloud/s/ZGCWq2ZLWN5nJ9J/download/info.zip"
+                "version": "2022.3.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.03/info_2022.3.0.zip"
             }
         ]
     },
@@ -90,8 +90,8 @@
         "hasModuleJS": false,
         "versions": [
             {
-                "version": "2.0.0",
-                "URL": "https://n-taka.info/nextcloud/s/meBibD32xLLakFa/download/assets.zip"
+                "version": "2022.7.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.07/assets_2022.7.0.zip"
             }
         ]
     },
@@ -106,8 +106,8 @@
         "hasModuleJS": false,
         "versions": [
             {
-                "version": "2.0.0",
-                "URL": "https://n-taka.info/nextcloud/s/CnPGtwsBZ8MA3Ne/download/updatePlugins.zip"
+                "version": "2022.3.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.03/updatePlugins_2022.3.0.zip"
             }
         ]
     },
@@ -122,8 +122,8 @@
         "hasModuleJS": false,
         "versions": [
             {
-                "version": "2.0.0",
-                "URL": "https://n-taka.info/nextcloud/s/Xe5CPFnxS5ffg6o/download/pullCurrentMeshes.zip"
+                "version": "2022.3.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.03/pullCurrentMeshes_2022.3.0.zip"
             }
         ]
     }

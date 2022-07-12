@@ -1,21 +1,5 @@
 [
     {
-        "name": "loadCADData",
-        "description": {
-            "en": "Load CAD data (iges, step)",
-            "ja": "CADデータを読み込みます(iges, step)"
-        },
-        "optional": true,
-        "UIPosition": "topLeft",
-        "hasModuleJS": true,
-        "versions": [
-            {
-                "version": "2.0.0",
-                "URL": "https://n-taka.info/nextcloud/s/saxW5E9n46MAHmC/download/loadCADData.zip"
-            }
-        ]
-    },
-    {
         "name": "splitIntoIslands",
         "description": {
             "en": "Split a mesh into connected components",
@@ -26,8 +10,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2.0.0",
-                "URL": "https://n-taka.info/nextcloud/s/iLyxHGRP3St6wf8/download/splitIntoIslands.zip"
+                "version": "2022.7.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.07/splitIntoIslands_2022.7.0.zip"
             }
         ]
     },
@@ -42,8 +26,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2.0.0",
-                "URL": "https://n-taka.info/nextcloud/s/QkGzSywAWCHwGB8/download/hollowMesh.zip"
+                "version": "2022.7.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.07/hollowMesh_2022.7.0.zip"
             }
         ]
     },
@@ -58,24 +42,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2.0.0.MeshFix",
-                "URL": "https://n-taka.info/nextcloud/s/P2sY2yd52m4GxpY/download/repairMesh.zip"
-            }
-        ]
-    },
-    {
-        "name": "estimateThickness",
-        "description": {
-            "en": "Estimate thickness",
-            "ja": "厚みをチェックします"
-        },
-        "optional": true,
-        "UIPosition": "mesh",
-        "hasModuleJS": true,
-        "versions": [
-            {
-                "version": "2.0.0",
-                "URL": "https://n-taka.info/nextcloud/s/2NrGjXFs8beD4YB/download/estimateThickness.zip"
+                "version": "2022.7.0.MeshFix",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.07/repairMesh_2022.7.0.MeshFix.zip"
             }
         ]
     },
@@ -90,8 +58,24 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2.0.0.MeshFix",
-                "URL": "https://n-taka.info/nextcloud/s/7LPzyAZT8TNdGD5/download/repairAllMeshes.zip"
+                "version": "2022.7.0.MeshFix",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.07/repairAllMeshes_2022.7.0.MeshFix.zip"
+            }
+        ]
+    },
+    {
+        "name": "estimateThickness",
+        "description": {
+            "en": "Estimate thickness",
+            "ja": "厚みをチェックします"
+        },
+        "optional": true,
+        "UIPosition": "mesh",
+        "hasModuleJS": true,
+        "versions": [
+            {
+                "version": "2202.7.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.07/estimateThickness_2022.7.0.zip"
             }
         ]
     }
