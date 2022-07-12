@@ -20,6 +20,7 @@ const text = {
     "Current": { "en": "Current", "ja": "現在のバージョン" },
     "Change to...": { "en": "Change to...", "ja": "アップデート先" },
     "Description": { "en": "Description", "ja": "説明" },
+    "Not installed": { "en": "Not installed", "ja": "未インストール" },
     "Uninstall": { "en": "Uninstall", "ja": "アンインストール" },
     "Don't install": { "en": "Don't install", "ja": "インストールしない" }
 };
@@ -191,11 +192,15 @@ const generateUI = async function () {
                         {
                             const spanCurrent = document.createElement("span");
                             spanCurrent.setAttribute("class", "center-align truncate");
-                            if (plugin["installedVersion"] == "latest") {
-                                spanCurrent.innerText = (plugin["installedVersion"] + " (" + plugin["versions"][0]["version"] + ")");
-
-                            } else {
-                                spanCurrent.innerText = plugin["installedVersion"];
+                            if ("installedVersion" in plugin) {
+                                if (plugin["installedVersion"] == "latest") {
+                                    spanCurrent.innerText = (plugin["installedVersion"] + " (" + plugin["versions"][0]["version"] + ")");
+                                } else {
+                                    spanCurrent.innerText = plugin["installedVersion"];
+                                }
+                            }
+                            else {
+                                spanCurrent.innerText = getText(text, "Not installed");
                             }
                             tdCurrent.appendChild(spanCurrent);
                         }
