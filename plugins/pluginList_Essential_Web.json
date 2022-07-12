@@ -1,0 +1,114 @@
+[
+    {
+        "name": "sortMeshes",
+        "description": {
+            "en": "Sort meshes based on name or #triangles",
+            "ja": "名前もしくはポリゴン数でメッシュをソートします"
+        },
+        "optional": false,
+        "UIPosition": "topRight",
+        "hasModuleJS": true,
+        "versions": [
+            {
+                "version": "2022.3.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.03/sortMeshes_2022.3.0.zip"
+            }
+        ]
+    },
+    {
+        "name": "listPlugins",
+        "description": {
+            "en": "List all available plugins",
+            "ja": "利用できるプラグインをリストアップします"
+        },
+        "optional": false,
+        "UIPosition": "bottomRight",
+        "hasModuleJS": true,
+        "versions": [
+            {
+                "version": "2022.3.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.03/listPlugins_2022.3.0.zip"
+            }
+        ]
+    },
+    {
+        "name": "shutdown",
+        "description": {
+            "en": "Graceful shutdown",
+            "ja": "正常終了を行います"
+        },
+        "optional": false,
+        "UIPosition": "bottomRight",
+        "hasModuleJS": true,
+        "versions": [
+            {
+                "version": "2022.7.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.07/shutdown_2022.7.0.zip"
+            }
+        ]
+    },
+    {
+        "name": "info",
+        "description": {
+            "en": "Information about Doppelganger",
+            "ja": "Doppelgangerについての情報"
+        },
+        "optional": false,
+        "UIPosition": "bottomRight",
+        "hasModuleJS": true,
+        "versions": [
+            {
+                "version": "2022.3.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.03/info_2022.3.0.zip"
+            }
+        ]
+    },
+    {
+        "name": "assets",
+        "description": {
+            "en": "Set of files for HTML client",
+            "ja": "HTMLクライアントのためのファイル群です"
+        },
+        "optional": false,
+        "UIPosition": "none",
+        "hasModuleJS": false,
+        "versions": [
+            {
+                "version": "2022.7.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.07/assets_2022.7.0.zip"
+            }
+        ]
+    },
+    {
+        "name": "updatePlugins",
+        "description": {
+            "en": "Update plugins",
+            "ja": "プラグインの更新を行います"
+        },
+        "optional": false,
+        "UIPosition": "none",
+        "hasModuleJS": false,
+        "versions": [
+            {
+                "version": "2022.7.0.Web",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.07/updatePlugins_2022.7.0.Web.zip"
+            }
+        ]
+    },
+    {
+        "name": "pullCurrentMeshes",
+        "description": {
+            "en": "Get already loaded meshes on startup",
+            "ja": "接続時にすでに読み込まれているメッシュを取得します"
+        },
+        "optional": false,
+        "UIPosition": "none",
+        "hasModuleJS": false,
+        "versions": [
+            {
+                "version": "2022.3.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.03/pullCurrentMeshes_2022.3.0.zip"
+            }
+        ]
+    }
+]

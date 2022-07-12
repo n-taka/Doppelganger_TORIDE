@@ -64,16 +64,12 @@ void pluginProcess(
 	configRoomPatch["plugin"] = nlohmann::json::object();
 	configRoomPatch.at("plugin")["installed"] = parameter;
 	configRoomPatch.at("plugin")["reInstall"] = true;
-	nlohmann::json configCorePatch = nlohmann::json::object();
-	configCorePatch["plugin"] = nlohmann::json::object();
-	configCorePatch.at("plugin")["installed"] = parameter;
-	configCorePatch.at("plugin")["reInstall"] = true;
+
+	// "forceReload" in Core reloads all rooms
+	configRoomPatch["forceReload"] = true;
 
 	// write result
 	writeJSONToChar(configRoomPatchChar, configRoomPatch);
-	// "forceReload" in Core reloads all rooms
-	configCorePatch["forceReload"] = true;
-	writeJSONToChar(configCorePatchChar, configCorePatch);
 }
 
 #endif
