@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.15)
 project(info
     VERSION 2022.3.0
     DESCRIPTION "Information about Doppelganger"
-    HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_Plugin"
+    HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_TORIDE"
     LANGUAGES CXX
 )
 

@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.15)
 project(loadCADData
     VERSION 2.0.0
     DESCRIPTION "Load CAD data (iges, step)"
-    HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_Plugin"
+    HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_TORIDE"
     LANGUAGES CXX
 )
 

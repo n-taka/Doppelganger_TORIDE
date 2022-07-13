@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.15)
 project(splitIntoIslands
     VERSION 2022.7.0
     DESCRIPTION "Split a mesh into connected components"
-    HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_Plugin"
+    HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_TORIDE"
     LANGUAGES CXX
 )
 

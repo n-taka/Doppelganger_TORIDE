@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.15)
 project(hollowMesh
     VERSION 2022.7.0
     DESCRIPTION "Hollow single mesh"
-    HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_Plugin"
+    HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_TORIDE"
     LANGUAGES CXX
 )
 

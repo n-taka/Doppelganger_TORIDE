@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.15)
 project(saveScreenshot
     VERSION 2022.3.0
     DESCRIPTION "Save a screenshot of a mesh"
-    HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_Plugin"
+    HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_TORIDE"
     LANGUAGES CXX
 )
 

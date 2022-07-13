@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.15)
 project(toggleMeshVisibility
     VERSION 2022.3.0
     DESCRIPTION "Toggle mesh visibility"
-    HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_Plugin"
+    HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_TORIDE"
     LANGUAGES CXX
 )
 
