@@ -25,6 +25,7 @@ void getPtrStrArrayForPartialConfig(
 	{
 		std::string targetMeshPath("/meshes/");
 		targetMeshPath += UUID.get<std::string>();
+		targetMeshPath += "/visibility";
 		ptrStrArrayRoom.push_back(targetMeshPath);
 	}
 	ptrStrArrayRoom.push_back("/history");
@@ -73,15 +74,14 @@ void pluginProcess(
 	for (const auto &UUID : parameter.at("meshes"))
 	{
 		const std::string meshUUID = UUID.get<std::string>();
-		Doppelganger::TriangleMesh mesh = configRoom.at("meshes").at(meshUUID).get<Doppelganger::TriangleMesh>();
+		nlohmann::json visibilityJson = nlohmann::json::object();
+		visibilityJson["visibility"] = configRoom.at("meshes").at(meshUUID).at("visibility");
 
-		diffInv.at("meshes")[meshUUID] = mesh;
-		mesh.visibility_ = !mesh.visibility_;
-		diff.at("meshes")[meshUUID] = mesh;
+		diffInv.at("meshes")[meshUUID] = visibilityJson;
+		visibilityJson["visibility"] = !visibilityJson["visibility"].get<bool>();
+		diff.at("meshes")[meshUUID] = visibilityJson;
 
-		nlohmann::json meshJsonf;
-		Doppelganger::to_json(meshJsonf, mesh, true);
-		broadcast.at("meshes")[meshUUID] = meshJsonf;
+		broadcast.at("meshes")[meshUUID] = visibilityJson;
 	}
 	configRoomPatch = diff;
 

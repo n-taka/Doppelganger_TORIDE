@@ -2,7 +2,7 @@ import * as THREE from 'https://cdn.skypack.dev/three@v0.132';
 import { OutlinePass } from 'https://cdn.skypack.dev/three@v0.132/examples/jsm/postprocessing/OutlinePass.js';
 import { Canvas } from '../../js/Canvas.js';
 import { UI } from '../../js/UI.js';
-import { constructMeshLiFromJson } from '../../js/constructMeshLiFrom.js';
+import { constructMeshLiFromUUID } from '../../js/constructMeshLiFrom.js';
 
 const findClosestMesh = function (e) {
     // [IN]
@@ -66,10 +66,10 @@ export const init = async function () {
         colorizeActiveMesh(closestMeshUUID);
     });
 
-    constructMeshLiFromJson.handlers.push(
-        function (json, liRoot) {
+    constructMeshLiFromUUID.handlers.push(
+        function (meshUUID, liRoot) {
             liRoot.addEventListener('click', function () {
-                colorizeActiveMesh(json["UUID"]);
+                colorizeActiveMesh(meshUUID);
             });
         }
     );

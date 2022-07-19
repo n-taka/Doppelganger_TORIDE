@@ -2,7 +2,7 @@ import { WSTasks } from '../../js/WSTasks.js';
 import { getText } from '../../js/Text.js';
 import { request } from '../../js/request.js';
 import { constructMeshFromParameters } from '../../js/constructMeshFrom.js';
-import { constructMeshLiFromParameters, constructMeshLiFromJson } from '../../js/constructMeshLiFrom.js';
+import { constructMeshLiFromParameters, constructMeshLiFromUUID } from '../../js/constructMeshLiFrom.js';
 
 const text = {
     "Split into islands": { "en": "Split into islands", "ja": "アイランドに分割" }
@@ -11,18 +11,18 @@ const text = {
 ////
 // UI
 const generateUI = async function () {
-    constructMeshLiFromJson.handlers.push(
-        function (json, liRoot) {
+    constructMeshLiFromUUID.handlers.push(
+        function (meshUUID, liRoot) {
             // for element, we cannot use getElementById ...
-            const pButtons = liRoot.querySelector("#buttons_" + json["UUID"]);
+            const pButtons = liRoot.querySelector("#buttons_" + meshUUID);
             {
                 const parametersForIslandCount = {};
-                parametersForIslandCount["meshes"] = [json["UUID"]];
+                parametersForIslandCount["meshes"] = [meshUUID];
                 parametersForIslandCount["dryRun"] = true;
 
                 return request("splitIntoIslands", parametersForIslandCount).then((response) => {
                     const responseJson = JSON.parse(response);
-                    const islandCount = responseJson["meshes"][json["UUID"]]["islandCount"];
+                    const islandCount = responseJson["meshes"][meshUUID]["islandCount"];
 
                     const a = document.createElement("a");
                     a.setAttribute("class", "tooltipped");
@@ -31,7 +31,7 @@ const generateUI = async function () {
                     if (islandCount > 1) {
                         a.addEventListener('click', function (e) {
                             const parameters = {};
-                            parameters["meshes"] = [json["UUID"]];
+                            parameters["meshes"] = [meshUUID];
                             parameters["dryRun"] = false;
                             request("splitIntoIslands", parameters);
                             // don't fire click event on the parent (e.g. outlineOnClick)

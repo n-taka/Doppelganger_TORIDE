@@ -23,7 +23,6 @@ void getPtrStrArrayForPartialConfig(
 	writeJSONToChar(ptrStrArrayCoreChar, ptrStrArrayCore);
 	nlohmann::json ptrStrArrayRoom = nlohmann::json::array();
 	ptrStrArrayRoom.push_back("/history");
-	ptrStrArrayRoom.push_back("/meshes");
 	writeJSONToChar(ptrStrArrayRoomChar, ptrStrArrayRoom);
 }
 
@@ -74,7 +73,7 @@ void pluginProcess(
 		for (const auto &uuid_meshJson : configRoom.at("history").at("diffFromNext").at(updatedIndex).at("meshes").items())
 		{
 			const std::string &uuid = uuid_meshJson.key();
-			const nlohmann::json &meshJson = uuid_meshJson.value();
+			nlohmann::json meshJson = uuid_meshJson.value();
 			if (meshJson.is_null())
 			{
 				// null indicates removing this mesh
@@ -84,7 +83,32 @@ void pluginProcess(
 			{
 				nlohmann::json meshJsonf;
 				Doppelganger::to_json(meshJsonf, meshJson.get<Doppelganger::TriangleMesh>(), true);
-				broadcast.at("meshes")[uuid] = meshJsonf;
+
+				// this looks stupid, but required to avoid overwriting with empty values
+				// toClient, we convert ...
+				//   * FC -> VC
+				//   * FTC -> TC
+				if (meshJson.find("FC") != meshJson.end())
+				{
+					meshJson.erase("FC");
+					meshJson["VC"] = nlohmann::json::array();
+				}
+				if (meshJson.find("FTC") != meshJson.end())
+				{
+					meshJson.erase("FTC");
+					meshJson["TC"] = nlohmann::json::array();
+				}
+				nlohmann::json filtered = nlohmann::json::object();
+				for (const auto &key_value : meshJson.items())
+				{
+					const std::string &key = key_value.key();
+					if (meshJsonf.find(key) != meshJsonf.end())
+					{
+						const nlohmann::json &value = meshJsonf.at(key);
+						filtered[key] = value;
+					}
+				}
+				broadcast.at("meshes")[uuid] = filtered;
 			}
 		}
 

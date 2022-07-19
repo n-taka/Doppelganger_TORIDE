@@ -3,7 +3,7 @@ import { WSTasks } from '../../js/WSTasks.js';
 import { getText } from '../../js/Text.js';
 import { request } from '../../js/request.js';
 import { constructMeshFromParameters } from '../../js/constructMeshFrom.js';
-import { constructMeshLiFromParameters, constructMeshLiFromJson } from '../../js/constructMeshLiFrom.js';
+import { constructMeshLiFromParameters, constructMeshLiFromUUID } from '../../js/constructMeshLiFrom.js';
 
 const text = {
     "Thickness estimation settings": { "en": "Thickness estimation settings", "ja": "厚み推定設定" },
@@ -137,17 +137,17 @@ const generateUI = async function () {
 
     ////
     // handler
-    constructMeshLiFromJson.handlers.push(
-        function (json, liRoot) {
+    constructMeshLiFromUUID.handlers.push(
+        function (meshUUID, liRoot) {
             // for element, we cannot use getElementById ...
-            const pButtons = liRoot.querySelector("#buttons_" + json["UUID"]);
+            const pButtons = liRoot.querySelector("#buttons_" + meshUUID);
             {
                 const a = document.createElement("a");
                 a.setAttribute("class", "tooltipped");
                 a.setAttribute("data-position", "top");
                 a.setAttribute("data-tooltip", getText(text, "Thickness estimation"));
                 a.addEventListener('click', function (e) {
-                    parameters["meshes"] = [json["UUID"]];
+                    parameters["meshes"] = [meshUUID];
                     const instance = M.Modal.getInstance(modal);
                     instance.open();
                     // don't fire click event on the parent (e.g. outlineOnClick)

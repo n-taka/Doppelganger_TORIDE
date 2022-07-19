@@ -2,7 +2,7 @@ import { UI } from '../../js/UI.js';
 import { getText } from '../../js/Text.js';
 import { Canvas } from '../../js/Canvas.js';
 import { request } from '../../js/request.js';
-import { constructMeshLiFromJson } from '../../js/constructMeshLiFrom.js';
+import { constructMeshLiFromUUID } from '../../js/constructMeshLiFrom.js';
 
 const text = {
     "Choose file format to save": { "en": "Choose file format to save", "ja": "保存するフォーマットを選んでください" },
@@ -89,17 +89,17 @@ const generateUI = async function () {
 
     ////
     // button
-    constructMeshLiFromJson.handlers.push(
-        function (json, liRoot) {
+    constructMeshLiFromUUID.handlers.push(
+        function (meshUUID, liRoot) {
             // for element, we cannot use getElementById ...
-            const pButtons = liRoot.querySelector("#buttons_" + json["UUID"]);
+            const pButtons = liRoot.querySelector("#buttons_" + meshUUID);
             {
                 const a = document.createElement("a");
                 a.setAttribute("class", "tooltipped");
                 a.setAttribute("data-position", "top");
                 a.setAttribute("data-tooltip", getText(text, "Save screenshot"));
                 a.addEventListener('click', function (e) {
-                    parameters["meshUUID"] = json["UUID"];
+                    parameters["meshUUID"] = meshUUID;
                     const instance = M.Modal.getInstance(modal);
                     instance.open();
                     // don't fire click event on the parent (e.g. outlineOnClick)

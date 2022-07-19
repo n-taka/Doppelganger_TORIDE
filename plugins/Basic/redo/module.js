@@ -19,7 +19,7 @@ const generateUI = async function () {
         {
             const a = document.createElement("a");
             a.addEventListener('click', function () {
-                request("redo");
+                request("redo", {});
             });
             a.setAttribute("class", "tooltipped");
             a.setAttribute("data-position", "bottom");

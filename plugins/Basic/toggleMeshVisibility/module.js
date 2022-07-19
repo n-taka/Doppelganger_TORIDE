@@ -1,8 +1,9 @@
 import { WSTasks } from '../../js/WSTasks.js';
 import { getText } from '../../js/Text.js';
 import { request } from '../../js/request.js';
+import { Canvas } from '../../js/Canvas.js';
 import { constructMeshFromParameters } from '../../js/constructMeshFrom.js';
-import { constructMeshLiFromParameters, constructMeshLiFromJson } from '../../js/constructMeshLiFrom.js';
+import { constructMeshLiFromParameters, constructMeshLiFromUUID } from '../../js/constructMeshLiFrom.js';
 
 const text = {
     "Toggle visibility": { "en": "Toggle visibility", "ja": "表示/非表示" }
@@ -11,10 +12,10 @@ const text = {
 ////
 // UI
 const generateUI = async function () {
-    constructMeshLiFromJson.handlers.push(
-        function (json, liRoot) {
+    constructMeshLiFromUUID.handlers.push(
+        function (meshUUID, liRoot) {
             // for element, we cannot use getElementById ...
-            const pButtons = liRoot.querySelector("#buttons_" + json["UUID"]);
+            const pButtons = liRoot.querySelector("#buttons_" + meshUUID);
             {
                 const a = document.createElement("a");
                 a.setAttribute("class", "tooltipped");
@@ -22,7 +23,7 @@ const generateUI = async function () {
                 a.setAttribute("data-tooltip", getText(text, "Toggle visibility"));
                 a.addEventListener('click', function (e) {
                     const parameters = {};
-                    parameters["meshes"] = [json["UUID"]];
+                    parameters["meshes"] = [meshUUID];
                     request("toggleMeshVisibility", parameters);
                     // don't fire click event on the parent (e.g. outlineOnClick)
                     e.stopPropagation();
@@ -32,7 +33,8 @@ const generateUI = async function () {
                 {
                     const i = document.createElement("i");
                     i.setAttribute("class", "material-icons teal-text text-lighten-2");
-                    i.innerText = (json["visibility"] ? "visibility" : "visibility_off");
+                    const mesh = Canvas.UUIDToMesh[meshUUID];
+                    i.innerText = (mesh.visibility ? "visibility" : "visibility_off");
                     a.appendChild(i);
                 }
                 pButtons.appendChild(a);

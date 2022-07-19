@@ -3,7 +3,7 @@ import { Canvas } from '../../js/Canvas.js';
 import { getText } from '../../js/Text.js';
 import { request } from '../../js/request.js';
 import { constructMeshFromParameters } from '../../js/constructMeshFrom.js';
-import { constructMeshLiFromParameters, constructMeshLiFromJson } from '../../js/constructMeshLiFrom.js';
+import { constructMeshLiFromParameters, constructMeshLiFromUUID } from '../../js/constructMeshLiFrom.js';
 
 const text = {
     "Load texture": { "en": "Load texture", "ja": "テクスチャ読み込み" }
@@ -12,13 +12,13 @@ const text = {
 ////
 // UI
 const generateUI = async function () {
-    constructMeshLiFromJson.handlers.push(
-        function (json, liRoot) {
-            const mesh = Canvas.UUIDToMesh[json["UUID"]];
+    constructMeshLiFromUUID.handlers.push(
+        function (meshUUID, liRoot) {
+            const mesh = Canvas.UUIDToMesh[meshUUID];
             const hasUV = (mesh.geometry.hasAttribute('uv') && mesh.geometry.getAttribute('uv').count > 0);
 
             // for element, we cannot use getElementById ...
-            const pButtons = liRoot.querySelector("#buttons_" + json["UUID"]);
+            const pButtons = liRoot.querySelector("#buttons_" + meshUUID);
             {
                 const a = document.createElement("a");
                 a.setAttribute("class", "tooltipped");
@@ -26,7 +26,7 @@ const generateUI = async function () {
                 a.setAttribute("data-tooltip", getText(text, "Load texture"));
                 if (hasUV) {
                     a.addEventListener('click', function (e) {
-                        loadTextures(json["UUID"]);
+                        loadTextures(meshUUID);
                         // don't fire click event on the parent (e.g. outlineOnClick)
                         e.stopPropagation();
                     });

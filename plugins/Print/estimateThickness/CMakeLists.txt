@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.15)
 ### project
 ##############################################
 project(estimateThickness
-    VERSION 2022.7.0
+    VERSION 2022.7.1
     DESCRIPTION "Estimate thickness"
     HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_TORIDE"
     LANGUAGES CXX

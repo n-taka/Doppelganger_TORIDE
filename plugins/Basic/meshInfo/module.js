@@ -1,6 +1,6 @@
 import { Canvas } from '../../js/Canvas.js';
 import { getText } from '../../js/Text.js';
-import { constructMeshLiFromJson } from '../../js/constructMeshLiFrom.js';
+import { constructMeshLiFromUUID } from '../../js/constructMeshLiFrom.js';
 
 const text = {
     "#Triangle": { "en": "#Triangle", "ja": "ポリゴン数" }
@@ -9,16 +9,16 @@ const text = {
 ////
 // UI
 const generateUI = async function () {
-    constructMeshLiFromJson.handlers.push(
-        function (json, liRoot) {
+    constructMeshLiFromUUID.handlers.push(
+        function (meshUUID, liRoot) {
             // for element, we cannot use getElementById ...
-            const divMetaInfo = liRoot.querySelector("#metaInfo_" + json["UUID"]);
+            const divMetaInfo = liRoot.querySelector("#metaInfo_" + meshUUID);
             {
                 if (divMetaInfo.innerHTML == "<p><br></p>") {
                     // if only dummy element is present, we remove it.
                     divMetaInfo.innerText = '';
                 }
-                const mesh = Canvas.UUIDToMesh[json["UUID"]];
+                const mesh = Canvas.UUIDToMesh[meshUUID];
 
                 // size info
                 // here, we only show XX.XX

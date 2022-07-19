@@ -36,8 +36,16 @@ import { Canvas } from './Canvas.js';
 export const constructMeshFromParameters = async function (parameters) {
     if ("meshes" in parameters) {
         for (let meshUUID in parameters["meshes"]) {
-            // erase old mesh (not optimal...)
-            if (meshUUID in Canvas.UUIDToMesh) {
+            if (!(meshUUID in Canvas.UUIDToMesh)) {
+                const geometry = new THREE.BufferGeometry();
+                const material = new THREE.MeshPhongMaterial({ color: 0xFFFFFF, flatShading: true, vertexColors: THREE.NoColors });
+                const mesh = new THREE.Mesh(geometry, material);
+
+                Canvas.UUIDToMesh[meshUUID] = mesh;
+                Canvas.meshGroup.add(mesh);
+            }
+            if (parameters["meshes"][meshUUID] == null) {
+                // null (remove)
                 const mesh = Canvas.UUIDToMesh[meshUUID];
                 // remove from scene
                 Canvas.meshGroup.remove(mesh);
@@ -48,11 +56,9 @@ export const constructMeshFromParameters = async function (parameters) {
                 mesh.children[0].material.dispose();
                 mesh.geometry.dispose();
                 mesh.material.dispose();
-            }
-            if (parameters["meshes"][meshUUID] != null) {
-                const updatedMesh = await constructMeshFromJson(parameters["meshes"][meshUUID]);
-                Canvas.meshGroup.add(updatedMesh);
-                Canvas.UUIDToMesh[meshUUID] = updatedMesh;
+            } else {
+                // non-null (update)
+                await updateMeshFromJson(Canvas.UUIDToMesh[meshUUID], parameters["meshes"][meshUUID]);
             }
         }
         Canvas.resetCamera(true);
@@ -67,6 +73,9 @@ constructMeshFromParameters.handlers = [];
 
 ////
 // [IN]
+// meshPrev = {
+//     previous mesh
+// }
 // json = {
 //     "UUID": UUID of this mesh,
 //     "name": name of this mesh,
@@ -90,10 +99,7 @@ constructMeshFromParameters.handlers = [];
 // [OUT]
 // THREE.Mesh
 //
-export const constructMeshFromJson = async function (json) {
-    const geometry = new THREE.BufferGeometry();
-    const material = new THREE.MeshPhongMaterial({ color: 0xFFFFFF, flatShading: true, vertexColors: THREE.NoColors });
-
+export const updateMeshFromJson = async function (mesh, json) {
     // IMPORTANT
     // If the mesh has face color, server automatically convert
     // face color to vertex color (by duplicating the vertices)
@@ -133,66 +139,66 @@ export const constructMeshFromJson = async function (json) {
     // V, 32 bit (4 byte) float in the client
     if ("V" in json && json["V"].length > 0) {
         const array = base64DecToArr(json["V"], 4);
-        geometry.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(array.buffer), 3));
-        geometry.deleteAttribute('normal');
-        geometry.getAttribute('position').needsUpdate = true;
+        mesh.geometry.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(array.buffer), 3));
+        mesh.geometry.deleteAttribute('normal');
+        mesh.geometry.getAttribute('position').needsUpdate = true;
     }
     // F, 32 bit (4 byte) int in the client
     if ("F" in json && json["F"].length > 0) {
         const array = base64DecToArr(json["F"], 4);
-        geometry.setIndex(new THREE.Uint32BufferAttribute(new Int32Array(array.buffer), 1));
+        mesh.geometry.setIndex(new THREE.Uint32BufferAttribute(new Int32Array(array.buffer), 1));
     }
     // VC, 32 bit (4 byte) float in the client
     if ("VC" in json) {
         // we accept VC even if VC.rows() != V.rows() to support erasing VC with undo/redo
         const array = base64DecToArr(json["VC"], 4);
-        geometry.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(array.buffer), 3));
-        geometry.getAttribute('color').needsUpdate = true;
+        mesh.geometry.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(array.buffer), 3));
+        mesh.geometry.getAttribute('color').needsUpdate = true;
     }
     // TC, 32 bit (4 byte) float in the client
     if ("TC" in json && json["TC"].length > 0) {
         const array = base64DecToArr(json["TC"], 4);
-        geometry.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(array.buffer), 2));
-        geometry.getAttribute('uv').needsUpdate = true;
+        mesh.geometry.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(array.buffer), 2));
+        mesh.geometry.getAttribute('uv').needsUpdate = true;
     }
     // Tex, 8 bit (1 byte) uint in the client
     //   Currently, we only support single texture
     if ("textures" in json && json["textures"].length > 0) {
         const array = base64DecToArr(json["textures"][0]["texData"], 1);
-        material.map = new THREE.DataTexture(new Uint8Array(array.buffer), json["textures"][0]["width"], json["textures"][0]["height"], THREE.RGBAFormat);
-        material.map.needsUpdate = true;
+        mesh.material.map = new THREE.DataTexture(new Uint8Array(array.buffer), json["textures"][0]["width"], json["textures"][0]["height"], THREE.RGBAFormat);
+        mesh.material.map.needsUpdate = true;
     }
 
-    if (material.map && geometry.hasAttribute('position') && geometry.hasAttribute('uv') && geometry.getAttribute('position').count == geometry.getAttribute('uv').count) {
+    if (mesh.material.map && mesh.geometry.hasAttribute('position') && mesh.geometry.hasAttribute('uv') && mesh.geometry.getAttribute('position').count == mesh.geometry.getAttribute('uv').count) {
         // texture
-        material.vertexColors = THREE.NoColors;
-    } else if (geometry.hasAttribute('position') &&
-        geometry.hasAttribute('color') &&
-        geometry.getAttribute('position').count == geometry.getAttribute('color').count) {
+        mesh.material.vertexColors = THREE.NoColors;
+    } else if (mesh.geometry.hasAttribute('position') &&
+        mesh.geometry.hasAttribute('color') &&
+        mesh.geometry.getAttribute('position').count == mesh.geometry.getAttribute('color').count) {
         // vertex color (user-defined)
-        material.vertexColors = THREE.VertexColors;
+        mesh.material.vertexColors = THREE.VertexColors;
     } else {
         // vertex color (default, grey)
-        const buffer = new ArrayBuffer(geometry.getAttribute('position').count * 3 * 4);
+        const buffer = new ArrayBuffer(mesh.geometry.getAttribute('position').count * 3 * 4);
         const view = new Float32Array(buffer);
-        for (let i = 0; i < geometry.getAttribute('position').count; ++i) {
+        for (let i = 0; i < mesh.geometry.getAttribute('position').count; ++i) {
             for (let rgb = 0; rgb < 3; ++rgb) {
                 view[i * 3 + rgb] = Canvas.defaultColor[rgb];
             }
         }
-        geometry.setAttribute('color', new THREE.Float32BufferAttribute(view, 3));
-        geometry.getAttribute('color').needsUpdate = true;
-        material.vertexColors = THREE.VertexColors;
+        mesh.geometry.setAttribute('color', new THREE.Float32BufferAttribute(view, 3));
+        mesh.geometry.getAttribute('color').needsUpdate = true;
+        mesh.material.vertexColors = THREE.VertexColors;
     }
-    geometry.computeVertexNormals();
-    material.needsUpdate = true;
+    mesh.geometry.computeVertexNormals();
+    mesh.material.needsUpdate = true;
 
-    const mesh = new THREE.Mesh(geometry, material);
 
     // UUID
     if ("UUID" in json) {
         mesh.DoppelgangerUUID = json["UUID"];
     }
+
     // name
     if ("name" in json) {
         mesh.name = json["name"];
@@ -203,18 +209,18 @@ export const constructMeshFromJson = async function (json) {
     }
 
     // create mesh for backface
-    {
+    if (mesh.children.length == 0) {
         // const backFaceMaterial = new THREE.MeshPhongMaterial({ color: 0xf56c0a, flatShading: true, vertexColors: THREE.NoColors, side: THREE.BackSide });
         const backFaceMaterial = new THREE.MeshBasicMaterial({ color: 0xf56c0a, vertexColors: THREE.NoColors, side: THREE.BackSide });
         const backFaceMesh = new THREE.Mesh(mesh.geometry, backFaceMaterial);
         mesh.add(backFaceMesh);
     }
 
-    for (let handler of constructMeshFromJson.handlers) {
+    for (let handler of updateMeshFromJson.handlers) {
         await handler(json, mesh);
     }
-    return mesh;
 }
-// handlers that need to be called when we call constructMeshFromJson
+
+// handlers that need to be called when we call updateMeshFromJson
 // function (json, mesh) { ... }
-constructMeshFromJson.handlers = [];
+updateMeshFromJson.handlers = [];

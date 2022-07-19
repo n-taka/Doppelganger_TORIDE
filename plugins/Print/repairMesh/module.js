@@ -2,7 +2,7 @@ import { WSTasks } from '../../js/WSTasks.js';
 import { getText } from '../../js/Text.js';
 import { request } from '../../js/request.js';
 import { constructMeshFromParameters } from '../../js/constructMeshFrom.js';
-import { constructMeshLiFromParameters, constructMeshLiFromJson } from '../../js/constructMeshLiFrom.js';
+import { constructMeshLiFromParameters, constructMeshLiFromUUID } from '../../js/constructMeshLiFrom.js';
 
 const text = {
     "Repair": { "en": "Repair", "ja": "エラー修正" }
@@ -11,10 +11,10 @@ const text = {
 ////
 // UI
 const generateUI = async function () {
-    constructMeshLiFromJson.handlers.push(
-        function (json, liRoot) {
+    constructMeshLiFromUUID.handlers.push(
+        function (meshUUID, liRoot) {
             // for element, we cannot use getElementById ...
-            const pButtons = liRoot.querySelector("#buttons_" + json["UUID"]);
+            const pButtons = liRoot.querySelector("#buttons_" + meshUUID);
             {
                 const a = document.createElement("a");
                 a.setAttribute("class", "tooltipped");
@@ -22,7 +22,7 @@ const generateUI = async function () {
                 a.setAttribute("data-tooltip", getText(text, "Repair"));
                 a.addEventListener('click', function (e) {
                     const parameters = {};
-                    parameters["meshes"] = [json["UUID"]];
+                    parameters["meshes"] = [meshUUID];
                     request("repairMesh", parameters);
                     // don't fire click event on the parent (e.g. outlineOnClick)
                     e.stopPropagation();
