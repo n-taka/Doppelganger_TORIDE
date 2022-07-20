@@ -34,7 +34,7 @@ const generateUI = async function () {
                     const i = document.createElement("i");
                     i.setAttribute("class", "material-icons teal-text text-lighten-2");
                     const mesh = Canvas.UUIDToMesh[meshUUID];
-                    i.innerText = (mesh.visibility ? "visibility" : "visibility_off");
+                    i.innerText = (mesh.visible ? "visibility" : "visibility_off");
                     a.appendChild(i);
                 }
                 pButtons.appendChild(a);
