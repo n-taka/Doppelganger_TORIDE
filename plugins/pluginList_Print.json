@@ -10,8 +10,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.7.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.7/splitIntoIslands_2022.7.0.zip"
+                "version": "2022.7.1",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.7.1/splitIntoIslands_2022.7.1.zip"
             }
         ]
     },
@@ -26,8 +26,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.7.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.7/hollowMesh_2022.7.0.zip"
+                "version": "2022.7.1",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.7.1/hollowMesh_2022.7.1.zip"
             }
         ]
     },
@@ -42,8 +42,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.7.0.MeshFix",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.7/repairMesh_2022.7.0.MeshFix.zip"
+                "version": "2022.7.1.MeshFix",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.7.1/repairMesh_2022.7.1.MeshFix.zip"
             }
         ]
     },
@@ -74,8 +74,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2202.7.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.7/estimateThickness_2022.7.0.zip"
+                "version": "2202.7.1",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.7.1/estimateThickness_2022.7.1.zip"
             }
         ]
     }
