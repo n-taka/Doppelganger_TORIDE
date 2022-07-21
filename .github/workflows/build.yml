@@ -134,6 +134,9 @@ jobs:
         name: Doppelganger_TORIDE_macOS
         path: ${{github.workspace}}/bin
 
+    - name: Zip all directories
+      run: find bin -maxdepth 2 -mindepth 2 -type d -execdir sh -c "cd {}; zip -r {}.zip *; mv {}.zip .." \;
+
     - name: Archive production artifacts
       uses: actions/upload-artifact@v3
       with:
