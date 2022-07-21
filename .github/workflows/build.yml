@@ -112,6 +112,7 @@ jobs:
           !**/*.zip
 
   put_plugins_together:
+    needs: [ build_Windows, build_Linux, build_macOS ]
     runs-on: [ ubuntu-latest ]
 
     steps:
