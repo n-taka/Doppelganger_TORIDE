@@ -21,22 +21,22 @@ add_custom_target(${PROJECT_NAME} ALL)
 ### resources
 ##############################################
 # directory
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}/${CMAKE_SYSTEM_NAME}")
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}_${PROJECT_VERSION}/${CMAKE_SYSTEM_NAME}")
 # css
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/css")
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/css" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}/css")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/css" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}_${PROJECT_VERSION}/css")
 endif()
 # html
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/html")
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/html" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}/html")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/html" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}_${PROJECT_VERSION}/html")
 endif()
 # icon
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/icon")
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/icon" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}/icon")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/icon" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}_${PROJECT_VERSION}/icon")
 endif()
 # js
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/js")
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/js" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}/js")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/js" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}_${PROJECT_VERSION}/js")
 endif()
 
 # create zip archive
@@ -45,10 +45,10 @@ add_custom_command(
     TARGET ${PROJECT_NAME}
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E tar "cf" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}_${PROJECT_VERSION}.zip" --format=zip -- .
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}/")
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}_${PROJECT_VERSION}/")
 
 # erase temporal directory
 # add_custom_command(
 #     TARGET ${PROJECT_NAME}
 #     POST_BUILD
-#     COMMAND ${CMAKE_COMMAND} -E rm "-r" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}")
+#     COMMAND ${CMAKE_COMMAND} -E rm "-r" "${CMAKE_SOURCE_DIR}/bin/Essential/${PROJECT_NAME}_${PROJECT_VERSION}")
