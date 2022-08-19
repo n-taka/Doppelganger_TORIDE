@@ -1,5 +1,4 @@
 import * as THREE from 'https://cdn.skypack.dev/three@v0.132';
-import { TrackballControls } from 'https://cdn.skypack.dev/three@v0.132/examples/jsm/controls/TrackballControls.js';
 import { mergeBufferAttributes } from 'https://cdn.skypack.dev/three@v0.132/examples/jsm/utils/BufferGeometryUtils.js';
 import { RenderPass } from 'https://cdn.skypack.dev/three@v0.132/examples/jsm/postprocessing/RenderPass.js';
 import { EffectComposer } from 'https://cdn.skypack.dev/three@v0.132/examples/jsm/postprocessing/EffectComposer.js';
@@ -12,6 +11,9 @@ import { MouseKey } from './MouseKey.js';
 
 import { constructMeshFromParameters } from './constructMeshFrom.js';
 import { constructMeshLiFromParameters } from './constructMeshLiFrom.js';
+
+import { OrbitControls } from './ThreeOrbitControlsGizmo/OrbitControls.js';
+import { OrbitControlsGizmo } from "./ThreeOrbitControlsGizmo/OrbitControlsGizmo.js";
 
 ////
 // [note]
@@ -98,9 +100,16 @@ Canvas.init = async function () {
 
     // controls
     {
-        Canvas.controls = new TrackballControls(Canvas.camera, Canvas.renderer.domElement);
+        Canvas.controls = new OrbitControls(Canvas.camera, Canvas.renderer.domElement);
         Canvas.controls.panSpeed = 0.3 * 5;
         Canvas.controls.target.set(0.0, 0.0, 0.0);
+
+        Canvas.gizmoDiv = document.createElement('div');
+        Canvas.gizmoDiv.setAttribute('style', 'position: absolute; right: 500px; top: 0; z-index: 2147483646;');
+        UI.webGLDiv.appendChild(Canvas.gizmoDiv);
+        Canvas.controlsGizmo = new OrbitControlsGizmo(Canvas.controls, { size: 100, padding: 8 });
+        Canvas.gizmoDiv.appendChild(Canvas.controlsGizmo.domElement);
+
         Canvas.camera.lookAt(Canvas.controls.target.clone());
         Canvas.camera.updateMatrixWorld(true);
     }
