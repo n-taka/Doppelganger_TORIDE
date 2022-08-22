@@ -46,6 +46,8 @@ namespace Doppelganger
 		Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> TTi_;
 		std::vector<std::vector<int>> VF_;
 		std::vector<std::vector<int>> VFi_;
+		// Matrix for transforrm
+		Eigen::Matrix<double, 4, 4> matrixWorld_;
 
 		nlohmann::json extension_;
 	};

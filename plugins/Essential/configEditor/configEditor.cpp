@@ -6,6 +6,7 @@
 #include "Doppelganger/Util/filesystem.h"
 
 #include <string>
+#include <sstream>
 #include <nlohmann/json.hpp>
 
 void getPtrStrArrayForPartialConfig(

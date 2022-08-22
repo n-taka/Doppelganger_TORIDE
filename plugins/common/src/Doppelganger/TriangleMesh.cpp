@@ -35,6 +35,7 @@ namespace Doppelganger
 	TriangleMesh::TriangleMesh()
 	{
 		visibility_ = true;
+		matrixWorld_ = Eigen::Matrix<double, 4, 4>::Identity();
 		extension_ = nlohmann::json::object();
 	}
 
@@ -235,6 +236,21 @@ namespace Doppelganger
 			json.at("textures").push_back(texJson);
 		}
 
+		// matrix for transform
+		json["matrix"] = nlohmann::json::object();
+		{
+			json["matrix"]["world"] = nlohmann::json::array();
+			for (int row = 0; row < 4; ++row)
+			{
+				nlohmann::json rowArray = nlohmann::json::array();
+				for (int col = 0; col = 4; ++col)
+				{
+					rowArray.push_back(mesh.matrixWorld_(row, col));
+				}
+				json["matrix"]["world"].push_back(rowArray);
+			}
+		}
+
 		// extension
 		json["extension"] = mesh.extension_;
 	}
@@ -295,6 +311,22 @@ namespace Doppelganger
 				texture.fileFormat_ = textureJson.at("fileFormat").get<std::string>();
 				texture.texData_.resize(textureJson.at("height").get<int>(), textureJson.at("width").get<int>());
 				Doppelganger::Util::decodeBase64ToEigenMatrix(textureJson.at("texData").get<std::string>(), texture.texData_.cols(), texture.texData_);
+			}
+		}
+
+		// matrix for transform
+		if (json.contains("matrix"))
+		{
+			if (json.at("matrix").contains("world"))
+			{
+				const nlohmann::json &matrixWorldArray = json.at("matrix").at("world");
+				for (int row = 0; row < 4; ++row)
+				{
+					for (int col = 0; col = 4; ++col)
+					{
+						mesh.matrixWorld_(row, col) = matrixWorldArray.at(row).at(col).get<double>();
+					}
+				}
 			}
 		}
 
