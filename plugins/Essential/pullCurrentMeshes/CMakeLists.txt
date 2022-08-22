@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.15)
 ### project
 ##############################################
 project(pullCurrentMeshes
-    VERSION 2022.3.0
+    VERSION 2022.8.0
     DESCRIPTION "Get already loaded meshes on startup"
     HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_TORIDE"
     LANGUAGES CXX

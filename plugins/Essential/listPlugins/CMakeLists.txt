@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.15)
 ### project
 ##############################################
 project(listPlugins
-    VERSION 2022.7.0
+    VERSION 2022.8.0
     DESCRIPTION "List all available plugins"
     HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_TORIDE"
     LANGUAGES CXX

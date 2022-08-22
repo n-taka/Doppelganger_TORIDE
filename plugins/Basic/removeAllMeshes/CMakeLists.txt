@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.15)
 ### project
 ##############################################
 project(removeAllMeshes
-    VERSION 2022.3.0
+    VERSION 2022.8.0
     DESCRIPTION "Remove all meshes"
     HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_TORIDE"
     LANGUAGES CXX
