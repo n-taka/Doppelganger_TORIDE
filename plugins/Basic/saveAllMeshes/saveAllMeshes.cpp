@@ -203,10 +203,15 @@ void pluginProcess(
 		}
 
 		{
+			// apply matrixWorld
+			Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> exportV;
+			exportV = mesh.V_ * mesh.matrixWorld_.transpose().block(0, 0, 3, 3);
+			exportV.rowwise() += mesh.matrixWorld_.transpose().block<1, 3>(3, 0, 1, 3);
+
 			if (meshFormat == "obj")
 			{
 				// write OBJ
-				igl::writeOBJ(meshFilePath.string(), mesh.V_, mesh.F_, mesh.VC_, mesh.VN_, mesh.F_, mesh.TC_, mesh.FTC_);
+				igl::writeOBJ(meshFilePath.string(), exportV, mesh.F_, mesh.VC_, mesh.VN_, mesh.F_, mesh.TC_, mesh.FTC_);
 
 				if (!mtlFilePath.empty())
 				{
@@ -262,7 +267,7 @@ void pluginProcess(
 				{
 					Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> outTC;
 					// convert FTC+TC to outTC
-					outTC.resize(mesh.V_.rows(), 2);
+					outTC.resize(exportV.rows(), 2);
 					for (int f = 0; f < mesh.FTC_.rows(); ++f)
 					{
 						for (int fv = 0; fv < mesh.FTC_.cols(); ++fv)
@@ -272,11 +277,11 @@ void pluginProcess(
 					}
 
 					// possibly, we need to support meshlab-style properties??
-					igl::writePLY(meshFilePath.string(), mesh.V_, mesh.F_, mesh.VN_, outTC, outVC255, ((mesh.V_.rows() == outVC255.rows()) ? std::vector<std::string>({"red", "green", "blue"}) : std::vector<std::string>()));
+					igl::writePLY(meshFilePath.string(), exportV, mesh.F_, mesh.VN_, outTC, outVC255, ((exportV.rows() == outVC255.rows()) ? std::vector<std::string>({"red", "green", "blue"}) : std::vector<std::string>()));
 				}
 				else
 				{
-					igl::writePLY(meshFilePath.string(), mesh.V_, mesh.F_, mesh.VN_, mesh.TC_, outVC255, ((mesh.V_.rows() == outVC255.rows()) ? std::vector<std::string>({"red", "green", "blue"}) : std::vector<std::string>()));
+					igl::writePLY(meshFilePath.string(), exportV, mesh.F_, mesh.VN_, mesh.TC_, outVC255, ((exportV.rows() == outVC255.rows()) ? std::vector<std::string>({"red", "green", "blue"}) : std::vector<std::string>()));
 				}
 
 				// texture file
@@ -287,17 +292,17 @@ void pluginProcess(
 			}
 			else if (meshFormat == "stl")
 			{
-				igl::writeSTL(meshFilePath.string(), mesh.V_, mesh.F_, mesh.FN_);
+				igl::writeSTL(meshFilePath.string(), exportV, mesh.F_, mesh.FN_);
 			}
 			else if (meshFormat == "wrl")
 			{
-				if (mesh.VC_.rows() == mesh.V_.rows())
+				if (mesh.VC_.rows() == exportV.rows())
 				{
-					igl::writeWRL(meshFilePath.string(), mesh.V_, mesh.F_, mesh.VC_);
+					igl::writeWRL(meshFilePath.string(), exportV, mesh.F_, mesh.VC_);
 				}
 				else
 				{
-					igl::writeWRL(meshFilePath.string(), mesh.V_, mesh.F_);
+					igl::writeWRL(meshFilePath.string(), exportV, mesh.F_);
 				}
 			}
 		}

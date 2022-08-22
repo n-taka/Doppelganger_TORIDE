@@ -240,14 +240,13 @@ namespace Doppelganger
 		json["matrix"] = nlohmann::json::object();
 		{
 			json["matrix"]["world"] = nlohmann::json::array();
-			for (int row = 0; row < 4; ++row)
+			// we store as column-major 16 elements (for compatibility with Threejs)
+			for (int col = 0; col = 4; ++col)
 			{
-				nlohmann::json rowArray = nlohmann::json::array();
-				for (int col = 0; col = 4; ++col)
+				for (int row = 0; row < 4; ++row)
 				{
-					rowArray.push_back(mesh.matrixWorld_(row, col));
+					json["matrix"]["world"].push_back(mesh.matrixWorld_(row, col));
 				}
-				json["matrix"]["world"].push_back(rowArray);
 			}
 		}
 
@@ -324,7 +323,7 @@ namespace Doppelganger
 				{
 					for (int col = 0; col = 4; ++col)
 					{
-						mesh.matrixWorld_(row, col) = matrixWorldArray.at(row).at(col).get<double>();
+						mesh.matrixWorld_(row, col) = matrixWorldArray.at(row * 4 + col).get<double>();
 					}
 				}
 			}

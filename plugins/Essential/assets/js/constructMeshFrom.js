@@ -23,7 +23,15 @@ import { Canvas } from './Canvas.js';
 //                     "texData" = base64-encoded texture data
 //                 },
 //                 ...
-//             ]
+//             ],
+//             "matrix": {
+//                 "world": [
+//                     [1, 0, 0, 0],
+//                     [0, 1, 0, 0],
+//                     [0, 0, 1, 0],
+//                     [0, 0, 0, 1]
+//                 ]
+//             }
 //         },
 //         "<UUID>": null, // to be removed
 //         ...
@@ -93,7 +101,15 @@ constructMeshFromParameters.handlers = [];
 //             "height" = height of this texture
 //             "texData" = base64-encoded texture data
 //         }
-//     ]
+//     ],
+//     "matrix": {
+//         "world": [
+//             [1, 0, 0, 0],
+//             [0, 1, 0, 0],
+//             [0, 0, 1, 0],
+//             [0, 0, 0, 1]
+//         ]
+//     }
 // }
 // 
 // [OUT]
@@ -167,6 +183,11 @@ export const updateMeshFromJson = async function (mesh, json) {
         const array = base64DecToArr(json["textures"][0]["texData"], 1);
         mesh.material.map = new THREE.DataTexture(new Uint8Array(array.buffer), json["textures"][0]["width"], json["textures"][0]["height"], THREE.RGBAFormat);
         mesh.material.map.needsUpdate = true;
+    }
+
+    // matrixWorld
+    if ("matrix" in json && "world" in json["matrix"]) {
+        mesh.matrixWorld.fromArray(json["matrix"]["world"]);
     }
 
     if (mesh.material.map && mesh.geometry.hasAttribute('position') && mesh.geometry.hasAttribute('uv') && mesh.geometry.getAttribute('position').count == mesh.geometry.getAttribute('uv').count) {
