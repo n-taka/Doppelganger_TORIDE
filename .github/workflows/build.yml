@@ -49,6 +49,7 @@ jobs:
         path: |
           ${{github.workspace}}/bin
           !**/*.zip
+        retention-days: 1
 
   build_Linux:
     runs-on: [ ubuntu-latest ]
@@ -78,6 +79,7 @@ jobs:
         path: |
           ${{github.workspace}}/bin
           !**/*.zip
+        retention-days: 1
 
   build_macOS:
     runs-on: [ macos-latest ]
@@ -110,6 +112,7 @@ jobs:
         path: |
           ${{github.workspace}}/bin
           !**/*.zip
+        retention-days: 1
 
   put_plugins_together:
     needs: [ build_Windows, build_Linux, build_macOS ]
@@ -143,6 +146,7 @@ jobs:
         name: Doppelganger_TORIDE
         path: |
           ${{github.workspace}}/bin
+        retention-days: 7
 
 #    - name: Test
 #      working-directory: ${{github.workspace}}/build
