@@ -12,6 +12,7 @@
 #include "Doppelganger/Util/encodeBinDataToBase64.h"
 
 #include <string>
+#include <sstream>
 #include <fstream>
 
 #include "igl/writeOBJ.h"

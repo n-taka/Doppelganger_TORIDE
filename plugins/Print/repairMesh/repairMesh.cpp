@@ -12,6 +12,7 @@
 #include "Doppelganger/Util/storeHistory.h"
 
 #include <string>
+#include <sstream>
 #include <vector>
 
 #include "igl/facet_components.h"

@@ -11,6 +11,7 @@
 #include "Doppelganger/Util/writeBase64ToFile.h"
 
 #include <string>
+#include <sstream>
 #include <fstream>
 
 void getPtrStrArrayForPartialConfig(
