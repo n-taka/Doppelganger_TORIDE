@@ -35,4 +35,5 @@ add_subdirectory(fitToFrame)
 add_subdirectory(outlineOnClick)
 add_subdirectory(syncViewport)
 add_subdirectory(syncCursor)
+add_subdirectory(transformGizmo)
 
