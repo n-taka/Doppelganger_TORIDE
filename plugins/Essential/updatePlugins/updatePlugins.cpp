@@ -5,6 +5,8 @@
 #include <string>
 #include <nlohmann/json.hpp>
 
+#define FOR_WEB
+
 void getPtrStrArrayForPartialConfig(
 	const char *&parameterChar,
 	char *&ptrStrArrayCoreChar,
@@ -65,11 +67,22 @@ void pluginProcess(
 	configRoomPatch.at("plugin")["installed"] = parameter;
 	configRoomPatch.at("plugin")["reInstall"] = true;
 
-	// "forceReload" in Core reloads all rooms
+	// "forceReload" in Room
 	configRoomPatch["forceReload"] = true;
-
 	// write result
 	writeJSONToChar(configRoomPatchChar, configRoomPatch);
+
+#ifndef FOR_WEB
+	nlohmann::json configCorePatch = nlohmann::json::object();
+	configCorePatch["plugin"] = nlohmann::json::object();
+	configCorePatch.at("plugin")["installed"] = parameter;
+	configCorePatch.at("plugin")["reInstall"] = true;
+
+	// "forceReload" in Core reloads all rooms
+	configCorePatch["forceReload"] = true;
+	// write result
+	writeJSONToChar(configCorePatchChar, configCorePatch);
+#endif
 }
 
 #endif
