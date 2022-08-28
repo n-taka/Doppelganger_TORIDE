@@ -239,9 +239,9 @@ namespace Doppelganger
 		// matrix for transform
 		json["matrix"] = nlohmann::json::object();
 		{
-			json["matrix"]["world"] = nlohmann::json::array();
+			json.at("matrix")["world"] = nlohmann::json::array();
 			// we store as column-major 16 elements (for compatibility with Threejs)
-			for (int col = 0; col = 4; ++col)
+			for (int col = 0; col < 4; ++col)
 			{
 				for (int row = 0; row < 4; ++row)
 				{
@@ -321,7 +321,7 @@ namespace Doppelganger
 				const nlohmann::json &matrixWorldArray = json.at("matrix").at("world");
 				for (int row = 0; row < 4; ++row)
 				{
-					for (int col = 0; col = 4; ++col)
+					for (int col = 0; col < 4; ++col)
 					{
 						mesh.matrixWorld_(row, col) = matrixWorldArray.at(row * 4 + col).get<double>();
 					}
