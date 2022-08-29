@@ -149,6 +149,7 @@ Canvas.init = async function () {
 
 
     Canvas.controls.domElement.addEventListener("pointerup", function (e) {
+        Canvas.calculateBoundingSphere();
         Canvas.resetCamera();
     });
 

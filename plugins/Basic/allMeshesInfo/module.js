@@ -83,7 +83,11 @@ const generateUI = async function () {
 
             const meshList = Canvas.meshGroup.children.filter(function (obj) { return (obj instanceof THREE.Mesh); });
             if (meshList.length > 0) {
-                const posAttrib = mergeBufferAttributes(meshList.map(function (obj) { return obj.geometry.getAttribute("position"); }));
+                const posAttrib = mergeBufferAttributes(meshList.map(function (obj) {
+                    const tmpGeometry = obj.geometry.clone();
+                    tmpGeometry.applyMatrix4(obj.matrixWorld);
+                    return tmpGeometry.getAttribute("position");
+                }));
                 const geometry = new THREE.BufferGeometry();
                 geometry.setAttribute("position", posAttrib);
                 geometry.computeBoundingBox();

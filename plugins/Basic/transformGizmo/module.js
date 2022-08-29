@@ -1,9 +1,14 @@
 import * as THREE from 'https://cdn.skypack.dev/three@v0.132';
 import { TransformControls } from 'https://cdn.skypack.dev/three@v0.132/examples/jsm/controls/TransformControls.js';
+import { WS } from '../../js/WS.js';
+import { WSTasks } from '../../js/WSTasks.js';
 import { Canvas } from '../../js/Canvas.js';
-import { updateMeshFromJson } from '../../js/constructMeshFrom.js';
+import { request } from '../../js/request.js';
+import { constructMeshFromParameters } from '../../js/constructMeshFrom.js';
+import { constructMeshLiFromParameters } from '../../js/constructMeshLiFrom.js';
 
-let activeMeshUUID = "";
+let activeMeshUUID = undefined;
+let beforeTransform = undefined;
 
 const findClosestMesh = function (e) {
     // [IN]
@@ -28,7 +33,14 @@ const findClosestMesh = function (e) {
             }
         }
     }
-    return "";
+    return undefined;
+}
+
+////
+// WS API
+const transformGizmo = async function (parameters) {
+    await constructMeshFromParameters(parameters);
+    await constructMeshLiFromParameters(parameters);
 }
 
 export const init = async function () {
@@ -39,8 +51,44 @@ export const init = async function () {
         Canvas.controls.enabled = !event.value;
     });
     Canvas.transformGizmo.addEventListener('objectChange', function (event) {
-        // todo
-        //   post the update to the server
+        // post the update to the server
+        const parameters = {};
+        parameters["storeHistory"] = false;
+        parameters["meshes"] = {};
+        parameters["meshes"][activeMeshUUID] = {
+            "matrix": {
+                "world": Canvas.UUIDToMesh[activeMeshUUID].matrixWorld.toArray()
+            }
+        };
+        WS.sendMsg("transformGizmo", parameters);
+        // for
+        //   plugin: meshInfo
+        //   plugin: allMeshesInfo
+        constructMeshLiFromParameters(parameters);
+    });
+    Canvas.transformGizmo.addEventListener('mouseDown', function (event) {
+        // store the matrixWorld before Transform
+        beforeTransform = {};
+        beforeTransform["meshes"] = {};
+        beforeTransform["meshes"][activeMeshUUID] = {
+            "matrix": {
+                "world": Canvas.UUIDToMesh[activeMeshUUID].matrixWorld.toArray()
+            }
+        };
+    });
+    Canvas.transformGizmo.addEventListener('mouseUp', function (event) {
+        // post the update to the server
+        const parameters = {};
+        parameters["storeHistory"] = true;
+        parameters["meshes"] = {};
+        parameters["meshes"][activeMeshUUID] = {
+            "matrix": {
+                "world": Canvas.UUIDToMesh[activeMeshUUID].matrixWorld.toArray()
+            }
+        };
+        parameters["beforeTransform"] = beforeTransform;
+        request("transformGizmo", parameters);
+        beforeTransform = undefined;
     });
     Canvas.transformGizmo.detach();
 
@@ -58,7 +106,7 @@ export const init = async function () {
                     Canvas.transformGizmo.attach(Canvas.UUIDToMesh[closestMeshUUID]);
                     activeMeshUUID = closestMeshUUID;
                 } else {
-                    activeMeshUUID = "";
+                    activeMeshUUID = undefined;
                 }
             }
         } else {
@@ -68,7 +116,7 @@ export const init = async function () {
                 Canvas.transformGizmo.attach(Canvas.UUIDToMesh[closestMeshUUID]);
                 activeMeshUUID = closestMeshUUID;
             } else {
-                activeMeshUUID = "";
+                activeMeshUUID = undefined;
             }
         }
     });
@@ -114,4 +162,7 @@ export const init = async function () {
             }
         }
     });
+
+    WSTasks["transformGizmo"] = transformGizmo;
 }
+

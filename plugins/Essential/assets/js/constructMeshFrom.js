@@ -188,7 +188,10 @@ export const updateMeshFromJson = async function (mesh, json) {
 
     // matrixWorld
     if ("matrix" in json && "world" in json["matrix"]) {
-        mesh.matrixWorld.fromArray(json["matrix"]["world"]);
+        // see: https://stackoverflow.com/questions/37446330/setting-matrixworld-property-of-a-three-js-object
+        const matrixWorld = new THREE.Matrix4();
+        matrixWorld.fromArray(json["matrix"]["world"]);
+        matrixWorld.decompose(mesh.position, mesh.quaternion, mesh.scale);
     }
 
     if (mesh.material.map && mesh.geometry.hasAttribute('position') && mesh.geometry.hasAttribute('uv') && mesh.geometry.getAttribute('position').count == mesh.geometry.getAttribute('uv').count) {

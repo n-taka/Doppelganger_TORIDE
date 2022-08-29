@@ -23,8 +23,10 @@ const generateUI = async function () {
                 // size info
                 // here, we only show XX.XX
                 {
-                    mesh.geometry.computeBoundingBox();
-                    const BBox = mesh.geometry.boundingBox;
+                    const tmpGeometry = mesh.geometry.clone();
+                    tmpGeometry.applyMatrix4(mesh.matrixWorld);
+                    tmpGeometry.computeBoundingBox();
+                    const BBox = tmpGeometry.boundingBox;
                     const XYZSize = BBox.max.clone();
                     XYZSize.sub(BBox.min);
 

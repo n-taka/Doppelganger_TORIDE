@@ -21,14 +21,20 @@ void getPtrStrArrayForPartialConfig(
 	nlohmann::json ptrStrArrayCore = nlohmann::json::array();
 	writeJSONToChar(ptrStrArrayCoreChar, ptrStrArrayCore);
 	nlohmann::json ptrStrArrayRoom = nlohmann::json::array();
-	for (const auto &UUID : parameter.at("meshes"))
+	if (parameter.at("storeHistory").get<bool>())
 	{
+		// HTTP API call just for storing history requires edit history
+		ptrStrArrayRoom.push_back("/history");
+	}
+
+	for (const auto &uuid_value : parameter.at("meshes").items())
+	{
+		const std::string &UUID = uuid_value.key();
 		std::string targetMeshPath("/meshes/");
-		targetMeshPath += UUID.get<std::string>();
-		targetMeshPath += "/matrixWorld";
+		targetMeshPath += UUID;
+		targetMeshPath += "/matrix/world";
 		ptrStrArrayRoom.push_back(targetMeshPath);
 	}
-	ptrStrArrayRoom.push_back("/history");
 	writeJSONToChar(ptrStrArrayRoomChar, ptrStrArrayRoom);
 }
 
@@ -66,32 +72,32 @@ void pluginProcess(
 	const nlohmann::json parameter = nlohmann::json::parse(parameterChar);
 	nlohmann::json configRoomPatch = nlohmann::json::object();
 	nlohmann::json broadcast = nlohmann::json::object();
-	nlohmann::json diff = nlohmann::json::object();
-	nlohmann::json diffInv = nlohmann::json::object();
 
-	broadcast["meshes"] = nlohmann::json::object();
-	diff["meshes"] = nlohmann::json::object();
-	diffInv["meshes"] = nlohmann::json::object();
-
-	diffInv = parameter;
-	// overwrite matrix
-	for (const auto &UUID_mesh : parameter.at("meshes").items())
+	if (parameter.at("storeHistory").get<bool>())
 	{
-		const std::string &UUID = UUID_mesh.key();
-		const nlohmann::json &value = UUID_mesh.value();
+		// store history
+		nlohmann::json diff = nlohmann::json::object();
+		nlohmann::json diffInv = nlohmann::json::object();
 
-		diff.at("meshes")[UUID] = value;
-		broadcast.at("meshes")[UUID] = value;
+		diffInv = parameter.at("beforeTransform");
+		diff["meshes"] = parameter.at("meshes");
+
+		// history
+		configRoomPatch["history"] = nlohmann::json::object();
+		Doppelganger::Util::storeHistory(configRoom.at("history"), diff, diffInv, configRoomPatch.at("history"));
+
+		writeJSONToChar(configRoomPatchChar, configRoomPatch);
 	}
-	configRoomPatch = diff;
+	else
+	{
+		// update transformation
+		broadcast["meshes"] = parameter.at("meshes");
+		configRoomPatch["meshes"] = parameter.at("meshes");
 
-	// history
-	configRoomPatch["history"] = nlohmann::json::object();
-	Doppelganger::Util::storeHistory(configRoom.at("history"), diff, diffInv, configRoomPatch.at("history"));
-
-	// write result
-	writeJSONToChar(configRoomPatchChar, configRoomPatch);
-	writeJSONToChar(broadcastChar, broadcast);
+		// write result
+		writeJSONToChar(configRoomPatchChar, configRoomPatch);
+		writeJSONToChar(broadcastChar, broadcast);
+	}
 }
 
 #endif
