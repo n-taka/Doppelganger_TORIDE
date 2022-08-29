@@ -20,7 +20,7 @@ const generateUI = function () {
             }
         });
         UI.sliderDiv.noUiSlider.on('update', function () {
-            Canvas.resetCamera(false);
+            Canvas.resetCamera();
         });
         UI.sliderDiv.noUiSlider.on('end', function () {
             document.body.style.cursor = "url(../icon/cursorIcon" + MouseKey.iconIdx + ".png) 16 16 , default"

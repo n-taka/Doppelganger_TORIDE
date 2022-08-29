@@ -14,18 +14,18 @@ const alignCamera = function (direction) {
         [new THREE.Vector3(0, -1, 0), new THREE.Vector3(0, 0, 1)]
     ];
 
-    // for updating Canvas.unifiedBSphere
-    Canvas.resetCamera(true);
+    // update Canvas.boundingSphere
+    Canvas.calculateBoundingSphere();
     // change camera position, up, zoom
-    Canvas.controls.target.copy(Canvas.unifiedBSphere.center);
+    Canvas.controls.target.copy(Canvas.boundingSphere.center);
     const targetToCamera = directions[direction][0].clone();
-    targetToCamera.multiplyScalar(Canvas.unifiedBSphere.radius * 1.01);
+    targetToCamera.multiplyScalar(Canvas.boundingSphere.radius * 1.01);
     Canvas.camera.position.copy(targetToCamera);
     Canvas.camera.position.add(Canvas.controls.target);
     Canvas.camera.up.copy(directions[direction][1]);
 
     // for updating camera.clippingNear, clippingFar, making sure that whole of the mesh is visible
-    Canvas.resetCamera(false);
+    Canvas.resetCamera();
 }
 
 export const init = async function () {

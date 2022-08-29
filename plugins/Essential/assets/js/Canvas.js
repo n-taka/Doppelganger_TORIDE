@@ -115,7 +115,7 @@ Canvas.init = async function () {
     }
 
     // bounding sphere (for tweaking camera parameters)
-    Canvas.unifiedBSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), 1.0);
+    Canvas.boundingSphere = undefined;
 
     // parameters for UI
     Canvas.lastControlTarget = {};
@@ -147,6 +147,11 @@ Canvas.init = async function () {
         Canvas.effectComposer.setSize(Canvas.width, Canvas.height);
     });
 
+
+    Canvas.controls.domElement.addEventListener("pointerup", function (e) {
+        Canvas.resetCamera();
+    });
+
     Canvas.drawLoop();
     return;
 };
@@ -167,53 +172,77 @@ Canvas.pullCurrentMeshes = async function () {
     await constructMeshLiFromParameters(parameters);
 }
 
-Canvas.resetCamera = function (refreshBSphere) {
-    let clippingNear = -1.01;
-    let clippingFar = 1.01;
-    if (UI.sliderDiv) {
-        const sliderValue = UI.sliderDiv.noUiSlider.get();
-        clippingNear = (parseFloat(sliderValue[0]) - 50.0) / 50.0;
-        clippingFar = (parseFloat(sliderValue[1]) - 50.0) / 50.0;
-    }
-
-    MouseKey.lastInteractionTimeStamp = Date.now();
+// calculates bounding sphere for all meshes
+Canvas.calculateBoundingSphere = function () {
+    Canvas.boundingSphere = undefined;
 
     const meshList = Canvas.meshGroup.children.filter(function (obj) { return (obj instanceof THREE.Mesh); });
     if (meshList.length > 0) {
+        const posAttrib = mergeBufferAttributes(meshList.map(function (obj) {
+            const tmpGeometry = obj.geometry.clone();
+            tmpGeometry.applyMatrix4(obj.matrixWorld);
+            return tmpGeometry.getAttribute("position");
+        }));
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute("position", posAttrib);
+        geometry.computeBoundingSphere();
+        Canvas.boundingSphere = geometry.boundingSphere.clone();
+        geometry.dispose();
+    }
+};
 
-        if (refreshBSphere) {
-            const posAttrib = mergeBufferAttributes(meshList.map(function (obj) { return obj.geometry.getAttribute("position"); }));
-            const geometry = new THREE.BufferGeometry();
-            geometry.setAttribute("position", posAttrib);
-            geometry.computeBoundingSphere();
-            Canvas.unifiedBSphere = geometry.boundingSphere.clone();
-            geometry.dispose();
-        }
+// update camera/controls parameters
+//   + camera.position
+//   + camera.near
+//   + camera.far
+//   + controls.target
+//   + controls.panSpeed
+Canvas.resetCamera = function () {
+    // default values for three js
+    let clippingNear = 0.0;
+    let clippingFar = 2000.0;
+    let panSpeed = 1.0;
 
-        // the procedure below also handles the case "controls.target != BSphere.center"
-        const targetToCamera = Canvas.camera.position.clone();
-        targetToCamera.sub(Canvas.controls.target);
-        targetToCamera.normalize();
+    if (Canvas.boundingSphere) {
+        MouseKey.lastInteractionTimeStamp = Date.now();
 
-        const targetToBCenter = Canvas.unifiedBSphere.center.clone();
+        // re-locate camera so that whole meshes are visible during the rotation
+        //   the procedure below also handles the case "controls.target != BSphere.center"
+        const targetToCameraUnit = Canvas.camera.position.clone();
+        targetToCameraUnit.sub(Canvas.controls.target);
+        targetToCameraUnit.normalize();
+        const targetToBCenter = Canvas.boundingSphere.center.clone();
         targetToBCenter.sub(Canvas.controls.target);
-        const shift = (targetToBCenter.length() + Canvas.unifiedBSphere.radius) * 1.01;
+        const shift = (targetToBCenter.length() + Canvas.boundingSphere.radius) * 1.01;
         const cameraPos = Canvas.controls.target.clone();
+        const targetToCamera = targetToCameraUnit.clone();
         targetToCamera.multiplyScalar(shift);
         cameraPos.add(targetToCamera);
         Canvas.camera.position.copy(cameraPos);
 
         // update pan speed
-        Canvas.controls.panSpeed = 100.0 / targetToCamera.length();
+        panSpeed = 100.0 / targetToCamera.length();
 
-        // update near/far clip
-        const cameraToBCenter = Canvas.unifiedBSphere.center.clone();
-        cameraToBCenter.sub(Canvas.camera.position);
-        const cameraToTarget = Canvas.controls.target.clone();
-        cameraToTarget.sub(Canvas.camera.position);
-        cameraToTarget.normalize();
-        Canvas.camera.near = cameraToBCenter.dot(cameraToTarget) + Canvas.unifiedBSphere.radius * clippingNear;
-        Canvas.camera.far = cameraToBCenter.dot(cameraToTarget) + Canvas.unifiedBSphere.radius * clippingFar;
-        Canvas.camera.updateProjectionMatrix();
+        if (UI.sliderDiv) {
+            // plugin crossSectionalView is installed
+            const sliderValue = UI.sliderDiv.noUiSlider.get();
+            const sliderValueNear = parseFloat(sliderValue[0]);
+            const sliderValueFar = parseFloat(sliderValue[1]);
+
+            if (sliderValueNear > 0.0 || sliderValueFar < 100.0) {
+                // ranged rendering
+                const sliderValueNearRatio = (sliderValueNear - 50.0) / 50.0;
+                const sliderValueFarRatio = (sliderValueFar - 50.0) / 50.0;
+                const clippingCenter = shift;
+                // update near/far clip
+                clippingNear = clippingCenter + sliderValueNearRatio * clippingCenter;
+                clippingFar = clippingCenter + sliderValueFarRatio * clippingCenter;
+            }
+        }
+
     }
+    Canvas.camera.near = clippingNear;
+    Canvas.camera.far = clippingFar;
+    Canvas.controls.panSpeed = panSpeed;
+    Canvas.camera.updateProjectionMatrix();
 };

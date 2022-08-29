@@ -69,7 +69,8 @@ export const constructMeshFromParameters = async function (parameters) {
                 await updateMeshFromJson(Canvas.UUIDToMesh[meshUUID], parameters["meshes"][meshUUID]);
             }
         }
-        Canvas.resetCamera(true);
+        Canvas.calculateBoundingSphere();
+        Canvas.resetCamera();
     }
     for (let handler of constructMeshFromParameters.handlers) {
         await handler();
