@@ -104,7 +104,7 @@ void pluginProcess(
 				std::string dirName("repairMesh");
 				dirName += "_";
 				// todo: should not use hard-code
-				std::string installedVersion("2022.7.1.MeshFix");
+				std::string installedVersion("2022.8.0.MeshFix");
 				dirName += installedVersion;
 
 				pluginDir.append(dirName);
