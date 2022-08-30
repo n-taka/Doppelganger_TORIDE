@@ -85,19 +85,15 @@ void pluginProcess(
 		// history
 		configRoomPatch["history"] = nlohmann::json::object();
 		Doppelganger::Util::storeHistory(configRoom.at("history"), diff, diffInv, configRoomPatch.at("history"));
-
-		writeJSONToChar(configRoomPatchChar, configRoomPatch);
 	}
-	else
-	{
-		// update transformation
-		broadcast["meshes"] = parameter.at("meshes");
-		configRoomPatch["meshes"] = parameter.at("meshes");
 
-		// write result
-		writeJSONToChar(configRoomPatchChar, configRoomPatch);
-		writeJSONToChar(broadcastChar, broadcast);
-	}
+	// update transformation
+	broadcast["meshes"] = parameter.at("meshes");
+	configRoomPatch["meshes"] = parameter.at("meshes");
+
+	// write result
+	writeJSONToChar(configRoomPatchChar, configRoomPatch);
+	writeJSONToChar(broadcastChar, broadcast);
 }
 
 #endif
