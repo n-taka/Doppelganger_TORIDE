@@ -334,5 +334,21 @@
                 "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/syncCursor_2022.8.0.zip"
             }
         ]
+    },
+    {
+        "name": "transformGizmo",
+        "description": {
+            "en": "Gizmo for 3D transformation",
+            "ja": "移動・回転・拡大縮小のためのギズモを追加します"
+        },
+        "optional": true,
+        "UIPosition": "none",
+        "hasModuleJS": true,
+        "versions": [
+            {
+                "version": "2022.8.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/transformGizmo_2022.8.0.zip"
+            }
+        ]
     }
 ]
