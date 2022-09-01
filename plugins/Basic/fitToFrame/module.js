@@ -5,18 +5,18 @@ import { UI } from '../../js/UI.js';
 const fitToFrame = function () {
     const visibleMeshList = Canvas.meshGroup.children.filter(function (obj) { return (obj instanceof THREE.Mesh && obj.visible); });
     if (visibleMeshList.length > 0) {
-        // update Canvas.boundingSphere
+        // update Canvas.boundingSphereVisible
         Canvas.calculateBoundingSphere();
         // change camera position, zoom
-        const translateVec = Canvas.boundingSphere.center.clone();
+        const translateVec = Canvas.boundingSphereVisible.center.clone();
         translateVec.sub(Canvas.controls.target);
 
         Canvas.camera.position.add(translateVec);
         Canvas.controls.target.add(translateVec);
         if (Canvas.width > Canvas.height) {
-            Canvas.camera.zoom = (Canvas.height * 0.5) / Canvas.boundingSphere.radius;
+            Canvas.camera.zoom = (Canvas.height * 0.5) / Canvas.boundingSphereVisible.radius;
         } else {
-            Canvas.camera.zoom = (Canvas.width * 0.5) / Canvas.boundingSphere.radius;
+            Canvas.camera.zoom = (Canvas.width * 0.5) / Canvas.boundingSphereVisible.radius;
         }
         // for updating camera.clippingNear, clippingFar, making sure that whole of the mesh is visible
         Canvas.resetCamera();
@@ -37,8 +37,32 @@ export const init = async function () {
         const keycode = e.code;
         if (keycode == 'KeyF') {
             // fitToFrame() updates MouseKey.lastInteractionTimeStamp
-            fitToFrame();
+            Canvas.fitToFrame();
         }
     }));
+
+    // FAB
+    const FABLi = document.createElement('li');
+    {
+        const FABA = document.createElement('a');
+        FABA.setAttribute('class', 'btn-floating teal lighten-2')
+        FABA.addEventListener('click', () => {
+            Canvas.fitToFrame();
+        });
+        {
+            const FABI = document.createElement('i');
+            FABI.setAttribute('class', 'material-icons');
+            FABI.innerText = 'fullscreen';
+            FABA.appendChild(FABI);
+        }
+        FABLi.appendChild(FABA);
+    }
+    UI.FABUl.appendChild(FABLi);
+
+    // re-initialize FAB
+    const elems = document.querySelectorAll('.fixed-action-btn');
+    M.FloatingActionButton.init(elems, {
+        hoverEnabled: false
+    });
 }
 

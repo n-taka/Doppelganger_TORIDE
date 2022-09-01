@@ -42,6 +42,38 @@ UI.init = function () {
                 }
                 UI.rootDiv.appendChild(UI.webGLDiv);
             }
+            // Fixed-action-button
+            // https://materializecss.com/floating-action-button.html
+            {
+                UI.FABDiv = document.createElement('div');
+                UI.FABDiv.setAttribute('class', 'fixed-action-btn');
+                // hard-coded...
+                UI.FABDiv.setAttribute('style', 'right: 523px;');
+                {
+                    const FABLargeBtn = document.createElement('a');
+                    FABLargeBtn.setAttribute('class', 'btn-floating btn-large teal lighten-2');
+                    {
+                        const FABLargeBtnIcon = document.createElement('i');
+                        FABLargeBtnIcon.setAttribute('class', 'large material-icons');
+                        FABLargeBtnIcon.innerText = 'menu';
+                        FABLargeBtn.appendChild(FABLargeBtnIcon);
+                    }
+                    UI.FABDiv.appendChild(FABLargeBtn);
+                }
+                {
+                    UI.FABUl = document.createElement('ul');
+                    {
+                        // actual elements are added by plugins
+                    }
+                    UI.FABDiv.appendChild(UI.FABUl);
+                }
+                UI.rootDiv.appendChild(UI.FABDiv);
+
+                const elems = document.querySelectorAll('.fixed-action-btn');
+                M.FloatingActionButton.init(elems, {
+                    hoverEnabled: false
+                });
+            }
             // sidebar (sidenav)
             {
                 UI.sideNavDiv = document.createElement('div');

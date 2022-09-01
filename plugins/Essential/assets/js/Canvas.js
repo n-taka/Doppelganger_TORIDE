@@ -114,8 +114,8 @@ Canvas.init = async function () {
         Canvas.camera.updateMatrixWorld(true);
     }
 
-    // bounding sphere (for tweaking camera parameters)
-    Canvas.boundingSphere = undefined;
+    // bounding sphere (Only for visible meshes, for tweaking camera parameters)
+    Canvas.boundingSphereVisible = undefined;
 
     // parameters for UI
     Canvas.lastControlTarget = {};
@@ -175,11 +175,11 @@ Canvas.pullCurrentMeshes = async function () {
 
 // calculates bounding sphere for all meshes
 Canvas.calculateBoundingSphere = function () {
-    Canvas.boundingSphere = undefined;
+    Canvas.boundingSphereVisible = undefined;
 
-    const meshList = Canvas.meshGroup.children.filter(function (obj) { return (obj instanceof THREE.Mesh); });
-    if (meshList.length > 0) {
-        const posAttrib = mergeBufferAttributes(meshList.map(function (obj) {
+    const meshListVisible = Canvas.meshGroup.children.filter(function (obj) { return ((obj instanceof THREE.Mesh) && obj.visible); });
+    if (meshListVisible.length > 0) {
+        const posAttrib = mergeBufferAttributes(meshListVisible.map(function (obj) {
             const tmpGeometry = obj.geometry.clone();
             tmpGeometry.applyMatrix4(obj.matrixWorld);
             return tmpGeometry.getAttribute("position");
@@ -187,7 +187,7 @@ Canvas.calculateBoundingSphere = function () {
         const geometry = new THREE.BufferGeometry();
         geometry.setAttribute("position", posAttrib);
         geometry.computeBoundingSphere();
-        Canvas.boundingSphere = geometry.boundingSphere.clone();
+        Canvas.boundingSphereVisible = geometry.boundingSphere.clone();
         geometry.dispose();
     }
 };
@@ -204,7 +204,7 @@ Canvas.resetCamera = function () {
     let clippingFar = 2000.0;
     let panSpeed = 1.0;
 
-    if (Canvas.boundingSphere) {
+    if (Canvas.boundingSphereVisible) {
         MouseKey.lastInteractionTimeStamp = Date.now();
 
         // re-locate camera so that whole meshes are visible during the rotation
@@ -212,9 +212,9 @@ Canvas.resetCamera = function () {
         const targetToCameraUnit = Canvas.camera.position.clone();
         targetToCameraUnit.sub(Canvas.controls.target);
         targetToCameraUnit.normalize();
-        const targetToBCenter = Canvas.boundingSphere.center.clone();
+        const targetToBCenter = Canvas.boundingSphereVisible.center.clone();
         targetToBCenter.sub(Canvas.controls.target);
-        const shift = (targetToBCenter.length() + Canvas.boundingSphere.radius) * 1.01;
+        const shift = (targetToBCenter.length() + Canvas.boundingSphereVisible.radius) * 1.01;
         const cameraPos = Canvas.controls.target.clone();
         const targetToCamera = targetToCameraUnit.clone();
         targetToCamera.multiplyScalar(shift);
