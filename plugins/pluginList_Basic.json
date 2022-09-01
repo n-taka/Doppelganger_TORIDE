@@ -266,6 +266,10 @@
         "hasModuleJS": true,
         "versions": [
             {
+                "version": "2022.9.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.9.0/fitToFrame_2022.9.0.zip"
+            },
+            {
                 "version": "2022.8.0",
                 "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/fitToFrame_2022.8.0.zip"
             }
@@ -281,6 +285,10 @@
         "UIPosition": "none",
         "hasModuleJS": true,
         "versions": [
+            {
+                "version": "2022.9.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.9.0/alignCamera_2022.9.0.zip"
+            },
             {
                 "version": "2022.8.0",
                 "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/alignCamera_2022.8.0.zip"
