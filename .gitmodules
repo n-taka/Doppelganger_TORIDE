@@ -4,3 +4,6 @@
 [submodule "submodule/Doppelganger_Util"]
 	path = submodule/Doppelganger_Util
 	url = https://github.com/n-taka/Doppelganger_Util.git
+[submodule "plugins/Basic/saveScreenshotAll/submodule/psd_sdk"]
+	path = plugins/Basic/saveScreenshotAll/submodule/psd_sdk
+	url = https://github.com/n-taka/psd_sdk

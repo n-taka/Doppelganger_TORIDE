@@ -6,7 +6,7 @@ import { request } from '../../js/request.js';
 const text = {
     "Choose file format to save": { "en": "Choose file format to save", "ja": "保存するフォーマットを選んでください" },
     "Cancel": { "en": "Cancel", "ja": "キャンセル" },
-    "Save a screenshot per mesh.": { "en": "Save a screenshot per mesh.", "ja": "各メッシュについて個別の画像として保存" },
+    "Save screenshot as single file. (for PSD, each meshes are rendered in separate layers)": { "en": "Save screenshot as single file. (for PSD, each meshes are rendered in separate layers)", "ja": "単一の画像にまとめてレンダリングします。 (PSDファイルの場合、それぞれのメッシュは異なるレイヤーに書き出されます)" },
     "Save screenshot": { "en": "Save screenshot", "ja": "スクリーンショットを保存" }
 };
 
@@ -36,57 +36,98 @@ const generateUI = async function () {
                         divRow.setAttribute('class', 'row');
                         {
                             const jpegDiv = document.createElement("div");
-                            jpegDiv.setAttribute("class", "col s6");
+                            jpegDiv.setAttribute("class", "col s2 offset-s1");
                             const jpegBtn = document.createElement("a");
                             jpegBtn.setAttribute("class", "waves-effect waves-light btn");
                             jpegBtn.setAttribute("style", "width: 100%;");
-                            jpegBtn.innerText = "JPEG (.jpeg)";
+                            jpegBtn.innerText = "JPEG";
                             jpegBtn.addEventListener('click', function () {
-                                if (document.getElementById('savePerMesh').checked) {
-                                    // save a screenshot per mesh
-                                    for (let meshUUID of Object.keys(Canvas.UUIDToMesh)) {
-                                        saveScreenshot([meshUUID], "jpeg");
+                                const meshUUIDToBeRendered = [];
+                                for (let meshUUID of Object.keys(Canvas.UUIDToMesh)) {
+                                    if (Canvas.UUIDToMesh[meshUUID].visible) {
+                                        meshUUIDToBeRendered.push(meshUUID);
                                     }
-                                } else {
-                                    // save the current view as-is
-                                    const meshUUIDToBeRendered = [];
-                                    for (let meshUUID of Object.keys(Canvas.UUIDToMesh)) {
-                                        if (Canvas.UUIDToMesh[meshUUID].visible) {
-                                            meshUUIDToBeRendered.push(meshUUID);
-                                        }
-                                    }
-                                    saveScreenshot(meshUUIDToBeRendered, "jpeg");
                                 }
+                                saveScreenshot(meshUUIDToBeRendered, "jpeg", document.getElementById('singleFile').checked);
                             });
                             jpegDiv.appendChild(jpegBtn);
                             divRow.appendChild(jpegDiv);
                         }
                         {
                             const pngDiv = document.createElement("div");
-                            pngDiv.setAttribute("class", "col s6");
+                            pngDiv.setAttribute("class", "col s2");
                             const pngBtn = document.createElement("a");
                             pngBtn.setAttribute("class", "waves-effect waves-light btn");
                             pngBtn.setAttribute("style", "width: 100%;");
-                            pngBtn.innerText = "PNG (.png)";
+                            pngBtn.innerText = "PNG";
                             pngBtn.addEventListener('click', function () {
-                                if (document.getElementById('savePerMesh').checked) {
-                                    // save a screenshot per mesh
-                                    for (let meshUUID of Object.keys(Canvas.UUIDToMesh)) {
-                                        saveScreenshot([meshUUID], "png");
+                                const meshUUIDToBeRendered = [];
+                                for (let meshUUID of Object.keys(Canvas.UUIDToMesh)) {
+                                    if (Canvas.UUIDToMesh[meshUUID].visible) {
+                                        meshUUIDToBeRendered.push(meshUUID);
                                     }
-                                } else {
-                                    // save the current view as-is
-                                    const meshUUIDToBeRendered = [];
-                                    for (let meshUUID of Object.keys(Canvas.UUIDToMesh)) {
-                                        if (Canvas.UUIDToMesh[meshUUID].visible) {
-                                            meshUUIDToBeRendered.push(meshUUID);
-                                        }
-                                    }
-                                    saveScreenshot(meshUUIDToBeRendered, "png");
                                 }
+                                saveScreenshot(meshUUIDToBeRendered, "png", document.getElementById('singleFile').checked);
                             });
                             pngDiv.appendChild(pngBtn);
                             divRow.appendChild(pngDiv);
+                        }
+                        {
+                            const bmpDiv = document.createElement("div");
+                            bmpDiv.setAttribute("class", "col s2");
+                            const bmpBtn = document.createElement("a");
+                            bmpBtn.setAttribute("class", "waves-effect waves-light btn");
+                            bmpBtn.setAttribute("style", "width: 100%;");
+                            bmpBtn.innerText = "BMP";
+                            bmpBtn.addEventListener('click', function () {
+                                const meshUUIDToBeRendered = [];
+                                for (let meshUUID of Object.keys(Canvas.UUIDToMesh)) {
+                                    if (Canvas.UUIDToMesh[meshUUID].visible) {
+                                        meshUUIDToBeRendered.push(meshUUID);
+                                    }
+                                }
+                                saveScreenshot(meshUUIDToBeRendered, "bmp", document.getElementById('singleFile').checked);
+                            });
+                            bmpDiv.appendChild(bmpBtn);
+                            divRow.appendChild(bmpDiv);
+                        }
+                        {
+                            const tgaDiv = document.createElement("div");
+                            tgaDiv.setAttribute("class", "col s2");
+                            const tgaBtn = document.createElement("a");
+                            tgaBtn.setAttribute("class", "waves-effect waves-light btn");
+                            tgaBtn.setAttribute("style", "width: 100%;");
+                            tgaBtn.innerText = "TGA";
+                            tgaBtn.addEventListener('click', function () {
+                                const meshUUIDToBeRendered = [];
+                                for (let meshUUID of Object.keys(Canvas.UUIDToMesh)) {
+                                    if (Canvas.UUIDToMesh[meshUUID].visible) {
+                                        meshUUIDToBeRendered.push(meshUUID);
+                                    }
+                                }
+                                saveScreenshot(meshUUIDToBeRendered, "tga", document.getElementById('singleFile').checked);
+                            });
+                            tgaDiv.appendChild(tgaBtn);
+                            divRow.appendChild(tgaDiv);
+                        }
+                        {
+                            const psdDiv = document.createElement("div");
+                            psdDiv.setAttribute("class", "col s2");
+                            const psdBtn = document.createElement("a");
+                            psdBtn.setAttribute("class", "waves-effect waves-light btn");
+                            psdBtn.setAttribute("style", "width: 100%;");
+                            psdBtn.innerText = "PSD";
+                            psdBtn.addEventListener('click', function () {
+                                const meshUUIDToBeRendered = [];
+                                for (let meshUUID of Object.keys(Canvas.UUIDToMesh)) {
+                                    if (Canvas.UUIDToMesh[meshUUID].visible) {
+                                        meshUUIDToBeRendered.push(meshUUID);
+                                    }
+                                }
+                                saveScreenshot(meshUUIDToBeRendered, "psd", document.getElementById('singleFile').checked);
+                            });
+                            psdDiv.appendChild(psdBtn);
+                            divRow.appendChild(psdDiv);
                         }
                         li.appendChild(divRow);
                     }
@@ -101,13 +142,13 @@ const generateUI = async function () {
                             {
                                 const inputCheckbox = document.createElement("input");
                                 inputCheckbox.setAttribute("type", "checkbox")
-                                inputCheckbox.setAttribute("id", "savePerMesh");
-                                inputCheckbox.checked = false;
+                                inputCheckbox.setAttribute("id", "singleFile");
+                                inputCheckbox.checked = true;
                                 labelCheckbox.appendChild(inputCheckbox);
                             }
                             {
                                 const spanCheckbox = document.createElement("span");
-                                spanCheckbox.innerText = getText(text, "Save screenshot per mesh.");
+                                spanCheckbox.innerText = getText(text, "Save screenshot as single file. (for PSD, each meshes are rendered in separate layers)");
                                 labelCheckbox.appendChild(spanCheckbox);
                             }
                             pCheckbox.appendChild(labelCheckbox);
@@ -166,7 +207,7 @@ const generateUI = async function () {
 
 ////
 // callback
-const saveScreenshot = function (visibleMeshUUIDArray, format) {
+const saveScreenshot = function (visibleMeshUUIDArray, format, mergedImages) {
     const toBlob = function (base64) {
         const bin = atob(base64.replace(/^.*,/, ''));
         const buffer = new Uint8Array(bin.length);
@@ -181,6 +222,20 @@ const saveScreenshot = function (visibleMeshUUIDArray, format) {
         }
     }
 
+    const captureCurrentView = function (meshName) {
+        Canvas.renderer.setClearAlpha(0.0);
+        Canvas.effectComposer.render();
+        const screenshotDataURL = Canvas.renderer.domElement.toDataURL("image/png");
+        const base64 = screenshotDataURL.substring(screenshotDataURL.indexOf(',') + 1);
+        Canvas.renderer.setClearAlpha(1.0);
+        window.URL.revokeObjectURL(screenshotDataURL);
+        return {
+            "name": meshName,
+            "format": "png",
+            "base64Str": base64
+        };
+    }
+
     ////
     // store current settings
     const originalVisibility = {};
@@ -188,39 +243,64 @@ const saveScreenshot = function (visibleMeshUUIDArray, format) {
         originalVisibility[meshUUID] = Canvas.UUIDToMesh[meshUUID].visible;
         Canvas.UUIDToMesh[meshUUID].visible = false;
     }
-    for (let meshUUID of visibleMeshUUIDArray) {
-        Canvas.UUIDToMesh[meshUUID].visible = true;
-    }
     let originalSelectedObjects = [];
     if (Canvas.outlinePass) {
         originalSelectedObjects = Canvas.outlinePass.selectedObjects;
         Canvas.outlinePass.selectedObjects = [];
     }
 
-    // filename
-    let screenshotFileName = "screenshot";
-    if (visibleMeshUUIDArray.length == 1) {
-        screenshotFileName += "_";
-        screenshotFileName += Canvas.UUIDToMesh[visibleMeshUUIDArray[0]].name;
-    }
-
-    if (format == "png") {
-        // temporary change alpha and force render (at least) once
-        Canvas.renderer.setClearAlpha(0.0);
-    }
-    Canvas.effectComposer.render();
-    const screenshotDataURL = Canvas.renderer.domElement.toDataURL("image/" + format);
-    const base64 = screenshotDataURL.substring(screenshotDataURL.indexOf(',') + 1);
-
+    ////
+    // prepare json
     const json = {
-        "screenshot": {
-            "name": screenshotFileName,
-            "file": {
-                "type": format.toLowerCase(),
-                "base64Str": base64
-            }
+        "screenshots": {
+            "name": "screenshot",
+            "saveFileFormat": format,
+            "imageAsLayers": mergedImages,
+            "images": []
         }
     };
+    if (mergedImages && format != "psd") {
+        for (let meshUUID of visibleMeshUUIDArray) {
+            Canvas.UUIDToMesh[meshUUID].visible = true;
+        }
+        json["screenshots"]["images"].push(captureCurrentView("screenshot_all"));
+    } else if (mergedImages && format == "psd") {
+        // merged(layers) for psd
+        //   sort visibleMeshUUIDArray based on the "depth" of the bounding sphere
+        const visibleMeshUUIDToBSphereCenterDepth = {};
+        for (let meshUUID of visibleMeshUUIDArray) {
+            const mesh = Canvas.UUIDToMesh[meshUUID];
+            const tmpGeometry = mesh.geometry.clone();
+            tmpGeometry.applyMatrix4(mesh.matrixWorld);
+            tmpGeometry.computeBoundingSphere();
+
+            const cameraToBSphereCenter = tmpGeometry.boundingSphere.center;
+            cameraToBSphereCenter.sub(Canvas.camera.position);
+
+            const cameraToTargetUnit = Canvas.controls.target.clone();
+            cameraToTargetUnit.sub(Canvas.camera.position);
+            cameraToTargetUnit.normalize();
+    
+            visibleMeshUUIDToBSphereCenterDepth[meshUUID] = cameraToBSphereCenter.dot(cameraToTargetUnit);
+        }
+
+        // deeper comes first
+        visibleMeshUUIDArray.sort((a, b) => visibleMeshUUIDToBSphereCenterDepth[b] - visibleMeshUUIDToBSphereCenterDepth[a]);
+
+        for (let meshUUID of visibleMeshUUIDArray) {
+            Canvas.UUIDToMesh[meshUUID].visible = true;
+            json["screenshots"]["images"].push(captureCurrentView(Canvas.UUIDToMesh[meshUUID].name));
+            Canvas.UUIDToMesh[meshUUID].visible = false;
+        }
+    } else {
+        // per-mesh rendering
+        for (let meshUUID of visibleMeshUUIDArray) {
+            Canvas.UUIDToMesh[meshUUID].visible = true;
+            json["screenshots"]["images"].push(captureCurrentView("screenshot_" + Canvas.UUIDToMesh[meshUUID].name));
+            Canvas.UUIDToMesh[meshUUID].visible = false;
+        }
+    }
+
     request("saveScreenshotAll", json).then((response) => {
         const responseJson = JSON.parse(response);
         if ("screenshots" in responseJson) {
@@ -247,8 +327,8 @@ const saveScreenshot = function (visibleMeshUUIDArray, format) {
         }
     });
 
-    Canvas.renderer.setClearAlpha(1.0);
-    window.URL.revokeObjectURL(screenshotDataURL);
+    ////
+    // restore settings
     if (Canvas.outlinePass) {
         Canvas.outlinePass.selectedObjects = originalSelectedObjects;
     }

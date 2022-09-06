@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.15)
 ### project
 ##############################################
 project(saveScreenshotAll
-    VERSION 2022.8.0
+    VERSION 2022.9.1
     DESCRIPTION "Save a screenshot of current view"
     HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_TORIDE"
     LANGUAGES CXX
@@ -34,7 +34,41 @@ add_library(${PROJECT_NAME} MODULE)
 target_sources(
     ${PROJECT_NAME} PRIVATE
     ${PROJECT_NAME}.cpp
+    convertImage.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdAllocator.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdBitUtil.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdBlendMode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdColorMode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdDecompressRle.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdEndianConversion.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdExport.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdFile.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdFixedSizeString.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdInterleave.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/Psdispod.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdLayerCanvasCopy.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdMallocAllocator.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdMemoryUtil.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/Psdminiz.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/Psdminiz.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdParseColorModeDataSection.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdParseDocument.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdParseImageDataSection.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdParseImageResourcesSection.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdParseLayerMaskSection.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdPch.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdStringUtil.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdSyncFileReader.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdSyncFileUtil.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdSyncFileWriter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdUnionCast.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/$<$<PLATFORM_ID:Windows>:src/Psd/PsdNativeFile_Windows.cpp>
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/$<$<PLATFORM_ID:Linux>:src/Psd/PsdNativeFile_Linux.cpp>
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/$<$<PLATFORM_ID:Darwin>:src/Psd/PsdNativeFile_Darwin.mm>
+    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger_Util/src/Doppelganger/Util/log.cpp
+    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger_Util/src/Doppelganger/Util/uuid.cpp
     ${CMAKE_SOURCE_DIR}/submodule/Doppelganger_Util/src/Doppelganger/Util/writeBase64ToFile.cpp
+    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger_Util/src/Doppelganger/Util/encodeBinDataToBase64.cpp
 )
 
 
@@ -45,6 +79,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_SOURCE_DIR}/submodule/Doppelganger_Util/include
     ${CMAKE_SOURCE_DIR}/submodule/Doppelganger_Util/submodule/libigl/include
     ${CMAKE_SOURCE_DIR}/plugins/common/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src
 )
 
 
