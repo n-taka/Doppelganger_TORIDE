@@ -15,8 +15,12 @@ project(saveScreenshotAll
 ### dependencies
 ##############################################
 # Boost
-if (APPLE)
-    find_package(Boost REQUIRED COMPONENTS filesystem)
+if (WIN32)
+    find_package(Boost REQUIRED COMPONENTS random)
+elseif (APPLE)
+    find_package(Boost REQUIRED COMPONENTS random filesystem)
+elseif (UNIX)
+    find_package(Boost REQUIRED COMPONENTS random)
 endif ()
 # json
 find_package(nlohmann_json CONFIG REQUIRED)
@@ -91,6 +95,7 @@ if(WIN32)
     # we need to explicitly add bcrypt.lib due to some bug.
     target_link_libraries(
         ${PROJECT_NAME} PRIVATE
+        ${Boost_LIBRARIES}
         nlohmann_json
         nlohmann_json::nlohmann_json
     )
@@ -104,6 +109,7 @@ elseif (APPLE)
 elseif (UNIX)
     target_link_libraries(
         ${PROJECT_NAME} PRIVATE
+        ${Boost_LIBRARIES}
         nlohmann_json
         nlohmann_json::nlohmann_json
     )
