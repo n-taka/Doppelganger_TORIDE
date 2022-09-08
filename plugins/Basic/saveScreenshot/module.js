@@ -38,11 +38,11 @@ const generateUI = async function () {
                         divRow.setAttribute('class', 'row');
                         {
                             const jpegDiv = document.createElement("div");
-                            jpegDiv.setAttribute("class", "col s6");
+                            jpegDiv.setAttribute("class", "col s2 offset-s1");
                             const jpegBtn = document.createElement("a");
                             jpegBtn.setAttribute("class", "waves-effect waves-light btn");
                             jpegBtn.setAttribute("style", "width: 100%;");
-                            jpegBtn.innerText = "JPEG (.jpeg)";
+                            jpegBtn.innerText = "JPEG";
                             jpegBtn.addEventListener('click', function () {
                                 saveScreenshot([parameters["meshUUID"]], "jpeg");
                             });
@@ -51,16 +51,55 @@ const generateUI = async function () {
                         }
                         {
                             const pngDiv = document.createElement("div");
-                            pngDiv.setAttribute("class", "col s6");
+                            pngDiv.setAttribute("class", "col s2");
                             const pngBtn = document.createElement("a");
                             pngBtn.setAttribute("class", "waves-effect waves-light btn");
                             pngBtn.setAttribute("style", "width: 100%;");
-                            pngBtn.innerText = "PNG (.png)";
+                            pngBtn.innerText = "PNG";
                             pngBtn.addEventListener('click', function () {
                                 saveScreenshot([parameters["meshUUID"]], "png");
                             });
                             pngDiv.appendChild(pngBtn);
                             divRow.appendChild(pngDiv);
+                        }
+                        {
+                            const bmpDiv = document.createElement("div");
+                            bmpDiv.setAttribute("class", "col s2");
+                            const bmpBtn = document.createElement("a");
+                            bmpBtn.setAttribute("class", "waves-effect waves-light btn");
+                            bmpBtn.setAttribute("style", "width: 100%;");
+                            bmpBtn.innerText = "BMP";
+                            bmpBtn.addEventListener('click', function () {
+                                saveScreenshot([parameters["meshUUID"]], "bmp");
+                            });
+                            bmpDiv.appendChild(bmpBtn);
+                            divRow.appendChild(bmpDiv);
+                        }
+                        {
+                            const tgaDiv = document.createElement("div");
+                            tgaDiv.setAttribute("class", "col s2");
+                            const tgaBtn = document.createElement("a");
+                            tgaBtn.setAttribute("class", "waves-effect waves-light btn");
+                            tgaBtn.setAttribute("style", "width: 100%;");
+                            tgaBtn.innerText = "TGA";
+                            tgaBtn.addEventListener('click', function () {
+                                saveScreenshot([parameters["meshUUID"]], "tga");
+                            });
+                            tgaDiv.appendChild(tgaBtn);
+                            divRow.appendChild(tgaDiv);
+                        }
+                        {
+                            const psdDiv = document.createElement("div");
+                            psdDiv.setAttribute("class", "col s2");
+                            const psdBtn = document.createElement("a");
+                            psdBtn.setAttribute("class", "waves-effect waves-light btn");
+                            psdBtn.setAttribute("style", "width: 100%;");
+                            psdBtn.innerText = "PSD";
+                            psdBtn.addEventListener('click', function () {
+                                saveScreenshot([parameters["meshUUID"]], "psd");
+                            });
+                            psdDiv.appendChild(psdBtn);
+                            divRow.appendChild(psdDiv);
                         }
                         li.appendChild(divRow);
                     }
@@ -136,6 +175,20 @@ const saveScreenshot = function (visibleMeshUUIDArray, format) {
         }
     }
 
+    const captureCurrentView = function (meshName) {
+        Canvas.renderer.setClearAlpha(0.0);
+        Canvas.effectComposer.render();
+        const screenshotDataURL = Canvas.renderer.domElement.toDataURL("image/png");
+        const base64 = screenshotDataURL.substring(screenshotDataURL.indexOf(',') + 1);
+        Canvas.renderer.setClearAlpha(1.0);
+        window.URL.revokeObjectURL(screenshotDataURL);
+        return {
+            "name": meshName,
+            "format": "png",
+            "base64Str": base64
+        };
+    }
+
     ////
     // store current settings
     const originalVisibility = {};
@@ -143,39 +196,28 @@ const saveScreenshot = function (visibleMeshUUIDArray, format) {
         originalVisibility[meshUUID] = Canvas.UUIDToMesh[meshUUID].visible;
         Canvas.UUIDToMesh[meshUUID].visible = false;
     }
-    for (let meshUUID of visibleMeshUUIDArray) {
-        Canvas.UUIDToMesh[meshUUID].visible = true;
-    }
     let originalSelectedObjects = [];
     if (Canvas.outlinePass) {
         originalSelectedObjects = Canvas.outlinePass.selectedObjects;
         Canvas.outlinePass.selectedObjects = [];
     }
 
-    // filename
-    let screenshotFileName = "screenshot";
-    if (visibleMeshUUIDArray.length == 1) {
-        screenshotFileName += "_";
-        screenshotFileName += Canvas.UUIDToMesh[visibleMeshUUIDArray[0]].name;
-    }
-
-    if (format == "png") {
-        // temporary change alpha and force render (at least) once
-        Canvas.renderer.setClearAlpha(0.0);
-    }
-    Canvas.effectComposer.render();
-    const screenshotDataURL = Canvas.renderer.domElement.toDataURL("image/" + format);
-    const base64 = screenshotDataURL.substring(screenshotDataURL.indexOf(',') + 1);
-
+    ////
+    // prepare json
     const json = {
-        "screenshot": {
-            "name": screenshotFileName,
-            "file": {
-                "type": format.toLowerCase(),
-                "base64Str": base64
-            }
+        "screenshots": {
+            "saveFileFormat": format,
+            "images": []
         }
     };
+
+    // per-mesh rendering
+    for (let meshUUID of visibleMeshUUIDArray) {
+        Canvas.UUIDToMesh[meshUUID].visible = true;
+        json["screenshots"]["images"].push(captureCurrentView("screenshot_" + Canvas.UUIDToMesh[meshUUID].name));
+        Canvas.UUIDToMesh[meshUUID].visible = false;
+    }
+
     request("saveScreenshot", json).then((response) => {
         const responseJson = JSON.parse(response);
         if ("screenshots" in responseJson) {
@@ -202,8 +244,8 @@ const saveScreenshot = function (visibleMeshUUIDArray, format) {
         }
     });
 
-    Canvas.renderer.setClearAlpha(1.0);
-    window.URL.revokeObjectURL(screenshotDataURL);
+    ////
+    // restore settings
     if (Canvas.outlinePass) {
         Canvas.outlinePass.selectedObjects = originalSelectedObjects;
     }

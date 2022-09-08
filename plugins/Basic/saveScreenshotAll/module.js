@@ -259,11 +259,12 @@ const saveScreenshot = function (visibleMeshUUIDArray, format, mergedImages) {
             "images": []
         }
     };
+    
     if (mergedImages && format != "psd") {
         for (let meshUUID of visibleMeshUUIDArray) {
             Canvas.UUIDToMesh[meshUUID].visible = true;
         }
-        json["screenshots"]["images"].push(captureCurrentView("screenshot_all"));
+        json["screenshots"]["images"].push(captureCurrentView("screenshot"));
     } else if (mergedImages && format == "psd") {
         // merged(layers) for psd
         //   sort visibleMeshUUIDArray based on the "depth" of the bounding sphere

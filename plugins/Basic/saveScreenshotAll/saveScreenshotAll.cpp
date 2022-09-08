@@ -15,8 +15,6 @@
 #include <sstream>
 #include <fstream>
 
-#include <iostream>
-
 void getPtrStrArrayForPartialConfig(
 	const char *&parameterChar,
 	char *&ptrStrArrayCoreChar,

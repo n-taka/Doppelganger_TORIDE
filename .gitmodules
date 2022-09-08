@@ -7,3 +7,6 @@
 [submodule "plugins/Basic/saveScreenshotAll/submodule/psd_sdk"]
 	path = plugins/Basic/saveScreenshotAll/submodule/psd_sdk
 	url = https://github.com/n-taka/psd_sdk
+[submodule "plugins/Basic/saveScreenshot/submodule/psd_sdk"]
+	path = plugins/Basic/saveScreenshot/submodule/psd_sdk
+	url = https://github.com/n-taka/psd_sdk

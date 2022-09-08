@@ -9,6 +9,7 @@
 #include <nlohmann/json.hpp>
 
 #include "Doppelganger/Util/writeBase64ToFile.h"
+#include "convertImage.h"
 
 #include <string>
 #include <sstream>
@@ -23,6 +24,7 @@ void getPtrStrArrayForPartialConfig(
 	writeJSONToChar(ptrStrArrayCoreChar, ptrStrArrayCore);
 	nlohmann::json ptrStrArrayRoom = nlohmann::json::array();
 	ptrStrArrayRoom.push_back("/output");
+	ptrStrArrayRoom.push_back("/log");
 	ptrStrArrayRoom.push_back("/dataDir");
 	writeJSONToChar(ptrStrArrayRoomChar, ptrStrArrayRoom);
 }
@@ -39,12 +41,15 @@ void pluginProcess(
 	////
 	// [IN]
 	// parameters = {
-	// 	   "screenshot": {
-	// 	       "name": name of this screenshot (usually, filename without extension),
-	// 	       "file": {
-	// 	           "type": extensiton of this file,
-	// 	           "base64Str": base64-encoded fragment
-	// 	       }
+	// 	   "screenshots": {
+	//         "saveFileFormat": extension to be downloaded,
+	// 	       "images": [ // we use array here for consistency with saveScreenshotAll
+	// 	           {
+	// 	               "name": name of this image, // usually, mesh name without extension
+	// 	               "format": extensiton of this image,
+	// 	               "base64Str": base64-encoded fragment
+	// 	           }
+	// 	       ]
 	// 	   }
 	// }
 
@@ -54,8 +59,8 @@ void pluginProcess(
 	// 	   "screenshots" : [
 	// 	       {
 	//             "fileName": fileName,
-	//             "base64Str": base64-encoded data,
-	//             "format": "jpeg"|"png"
+	//             "format": "jpeg"|"png",
+	//             "base64Str": base64-encoded data
 	//         },
 	//         ...
 	//     ]
@@ -78,24 +83,52 @@ void pluginProcess(
 
 	///////
 
-	const std::string fileName = parameter.at("screenshot").at("name").get<std::string>();
-	const std::string fileType = parameter.at("screenshot").at("file").at("type").get<std::string>();
-	const std::string base64Str = parameter.at("screenshot").at("file").at("base64Str").get<std::string>();
+	const std::string formatToBeSaved = parameter.at("screenshots").at("saveFileFormat").get<std::string>();
+
+	std::vector<Image> images;
+	for (const auto &image : parameter.at("screenshots").at("images"))
+	{
+		Image img;
+		img.name = image.at("name").get<std::string>();
+		img.format = image.at("format").get<std::string>();
+		img.fileBase64Str = image.at("base64Str").get<std::string>();
+		images.push_back(img);
+	}
+
+	std::vector<Image> convertedImages;
+	convertImage(images, formatToBeSaved, configRoom, convertedImages);
+
+	for (const auto &cImage : convertedImages)
+	{
+		if (saveToLocal)
+		{
+			fs::path directoryPath(configRoom.at("dataDir").get<std::string>());
+			directoryPath.append("output");
+			// path to screenshot file
+			fs::path screenshotFilePath;
+			{
+				std::string screenshotFileName(cImage.name);
+				screenshotFileName += ".";
+				screenshotFileName += cImage.format;
+				screenshotFilePath = directoryPath;
+				screenshotFilePath.append(screenshotFileName);
+			}
+			Doppelganger::Util::writeBase64ToFile(cImage.fileBase64Str, screenshotFilePath);
+		}
+		else
+		{
+			nlohmann::json screenshotJson = nlohmann::json::object();
+			screenshotJson["fileName"] = cImage.name;
+			screenshotJson["format"] = cImage.format;
+			screenshotJson["base64Str"] = cImage.fileBase64Str;
+			response.at("screenshots").push_back(screenshotJson);
+		}
+	}
 
 	if (saveToLocal)
 	{
 		fs::path directoryPath(configRoom.at("dataDir").get<std::string>());
 		directoryPath.append("output");
-		// path to screenshot file
-		fs::path screenshotFilePath;
-		{
-			std::string screenshotFileName(fileName);
-			screenshotFileName += ".";
-			screenshotFileName += fileType;
-			screenshotFilePath = directoryPath;
-			screenshotFilePath.append(screenshotFileName);
-		}
-		Doppelganger::Util::writeBase64ToFile(base64Str, screenshotFilePath);
 
 		// open a directory that containing filePath
 		// open output directory.
@@ -112,15 +145,6 @@ void pluginProcess(
 		system(cmd.str().c_str());
 	}
 	else
-	{
-		nlohmann::json screenshotJson = nlohmann::json::object();
-		screenshotJson["fileName"] = fileName;
-		screenshotJson["format"] = fileType;
-		screenshotJson["base64Str"] = base64Str;
-		response.at("screenshots").push_back(screenshotJson);
-	}
-
-	if (!saveToLocal)
 	{
 		// write result
 		writeJSONToChar(responseChar, response);
