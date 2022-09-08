@@ -62,9 +62,9 @@ target_sources(
     ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdSyncFileUtil.h
     ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdSyncFileWriter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdUnionCast.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/$<$<PLATFORM_ID:Windows>:src/Psd/PsdNativeFile_Windows.cpp>
-    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/$<$<PLATFORM_ID:Linux>:src/Psd/PsdNativeFile_Linux.cpp>
-    ${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/$<$<PLATFORM_ID:Darwin>:src/Psd/PsdNativeFile_Darwin.mm>
+    $<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdNativeFile_Windows.cpp>
+    $<$<PLATFORM_ID:Linux>:${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdNativeFile_Linux.cpp>
+    $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_SOURCE_DIR}/submodule/psd_sdk/src/Psd/PsdNativeFile_Darwin.mm>
     ${CMAKE_SOURCE_DIR}/submodule/Doppelganger_Util/src/Doppelganger/Util/log.cpp
     ${CMAKE_SOURCE_DIR}/submodule/Doppelganger_Util/src/Doppelganger/Util/uuid.cpp
     ${CMAKE_SOURCE_DIR}/submodule/Doppelganger_Util/src/Doppelganger/Util/writeBase64ToFile.cpp
