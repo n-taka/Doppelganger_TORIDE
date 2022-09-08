@@ -53,6 +53,7 @@ target_sources(
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_SOURCE_DIR}/submodule/Doppelganger_Util/include
     ${CMAKE_SOURCE_DIR}/submodule/Doppelganger_Util/submodule/libigl/include
+    ${CMAKE_SOURCE_DIR}/submodule/Doppelganger_Util/submodule/stb
     ${CMAKE_SOURCE_DIR}/plugins/common/include
 )
 

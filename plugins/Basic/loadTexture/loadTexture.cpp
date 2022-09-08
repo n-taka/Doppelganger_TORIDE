@@ -18,7 +18,7 @@
 #include <sstream>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "Doppelganger/Util/stb_image.h"
+#include "stb_image.h"
 
 void getPtrStrArrayForPartialConfig(
 	const char *&parameterChar,

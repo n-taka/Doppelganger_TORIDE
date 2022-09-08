@@ -21,8 +21,8 @@
 #include "igl/writeWRL.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "Doppelganger/Util/stb_image.h"
-#include "Doppelganger/Util/stb_image_write.h"
+#include "stb_image.h"
+#include "stb_image_write.h"
 
 namespace
 {
