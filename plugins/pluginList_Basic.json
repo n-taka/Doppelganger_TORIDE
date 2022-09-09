@@ -90,6 +90,10 @@
         "hasModuleJS": true,
         "versions": [
             {
+                "version": "2022.9.1",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.9.1/saveScreenshot_2022.9.1.zip"
+            },
+            {
                 "version": "2022.8.0",
                 "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/saveScreenshot_2022.8.0.zip"
             }
@@ -201,6 +205,10 @@
         "UIPosition": "bottomLeft",
         "hasModuleJS": true,
         "versions": [
+            {
+                "version": "2022.9.1",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.9.1/saveScreenshotAll_2022.9.1.zip"
+            },
             {
                 "version": "2022.8.0",
                 "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/saveScreenshotAll_2022.8.0.zip"
