@@ -99,6 +99,7 @@ if(WIN32)
         ${Boost_LIBRARIES}
         nlohmann_json
         nlohmann_json::nlohmann_json
+        bcrypt.lib
     )
 elseif (APPLE)
     target_link_libraries(
