@@ -22,14 +22,6 @@ jobs:
         ref: develop
         submodules: recursive
 
-    - name: Build MeshFix
-      run: |
-        cmake -B build_MeshFix -S ${{github.workspace}}/submodule/MeshFix-V2.1 -DCMAKE_BUILD_TYPE="Release"
-        cmake --build build_MeshFix --config "Release"
-        cp ${{github.workspace}}/submodule/MeshFix-V2.1/bin64/Release/MeshFix.exe ${{github.workspace}}/plugins/Print/repairMesh/MeshFix.exe
-        cp ${{github.workspace}}/submodule/MeshFix-V2.1/bin64/Release/MeshFix.exe ${{github.workspace}}/plugins/Print/repairAllMeshes/MeshFix.exe
-        rm ${{github.workspace}}/submodule/MeshFix-V2.1/bin64/Release/MeshFix.exe
-
     - name: Bootstrap vcpkg
       run: ${{github.workspace}}/submodule/Doppelganger_Util/submodule/vcpkg/bootstrap-vcpkg.bat
 
@@ -60,9 +52,6 @@ jobs:
         ref: develop
         submodules: recursive
 
-    - name: Build MeshFix
-      run: sh ${{github.workspace}}/build_MeshFix.sh
-        
     - name: Bootstrap vcpkg
       run: sh ${{github.workspace}}/submodule/Doppelganger_Util/submodule/vcpkg/bootstrap-vcpkg.sh
 
@@ -89,9 +78,6 @@ jobs:
       with:
         ref: develop
         submodules: recursive
-
-    - name: Build MeshFix
-      run: sh ${{github.workspace}}/build_MeshFix.sh
 
     - name: Bootstrap vcpkg
       run: sh ${{github.workspace}}/submodule/Doppelganger_Util/submodule/vcpkg/bootstrap-vcpkg.sh
