@@ -158,10 +158,10 @@ void pluginProcess(
 			Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> temp_V, unified_V, temp_FN;
 			Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> temp_F;
 			Eigen::Matrix<int, Eigen::Dynamic, 1> SVI, SVJ;
-			FILE *fp = fopen(filePath.string().c_str(), "rb");
-			igl::readSTL(fp, temp_V, temp_F, temp_FN);
-			fclose(fp);
-			igl::remove_duplicate_vertices(temp_V, 0, unified_V, SVI, SVJ);
+			std::ifstream ifs(filePath.string());
+			igl::readSTL(ifs, temp_V, temp_F, temp_FN);
+			ifs.close();
+			igl::remove_duplicate_vertices(temp_V, 0.0, unified_V, SVI, SVJ);
 			std::for_each(temp_F.data(), temp_F.data() + temp_F.size(), [&SVJ](int &f)
 						  { f = SVJ(f); });
 
