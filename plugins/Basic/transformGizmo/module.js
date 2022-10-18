@@ -16,8 +16,9 @@ const findClosestMesh = function (e) {
     // [OUT]
     //  UUID for intersected mesh
     const mouse = new THREE.Vector2();
-    const clientX = e.clientX;
-    const clientY = e.clientY;
+    const bounding = Canvas.controls.domElement.getBoundingClientRect();
+    const clientX = e.clientX - bounding.left;
+    const clientY = e.clientY - bounding.top;
     mouse.x = (clientX / Canvas.width) * 2 - 1;
     mouse.y = -(clientY / Canvas.height) * 2 + 1;
 

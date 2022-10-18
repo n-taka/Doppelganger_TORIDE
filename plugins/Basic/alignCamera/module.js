@@ -76,12 +76,6 @@ export const init = async function () {
                 Canvas.alignCamera(dirIndex);
             });
             FABA.innerText = text;
-            // {
-            //     const FABI = document.createElement('i');
-            //     FABI.setAttribute('class', 'material-icons');
-            //     FABI.innerText = text;
-            //     FABA.appendChild(FABI);
-            // }
             FABLi.appendChild(FABA);
         }
         UI.FABUl.appendChild(FABLi);

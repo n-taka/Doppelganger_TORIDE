@@ -2,6 +2,7 @@ import * as THREE from 'https://cdn.skypack.dev/three@v0.132';
 import { WS } from '../../js/WS.js';
 import { WSTasks } from '../../js/WSTasks.js';
 import { Core } from '../../js/Core.js';
+import { Canvas } from '../../js/Canvas.js';
 import { MouseKey } from '../../js/MouseKey.js';
 import { request, beacon } from '../../js/request.js';
 
@@ -12,8 +13,9 @@ const pullCurrentCursors = async function () {
 const updateCursor = async function (e) {
     if (Core["UUID"]) {
         const mouse = new THREE.Vector2();
-        mouse.x = e.clientX - window.innerWidth / 2.0;
-        mouse.y = e.clientY - window.innerHeight / 2.0;
+        const bounding = Canvas.controls.domElement.getBoundingClientRect();
+        mouse.x = e.clientX - bounding.left - Canvas.width / 2.0;
+        mouse.y = e.clientY - bounding.top - Canvas.height / 2.0;
         const cursorInfo = {
             "icon": MouseKey.iconIdx,
             "dir": mouse
@@ -85,8 +87,9 @@ const syncCursorReceive = async function (parameters) {
             }
             MouseKey["cursors"][uuid]["dir"].set(x, y);
 
-            const clientX = x + window.innerWidth / 2.0;
-            const clientY = y + window.innerHeight / 2.0;
+            const bounding = Canvas.controls.domElement.getBoundingClientRect();
+            const clientX = x + bounding.left + Canvas.width / 2.0;
+            const clientY = y + bounding.top + Canvas.height / 2.0;
             MouseKey["cursors"][uuid].img.style.left = (clientX - 16) + "px";
             MouseKey["cursors"][uuid].img.style.top = (clientY - 16) + "px";
         }
@@ -97,9 +100,10 @@ export const init = async function () {
     MouseKey["cursors"] = {};
     MouseKey["prevCursor"] = new THREE.Vector2(-1.0, -1.0);
     // we first updateCursor, then syncCursor
-    document.addEventListener("pointermove", function (e) { updateCursor(e) });
-    document.addEventListener("pointermove", function (e) { syncCursorSend() });
+    Canvas.controls.domElement.addEventListener("pointermove", function (e) { updateCursor(e) });
+    Canvas.controls.domElement.addEventListener("pointermove", function (e) { syncCursorSend() });
     // remove cursor
+    Canvas.controls.domElement.addEventListener("pointerleave", function (e) { unloadCursor() });
     //     we want to fire this function in the early stage. useCapture
     window.addEventListener("unload", function (e) { unloadCursor() });
 

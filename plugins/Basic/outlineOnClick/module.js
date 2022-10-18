@@ -4,14 +4,15 @@ import { Canvas } from '../../js/Canvas.js';
 import { UI } from '../../js/UI.js';
 import { constructMeshLiFromUUID } from '../../js/constructMeshLiFrom.js';
 
-const findClosestMesh = function (e) {
+const findClosestMesh = function (c, e) {
     // [IN]
     //  e: mouse event
     // [OUT]
     //  UUID for intersected mesh
     const mouse = new THREE.Vector2();
-    const clientX = e.clientX;
-    const clientY = e.clientY;
+    const bounding = c.getBoundingClientRect();
+    const clientX = e.clientX - bounding.left;
+    const clientY = e.clientY - bounding.top;
     mouse.x = (clientX / Canvas.width) * 2 - 1;
     mouse.y = -(clientY / Canvas.height) * 2 + 1;
 
@@ -56,13 +57,13 @@ export const init = async function () {
         Canvas.outlinePass.pulsePeriod = 0.0;
         Canvas.outlinePass.visibleEdgeColor.set("#f56c0a");
         Canvas.outlinePass.hiddenEdgeColor.set("#0a93f5");
-        // because our default color (background, mesh) are almost white
+        // because our default color (mesh) are almost white
         Canvas.outlinePass.overlayMaterial.blending = THREE.CustomBlending;
         Canvas.effectComposer.addPass(Canvas.outlinePass);
     }
 
     Canvas.controls.domElement.addEventListener("pointerdown", function (e) {
-        const closestMeshUUID = findClosestMesh(e);
+        const closestMeshUUID = findClosestMesh(Canvas.controls.domElement, e);
         colorizeActiveMesh(closestMeshUUID);
     });
 

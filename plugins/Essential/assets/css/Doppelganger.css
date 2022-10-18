@@ -13,9 +13,11 @@ body {
 .z-1 {
     z-index: 1;
 }
+
 .z-2 {
     z-index: 2;
 }
+
 .z-3 {
     z-index: 3;
 }
@@ -24,10 +26,21 @@ body {
     display: none;
 }
 
-.select-dropdown{
+.select-dropdown {
     text-align: center;
     text-overflow: ellipsis;
 }
-ul.select-dropdown > li {
+
+ul.select-dropdown>li {
     text-align: center;
+}
+
+.sideNavOnRight {
+    width: calc(100vw - 500px);
+}
+
+@media only screen and (max-width : 992px) {
+    .sideNavOnRight {
+        width: 100vw;
+    }
 }

@@ -105,7 +105,8 @@ Canvas.init = async function () {
         Canvas.controls.target.set(0.0, 0.0, 0.0);
 
         Canvas.gizmoDiv = document.createElement('div');
-        Canvas.gizmoDiv.setAttribute('style', 'position: absolute; right: 500px; top: 0; z-index: 2147483646;');
+        // z-inde: 997, same as FAB
+        Canvas.gizmoDiv.setAttribute('style', 'position: absolute; right: 0; top: 0; z-index: 997;');
         UI.webGLDiv.appendChild(Canvas.gizmoDiv);
         Canvas.controlsGizmo = new OrbitControlsGizmo(Canvas.controls, { size: 100, padding: 8 });
         Canvas.gizmoDiv.appendChild(Canvas.controlsGizmo.domElement);
@@ -135,6 +136,7 @@ Canvas.init = async function () {
     window.addEventListener('resize', function () {
         Canvas.width = UI.webGLDiv.offsetWidth;
         Canvas.height = UI.webGLDiv.offsetHeight;
+        console.log(Canvas);
 
         Canvas.camera.left = -Canvas.width / 2.0;
         Canvas.camera.right = Canvas.width / 2.0;

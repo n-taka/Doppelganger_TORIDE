@@ -4,7 +4,7 @@ import { Canvas } from '../../js/Canvas.js';
 
 const generateUI = function () {
     UI.sliderDiv = document.createElement('div');
-    UI.sliderDiv.setAttribute('style', 'position: absolute; left: 2.5vh; top: 0; height: 95vh; transform: translate(0, 2.5vh); background: rgba(100, 100, 100, .8); z-index: 2147483646;');
+    UI.sliderDiv.setAttribute('style', 'position: absolute; left: 23px; top: 23px; height: calc(100% - 46px); background: rgba(100, 100, 100, .8); z-index: 2147483646;');
 
     {
         noUiSlider.create(UI.sliderDiv, {
