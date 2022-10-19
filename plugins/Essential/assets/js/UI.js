@@ -30,7 +30,7 @@ UI.init = function () {
         {
             UI.rootDiv = document.createElement('div');
             UI.rootDiv.setAttribute('class', 'row');
-            UI.rootDiv.setAttribute('style', 'height: 100vh; width: 100vw;');
+            UI.rootDiv.setAttribute('style', 'height: 100%; width: 100%;');
 
             // top navbar
             {
@@ -72,7 +72,7 @@ UI.init = function () {
                 UI.webGLDiv = document.createElement('div');
                 UI.webGLDiv.setAttribute('class', 'sideNavOnRight');
                 // 192px: 64px (height for navbar) * 3
-                UI.webGLDiv.setAttribute('style', 'height: calc(100vh - 192px); position: relative;');
+                UI.webGLDiv.setAttribute('style', 'height: calc(100% - 192px); position: relative;');
                 {
                     UI.webGLOutputDiv = document.createElement('div');
                     UI.webGLOutputDiv.setAttribute('style', 'height: 100%; width: 100%;');
@@ -181,7 +181,7 @@ UI.init = function () {
                     UI.sideNavDiv = document.createElement('div');
                     UI.sideNavDiv.setAttribute('id', 'slide-out');
                     UI.sideNavDiv.setAttribute('class', 'sidenav sidenav-fixed');
-                    UI.sideNavDiv.setAttribute('style', 'width: 500px; height: 100vh; overflow: hidden; padding: 0;');
+                    UI.sideNavDiv.setAttribute('style', 'width: 500px; height: 100%; overflow: hidden; padding: 0;');
 
                     // list of imported mesh
                     {
@@ -212,7 +212,7 @@ UI.init = function () {
             UI.busyDiv.setAttribute('style', 'visibility: hidden; position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: rgba(100, 100, 100, .8); z-index: 2147483647;');
             {
                 UI.busyIconA = document.createElement('a');
-                UI.busyIconA.setAttribute('style', 'user-select: none; position: absolute; left: 0; top: 40vh; width: 100%; color: rgba(250, 250, 250, 1); text-align: center;');
+                UI.busyIconA.setAttribute('style', 'user-select: none; position: absolute; left: 0; top: 40%; width: 100%; color: rgba(250, 250, 250, 1); text-align: center;');
                 {
                     UI.busyIconI = document.createElement('i');
                     UI.busyIconI.setAttribute('class', 'material-icons');

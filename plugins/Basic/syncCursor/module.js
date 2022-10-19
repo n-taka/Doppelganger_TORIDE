@@ -67,8 +67,10 @@ const syncCursorReceive = async function (parameters) {
         let cursorInfo = parameters[uuid];
         if (cursorInfo == null) {
             // remove
-            document.body.removeChild(MouseKey["cursors"][uuid].img);
-            delete MouseKey["cursors"][uuid];
+            if (Core["UUID"] && Core["UUID"] != uuid) {
+                document.body.removeChild(MouseKey["cursors"][uuid].img);
+                delete MouseKey["cursors"][uuid];
+            }
         } else {
             const x = cursorInfo["dir"]["x"];
             const y = cursorInfo["dir"]["y"];
