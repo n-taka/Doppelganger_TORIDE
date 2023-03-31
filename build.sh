@@ -5,9 +5,10 @@
 ############
 TRIPLET="x"
 if [ "$(uname)" == "Darwin" ]; then
-    # we use custom triplet (x64-osx-mojave)
-    TRIPLET="${TRIPLET}64-osx-mojave"
-    # copy custom triplet file (for supporting Mojave)
+    # we use custom triplet (x64-osx-supported)
+    # this make effect for openssl (via vcpkg)
+    TRIPLET="${TRIPLET}64-osx-supported"
+    # copy custom triplet file
     cp "${TRIPLET}.cmake" "submodule/Doppelganger_Util/submodule/vcpkg/triplets/${TRIPLET}.cmake"
 elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
     TRIPLET="${TRIPLET}64-windows-static"
