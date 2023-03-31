@@ -87,7 +87,7 @@ endif ()
 target_compile_definitions(${PROJECT_NAME} PUBLIC _USE_MATH_DEFINES)
 
 # we prefer std::string_view
-target_compile_definitions(${PROJECT_NAME} PUBLIC BOOST_BEAST_USE_STD_STRING_VIEW)
+target_compile_definitions(${PROJECT_NAME} PUBLIC BOOST_NO_CXX17_HDR_STRING_VIEW)
 
 
 ##############################################
