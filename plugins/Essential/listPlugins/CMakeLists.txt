@@ -101,9 +101,8 @@ if (WIN32)
     # our target is windows 10 or newer
     target_compile_definitions(${PROJECT_NAME} PUBLIC _WIN32_WINNT=0x0A00)
 elseif (APPLE)
-    # because we support macOS Mojave, we only require C++14 for macOS
-    # we use boost::filesystem for macOS
-    target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
+    # we use std::filesystem for macOS
+    target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 elseif (UNIX)
     # because we want to use std::filesystem, we require C++17 for linux
     target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
