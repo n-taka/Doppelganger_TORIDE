@@ -14,10 +14,6 @@ project(configEditor
 ##############################################
 ### dependencies
 ##############################################
-# Boost
-if (APPLE)
-    find_package(Boost REQUIRED COMPONENTS filesystem)
-endif ()
 # json
 find_package(nlohmann_json CONFIG REQUIRED)
 
@@ -59,7 +55,6 @@ if(WIN32)
 elseif (APPLE)
     target_link_libraries(
         ${PROJECT_NAME} PRIVATE
-        ${Boost_LIBRARIES}
         nlohmann_json
         nlohmann_json::nlohmann_json
     )

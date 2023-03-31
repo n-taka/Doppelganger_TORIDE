@@ -15,13 +15,7 @@ project(repairAllMeshes
 ### dependencies
 ##############################################
 # Boost
-if (WIN32)
-    find_package(Boost REQUIRED COMPONENTS random)
-elseif (APPLE)
-    find_package(Boost REQUIRED COMPONENTS random filesystem)
-elseif (UNIX)
-    find_package(Boost REQUIRED COMPONENTS random)
-endif ()
+find_package(Boost REQUIRED COMPONENTS random)
 # json
 find_package(nlohmann_json CONFIG REQUIRED)
 
@@ -123,16 +117,16 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} --
 # MeshFix
 if (WIN32)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/submodule/MeshFix-V2.1/bin64/Release/MeshFix.exe" "${CMAKE_SOURCE_DIR}/bin/Print/${PROJECT_NAME}_${PROJECT_VERSION}/${CMAKE_SYSTEM_NAME}")
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E rm "${CMAKE_CURRENT_SOURCE_DIR}/submodule/MeshFix-V2.1/bin64/Release/MeshFix.exe")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E remove "${CMAKE_CURRENT_SOURCE_DIR}/submodule/MeshFix-V2.1/bin64/Release/MeshFix.exe")
 elseif (APPLE)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/submodule/MeshFix-V2.1/bin64/MeshFix" "${CMAKE_SOURCE_DIR}/bin/Print/${PROJECT_NAME}_${PROJECT_VERSION}/${CMAKE_SYSTEM_NAME}/MeshFix")
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E rm "${CMAKE_CURRENT_SOURCE_DIR}/submodule/MeshFix-V2.1/bin64/MeshFix")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E remove "${CMAKE_CURRENT_SOURCE_DIR}/submodule/MeshFix-V2.1/bin64/MeshFix")
 elseif (UNIX)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/submodule/MeshFix-V2.1/bin64/MeshFix" "${CMAKE_SOURCE_DIR}/bin/Print/${PROJECT_NAME}_${PROJECT_VERSION}/${CMAKE_SYSTEM_NAME}/MeshFix")
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E rm "${CMAKE_CURRENT_SOURCE_DIR}/submodule/MeshFix-V2.1/bin64/MeshFix")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E remove "${CMAKE_CURRENT_SOURCE_DIR}/submodule/MeshFix-V2.1/bin64/MeshFix")
 endif ()
 # remove build dir (optional)
-# add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E rm -r "${CMAKE_CURRENT_SOURCE_DIR}/build")
+# add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E remove -r "${CMAKE_CURRENT_SOURCE_DIR}/build")
 
 # create zip archive
 # https://stackoverflow.com/questions/44796465/cmake-zip-folder-but-remove-leading-path
@@ -147,4 +141,4 @@ add_custom_command(
 # add_custom_command(
 #     TARGET ${PROJECT_NAME}
 #     POST_BUILD
-#     COMMAND ${CMAKE_COMMAND} -E rm "-r" "${CMAKE_SOURCE_DIR}/bin/Print/${PROJECT_NAME}_${PROJECT_VERSION}")
+#     COMMAND ${CMAKE_COMMAND} -E remove "-r" "${CMAKE_SOURCE_DIR}/bin/Print/${PROJECT_NAME}_${PROJECT_VERSION}")
