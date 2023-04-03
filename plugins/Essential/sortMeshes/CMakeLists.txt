@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.16)
 
 ##############################################
 ### project
 ##############################################
 project(sortMeshes
-    VERSION 2022.3.0
+    VERSION 2023.04.0
     DESCRIPTION "Sort meshes based on name or #triangles"
     HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_TORIDE"
     LANGUAGES CXX

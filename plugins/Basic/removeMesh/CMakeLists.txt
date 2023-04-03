@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.16)
 
 ##############################################
 ### project
 ##############################################
 project(removeMesh
-    VERSION 2022.8.0
+    VERSION 2023.04.0
     DESCRIPTION "Remove single mesh"
     HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_TORIDE"
     LANGUAGES CXX

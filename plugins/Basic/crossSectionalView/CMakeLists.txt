@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.16)
 
 ##############################################
 ### project
 ##############################################
 project(crossSectionalView
-    VERSION 2022.10.1
+    VERSION 2023.04.0
     DESCRIPTION "Visualize cross-sectional view"
     HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_TORIDE"
     LANGUAGES CXX

@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.16)
 
 ##############################################
 ### project
 ##############################################
 project(loadPolygonMesh
-    VERSION 2022.10.0
+    VERSION 2023.04.0
     DESCRIPTION "Load polygon mesh (OBJ, PLY, STL, VRML)"
     HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_TORIDE"
     LANGUAGES CXX

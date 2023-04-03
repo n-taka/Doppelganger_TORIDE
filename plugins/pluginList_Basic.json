@@ -10,8 +10,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.10.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.10.0/loadPolygonMesh_2022.10.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/loadPolygonMesh_2023.04.0.zip"
             }
         ]
     },
@@ -26,8 +26,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.8.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/undo_2022.8.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/undo_2023.04.0.zip"
             }
         ]
     },
@@ -42,8 +42,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.8.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/redo_2022.8.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/redo_2023.04.0.zip"
             }
         ]
     },
@@ -58,8 +58,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.8.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/loadTexture_2022.8.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/loadTexture_2023.04.0.zip"
             }
         ]
     },
@@ -74,8 +74,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.8.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/saveMesh_2022.8.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/saveMesh_2023.04.0.zip"
             }
         ]
     },
@@ -90,12 +90,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.9.1",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.9.1/saveScreenshot_2022.9.1.zip"
-            },
-            {
-                "version": "2022.8.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/saveScreenshot_2022.8.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/saveScreenshot_2023.04.0.zip"
             }
         ]
     },
@@ -110,8 +106,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.8.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/removeMesh_2022.8.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/removeMesh_2023.04.0.zip"
             }
         ]
     },
@@ -126,8 +122,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.8.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/toggleMeshVisibility_2022.8.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/toggleMeshVisibility_2023.04.0.zip"
             }
         ]
     },
@@ -142,8 +138,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.8.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/meshInfo_2022.8.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/meshInfo_2023.04.0.zip"
             }
         ]
     },
@@ -158,8 +154,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.8.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/meshErrorInfo_2022.8.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/meshErrorInfo_2023.04.0.zip"
             }
         ]
     },
@@ -174,8 +170,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.8.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/allMeshesInfo_2022.8.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/allMeshesInfo_2023.04.0.zip"
             }
         ]
     },
@@ -190,8 +186,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.8.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/saveAllMeshes_2022.8.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/saveAllMeshes_2023.04.0.zip"
             }
         ]
     },
@@ -206,12 +202,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.9.1",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.9.1/saveScreenshotAll_2022.9.1.zip"
-            },
-            {
-                "version": "2022.8.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/saveScreenshotAll_2022.8.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/saveScreenshotAll_2023.04.0.zip"
             }
         ]
     },
@@ -226,8 +218,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.8.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/removeAllMeshes_2022.8.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/removeAllMeshes_2023.04.0.zip"
             }
         ]
     },
@@ -242,8 +234,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.3.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.3/toggleAxesVisibility_2022.3.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/toggleAxesVisibility_2023.04.0.zip"
             }
         ]
     },
@@ -258,8 +250,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.10.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.10.0/outlineOnClick_2022.10.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/outlineOnClick_2023.04.0.zip"
             }
         ]
     },
@@ -274,12 +266,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.9.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.9.0/fitToFrame_2022.9.0.zip"
-            },
-            {
-                "version": "2022.8.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/fitToFrame_2022.8.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/fitToFrame_2023.04.0.zip"
             }
         ]
     },
@@ -294,12 +282,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.9.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.9.0/alignCamera_2022.9.0.zip"
-            },
-            {
-                "version": "2022.8.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/alignCamera_2022.8.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/alignCamera_2023.04.0.zip"
             }
         ]
     },
@@ -314,8 +298,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.10.1",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.10.1/crossSectionalView_2022.10.1.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/crossSectionalView_2023.04.0.zip"
             }
         ]
     },
@@ -330,8 +314,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.8.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/syncViewport_2022.8.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/syncViewport_2023.04.0.zip"
             }
         ]
     },
@@ -346,8 +330,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.10.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.10.0/syncCursor_2022.10.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/syncCursor_2023.04.0.zip"
             }
         ]
     },
@@ -362,8 +346,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.10.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.10.0/transformGizmo_2022.10.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/transformGizmo_2023.04.0.zip"
             }
         ]
     }

@@ -1,4 +1,7 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.16)
+
+# keep leading zeros in version string
+cmake_policy(SET CMP0096 NEW)
 
 ##############################################
 ### we use MT for users without C++ runtime

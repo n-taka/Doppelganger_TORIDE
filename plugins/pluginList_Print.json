@@ -10,8 +10,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.8.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/splitIntoIslands_2022.8.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/splitIntoIslands_2023.04.0.zip"
             }
         ]
     },
@@ -26,8 +26,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.8.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/hollowMesh_2022.8.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/hollowMesh_2023.04.0.zip"
             }
         ]
     },
@@ -42,8 +42,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.8.0.MeshFix",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/repairMesh_2022.8.0.MeshFix.zip"
+                "version": "2023.04.0.MeshFix",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/repairMesh_2023.04.0.MeshFix.zip"
             }
         ]
     },
@@ -58,8 +58,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2022.8.0.MeshFix",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/repairAllMeshes_2022.8.0.MeshFix.zip"
+                "version": "2023.04.0.MeshFix",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/repairAllMeshes_2023.04.0.MeshFix.zip"
             }
         ]
     },
@@ -74,8 +74,8 @@
         "hasModuleJS": true,
         "versions": [
             {
-                "version": "2202.8.0",
-                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2022.8.0/estimateThickness_2022.8.0.zip"
+                "version": "2023.04.0",
+                "URL": "https://github.com/n-taka/Doppelganger_Plugin/releases/download/v2023.04.0/estimateThickness_2023.04.0.zip"
             }
         ]
     }

@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.16)
 
 ##############################################
 ### project
 ##############################################
 project(meshErrorInfo
-    VERSION 2022.8.0
+    VERSION 2023.04.0
     DESCRIPTION "Display mesh errors (e.g. holes, non-manifold)"
     HOMEPAGE_URL "https://github.com/n-taka/Doppelganger_TORIDE"
     LANGUAGES CXX
